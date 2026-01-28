@@ -31,7 +31,7 @@ export default function ProfileSidebar() {
                 href={item.href}
                 className={`text-left px-5 py-3.5 text-sm font-bold transition-all border-b border-zinc-100 last:border-b-0 ${
                   isActive
-                    ? 'bg-zinc-50 text-blue-600 border-l-4 border-l-blue-500'
+                    ? 'bg-zinc-50 text-green-700 border-l-4 border-l-green-700'
                     : 'text-zinc-600 hover:bg-zinc-50 border-l-4 border-l-transparent'
                 }`}
               >

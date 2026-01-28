@@ -43,7 +43,7 @@ export default function ProjectSection() {
             onClick={() => setCurrentStep(step.id)}
             className={`flex-1 px-4 py-3 text-[10px] font-bold uppercase tracking-wider transition-all border-r border-zinc-100 last:border-r-0 ${
               currentStep === step.id
-                ? 'bg-white text-blue-600'
+                ? 'bg-white text-green-700'
                 : 'text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/30'
             }`}
           >
@@ -201,7 +201,7 @@ export default function ProjectSection() {
         </Button>
         <Button
           onClick={handleNext}
-          className={currentStep === steps[steps.length - 1].id ? 'bg-green-600 hover:bg-green-700 border-none' : ''}
+          className={currentStep === steps[steps.length - 1].id ? 'bg-green-700 hover:bg-green-800 border-none' : ''}
         >
           {currentStep === steps[steps.length - 1].id ? 'Finalize Project' : 'Continue'}
         </Button>

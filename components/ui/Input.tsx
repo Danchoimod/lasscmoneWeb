@@ -13,7 +13,7 @@ export default function Input({
   className = '', 
   ...props 
 }: InputProps) {
-  const commonStyles = 'w-full border border-zinc-200 rounded-sm p-3 focus:outline-none focus:ring-1 focus:ring-zinc-400 font-medium text-zinc-800 transition-all placeholder:text-zinc-400 bg-zinc-50/30';
+  const commonStyles = 'w-full border border-zinc-200 rounded-sm p-3 focus:outline-none focus:ring-1 focus:ring-green-700/50 font-medium text-zinc-800 transition-all placeholder:text-zinc-400 bg-zinc-50/30';
   
   return (
     <div className="space-y-2">

@@ -15,7 +15,7 @@ export default function Button({
   const baseStyles = 'font-bold uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-sm';
   
   const variants = {
-    primary: 'bg-zinc-800 text-white hover:bg-zinc-900 shadow-sm active:scale-95',
+    primary: 'bg-green-700 text-white hover:bg-green-800 shadow-sm active:scale-95',
     secondary: 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200 border border-zinc-200 shadow-sm active:scale-95',
     outline: 'bg-transparent text-zinc-700 border border-zinc-200 hover:bg-zinc-50 active:scale-95',
     danger: 'text-red-600 hover:bg-red-50'
