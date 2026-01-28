@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "LF Launcher - Minecraft Launcher",
-  description: "Trình khởi chạy Minecraft mã nguồn mở cho cộng đồng",
+  description: "Minecraft Launcher for Android & PC - LF Launcher",
   icons: {
-    icon: "/icons/icon.jpg",
+    icon: '/icons/icon.jpg', // Reference path from the /public directory
   },
 };
 
