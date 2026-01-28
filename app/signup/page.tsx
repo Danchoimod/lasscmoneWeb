@@ -137,7 +137,8 @@ export default function Signup() {
                   />
                   <label htmlFor="agreeTerms" className="text-xs text-slate-500 leading-relaxed">
                     I agree to the 
-                    <a href="/terms" className="underline mx-1">Terms of Use</a>
+                    <a href="/terms" className="underline mx-1">Terms of Use</a> and 
+                    <a href="/privacy-policy" className="underline mx-1">Privacy Policy</a>.
                   </label>
                 </div>
 

@@ -91,12 +91,6 @@ const Carousel = () => {
         ))}
       </div>
 
-      {/* View Button - Bottom Right */}
-      <div className="absolute bottom-10 right-10 z-30 hidden md:block">
-        <button className="bg-[#333] hover:bg-[#444] text-white px-8 py-3 text-lg transition-colors border border-zinc-700 shadow-xl">
-          View
-        </button>
-      </div>
     </div>
   );
 };
