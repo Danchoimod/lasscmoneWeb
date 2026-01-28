@@ -2,7 +2,7 @@ import React from 'react';
 import SectionHeading from '@/components/ui/SectionHeading';
 
 const followedUsers = [
-  { id: 1, name: 'Phu Pham' },
+  { id: 1, name: 'Mod2090' },
   { id: 2, name: 'Lasscmone' },
   { id: 3, name: 'Steve' },
   { id: 4, name: 'Alex' },
