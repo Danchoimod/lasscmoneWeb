@@ -12,7 +12,7 @@ export default function Button({
   className = '', 
   ...props 
 }: ButtonProps) {
-  const baseStyles = 'font-bold uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-sm';
+  const baseStyles = 'font-bold uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-none';
   
   const variants = {
     primary: 'bg-green-700 text-white hover:bg-green-800 shadow-sm active:scale-95',

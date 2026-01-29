@@ -97,7 +97,7 @@ const UserProfilePage = () => {
         </div>
 
         {/* Lưới hiển thị các Card */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {userSubmissions.map((item, index) => (
             <ContentCard key={index} {...item} />
           ))}

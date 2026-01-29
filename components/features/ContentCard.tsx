@@ -28,7 +28,7 @@ const ContentCard = ({
   description,
 }: ContentCardProps) => {
   return (
-    <div className="bg-white border border-zinc-200 rounded-sm overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow h-full">
+    <div className="bg-white border border-zinc-200 rounded-none overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow h-full">
       
       {/* 1. Thumbnail */}
       <div className="relative aspect-video w-full bg-zinc-100">
@@ -63,13 +63,13 @@ const ContentCard = ({
       {/* 3. Footer Info */}
       <div className="px-4 py-3 border-t border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-zinc-200">
+          <div className="w-8 h-8 rounded-none overflow-hidden shrink-0 border border-zinc-200">
             <Image src={authorAvatar} alt={author} width={32} height={32} className="object-cover" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <span className="text-[#3b82f6] font-bold text-[13px] leading-none">By {author}</span>
-              <div className="w-3 h-3 bg-orange-500 rounded-full flex items-center justify-center shrink-0">
+              <div className="w-3 h-3 bg-orange-500 rounded-none flex items-center justify-center shrink-0">
                 <span className="text-[7px] text-white font-black">✓</span>
               </div>
             </div>
@@ -77,7 +77,7 @@ const ContentCard = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-white border border-zinc-200 px-2 py-1 rounded-sm shadow-sm">
+        <div className="flex items-center gap-1 bg-white border border-zinc-200 px-2 py-1 rounded-none shadow-sm">
           <span className="font-bold text-zinc-700 text-sm leading-none">{rating}</span>
           <Star className="w-3.5 h-3.5 fill-orange-400 text-orange-400" />
         </div>

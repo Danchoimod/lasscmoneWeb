@@ -19,24 +19,24 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full shadow-md font-sans">
+    <header className="sticky top-0 z-50 w-full shadow-sm font-sans border-b border-gray-200">
       {/* Top Navbar */}
-      <nav className="flex items-center bg-[#222222] text-[#E0E0E0] h-12 w-full text-sm px-2 gap-2">
+      <nav className="flex items-center bg-white text-gray-700 h-14 w-full text-sm px-4 gap-2">
         
-        {/* Logo */}
+        {/* Logo - Removed rounded-md */}
         <Link href="/" className="flex items-center px-2 cursor-pointer shrink-0">
           <Image
             src="/icons/icon.jpg"
             alt="LF App Icon"
-            width={28}
-            height={28}
-            className="rounded-sm" // Bo nhẹ cho icon đồng bộ
+            width={32}
+            height={32}
+            className="rounded-none shadow-sm"
             priority
           />
         </Link>
 
-        {/* 🔍 Mobile Search Button (Thay thế cho Input) */}
-        <button className="flex md:hidden flex-1 items-center bg-[#333] hover:bg-[#444] rounded px-3 h-8 text-gray-400 transition-colors">
+        {/* 🔍 Mobile Search Button - Changed to rounded-none */}
+        <button className="flex md:hidden flex-1 items-center bg-gray-100 hover:bg-gray-200 rounded-none px-3 h-9 text-gray-500 transition-colors">
           <Search className="w-4 h-4 mr-2" />
           <span className="text-xs">Search...</span>
         </button>
@@ -46,7 +46,7 @@ const Navbar = () => {
           {navItems.map((item) => (
             <div
               key={item.name}
-              className="flex items-center px-3 h-full hover:bg-[#333333] cursor-pointer transition-colors whitespace-nowrap"
+              className="flex items-center px-4 h-full hover:text-blue-600 hover:bg-gray-50 cursor-pointer transition-all whitespace-nowrap font-medium"
             >
               <span>{item.name}</span>
               {item.hasDropdown && (
@@ -57,37 +57,36 @@ const Navbar = () => {
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-1 shrink-0">
-          {/* Desktop actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Search className="hidden md:block w-5 h-5 mx-2 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors" />
+
+          {/* Download Button - Changed to rounded-none */}
           <Link 
             href="/download"
-            className="hidden md:block bg-[#D4A017] hover:bg-[#C19214] text-white font-bold px-3 py-1 rounded-sm text-xs"
+            className="hidden md:block bg-[#D4A017] hover:bg-[#C19214] text-white font-bold px-4 py-1.5 rounded-none text-xs transition-colors"
           >
             DOWNLOAD
           </Link>
 
-          <Link 
+          {/* Login Button - Changed to rounded-none */}
+          <Link
             href="/login"
-            className="hidden md:block bg-[#4CAF50] hover:bg-[#45a049] text-white font-bold px-3 py-1 rounded-sm text-xs"
+            className="hidden md:block bg-[#4CAF50] hover:bg-[#45a049] text-white font-bold px-3 py-1 rounded-none text-xs"
           >
             LOGIN
           </Link>
 
-          <Search className="hidden md:block w-5 h-5 mx-2 cursor-pointer hover:text-white" />
-
-          {/* 👤 User Avatar Square (Mobile & Desktop) */}
+          {/* 👤 User Avatar - Changed rounded-full to rounded-none */}
           <Link href="/profile" className="p-1">
-            <div className="w-8 h-8 bg-[#444] border border-[#555] rounded-sm flex items-center justify-center overflow-hidden hover:border-[#D4A017] transition-all">
-              {/* Nếu có ảnh thật thì dùng <Image />, không thì dùng Icon User */}
-              <User className="w-5 h-5 text-gray-300" />
-              {/* <Image src="/avatar.jpg" width={32} height={32} alt="User" /> */}
+            <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all">
+              <User className="w-5 h-5 text-gray-600" />
             </div>
           </Link>
 
           {/* Hamburger Menu Mobile */}
           <button 
             onClick={() => setOpen(!open)} 
-            className="md:hidden p-1 text-gray-300 hover:text-white"
+            className="md:hidden p-1 text-gray-600 hover:text-black"
           >
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -96,30 +95,31 @@ const Navbar = () => {
 
       {/* Mobile Dropdown Menu */}
       {open && (
-        <div className="absolute top-12 left-0 w-full md:hidden bg-[#1E1E1E] text-[#E0E0E0] border-t border-[#333] shadow-lg max-h-[calc(100vh-48px)] overflow-y-auto">
+        <div className="absolute top-14 left-0 w-full md:hidden bg-white text-gray-800 border-t border-gray-100 shadow-xl max-h-[calc(100vh-56px)] overflow-y-auto">
           {navItems.map((item) => (
             <div
               key={item.name}
-              className="flex items-center justify-between px-4 py-4 border-b border-[#2a2a2a] hover:bg-[#333] cursor-pointer"
+              className="flex items-center justify-between px-6 py-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer"
             >
-              <span className="font-medium">{item.name}</span>
+              <span className="font-medium text-gray-700">{item.name}</span>
               {item.hasDropdown && (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               )}
             </div>
           ))}
 
-          <div className="flex gap-2 p-4 bg-[#181818]">
+          <div className="flex flex-col gap-2 p-6 bg-gray-50">
+            {/* Mobile Buttons - Changed to rounded-none */}
             <Link 
               href="/download"
-              className="flex-1 bg-[#D4A017] text-white font-bold py-3 text-sm text-center rounded-sm"
+              className="w-full bg-[#D4A017] text-white font-bold py-3 text-sm text-center rounded-none shadow-sm"
               onClick={() => setOpen(false)}
             >
               DOWNLOAD
             </Link>
-            <Link 
+            <Link
               href="/login"
-              className="flex-1 bg-[#4CAF50] text-white font-bold py-3 text-sm text-center rounded-sm"
+              className="w-full bg-[#4CAF50] text-white font-bold py-3 text-sm text-center rounded-none"
               onClick={() => setOpen(false)}
             >
               LOGIN
