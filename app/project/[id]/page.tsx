@@ -72,22 +72,31 @@ export default function ProjectDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             <ProjectGallery images={projectData.images} badge={projectData.badge} />
             
-            <div className="bg-white dark:bg-gray-800 rounded-none shadow-sm">
-              <ProjectTabs 
-                tabs={projectData.tabs} 
-                activeTab={activeTab} 
-                onTabChange={setActiveTab} 
-              />
+            {/* Main Content Card - Removed all rounded corners */}
+            <div className="bg-white dark:bg-gray-800 rounded-none shadow-sm border border-gray-200 dark:border-gray-700">
+              
+              {/* Tabs Scroll Container - FIXED FOR MOBILE */}
+              <div className="w-full border-b border-gray-200 dark:border-gray-700">
+                <div className="overflow-x-auto overflow-y-hidden transition-all scrollbar-hide">
+                  <div className="min-w-max">
+                    <ProjectTabs 
+                      tabs={projectData.tabs} 
+                      activeTab={activeTab} 
+                      onTabChange={setActiveTab} 
+                    />
+                  </div>
+                </div>
+              </div>
               
               <div className="p-6 text-gray-700 dark:text-gray-300 max-w-none">
                 {activeTab === 'description' && (
-                  <>
-                    <h2 className="text-2xl font-bold mb-4 italic text-gray-900 dark:text-white">About {projectData.title}</h2>
+                  <div className="animate-in fade-in duration-300">
+                    <h2 className="text-2xl font-bold mb-4 italic text-gray-900 dark:text-white uppercase tracking-tight">About {projectData.title}</h2>
                     <p className="mb-4">
                         Unknown Technology changes your complete play style. You create complex machines and try to survive in a world where technology is the only key to survival. 
                         This add-on introduces over 50 new blocks, modular machinery, and a completely new energy system (Redstone Flux compatible).
                     </p>
-                    <h3 className="text-lg font-bold mt-6 mb-2 text-gray-900 dark:text-white">Key Features:</h3>
+                    <h3 className="text-lg font-bold mt-6 mb-2 text-gray-900 dark:text-white uppercase">Key Features:</h3>
                     <ul className="list-disc pl-5 space-y-2 mb-4">
                       <li><strong>Automated Mining:</strong> Build drills that mine for you while you focus on building.</li>
                       <li><strong>Power Generation:</strong> Solar panels, wind turbines, and coal generators.</li>
@@ -97,31 +106,42 @@ export default function ProjectDetailPage() {
                     <p>
                         Join the discord community for updates and to share your builds! This mod is designed for both single-player survival and multiplayer SMP servers.
                     </p>
-                  </>
+                  </div>
                 )}
+                
                 {activeTab === 'changelog' && (
-                  <p className="text-gray-500 italic">No changelog entries yet.</p>
+                  <div className="animate-in fade-in duration-300">
+                    <p className="text-gray-500 italic">No changelog entries yet.</p>
+                  </div>
                 )}
+                
                 {activeTab === 'comments' && (
-                  <p className="text-gray-500 italic">Comments section coming soon...</p>
+                  <div className="animate-in fade-in duration-300">
+                    <p className="text-gray-500 italic">Comments section coming soon...</p>
+                  </div>
                 )}
+                
                 {activeTab === 'installation' && (
-                  <p className="text-gray-500 italic">Installation guide coming soon...</p>
+                  <div className="animate-in fade-in duration-300">
+                    <p className="text-gray-500 italic">Installation guide coming soon...</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
           {/* Right Column */}
-          <ProjectSidebar 
-            title={projectData.title}
-            category={projectData.category}
-            event={projectData.event}
-            creator={projectData.creator}
-            stats={projectData.stats}
-            tags={projectData.tags}
-            otherFromCreator={projectData.otherFromCreator}
-          />
+          <div className="lg:col-span-1">
+            <ProjectSidebar 
+              title={projectData.title}
+              category={projectData.category}
+              event={projectData.event}
+              creator={projectData.creator}
+              stats={projectData.stats}
+              tags={projectData.tags}
+              otherFromCreator={projectData.otherFromCreator}
+            />
+          </div>
         </div>
       </main>
 
