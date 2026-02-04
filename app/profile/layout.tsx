@@ -48,15 +48,6 @@ function ProfileSidebar() {
           Logout / Exit
         </Link>
       </nav>
-
-      {/* Thông tin phụ ở đáy */}
-      <div className="p-4 mt-10">
-        <div className="p-3 border border-gray-300 bg-white text-[11px] text-gray-500 leading-relaxed shadow-sm">
-          <strong>System Info:</strong>
-          <p>Last login: 2026-01-29</p>
-          <p>IP: 192.168.1.1</p>
-        </div>
-      </div>
     </div>
   );
 }
