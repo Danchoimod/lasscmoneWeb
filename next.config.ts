@@ -4,9 +4,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-        port: '',
-        pathname: '/**',
+        hostname: '**', // Cho phép tất cả các domain dùng https
+      },
+      {
+        protocol: 'http',
+        hostname: '**', // Cho phép tất cả các domain dùng http (nếu cần)
       },
     ],
   },

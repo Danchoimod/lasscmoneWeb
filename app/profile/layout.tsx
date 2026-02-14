@@ -3,8 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Navbar from '@/components/common/Navbar';
-import Footer from '@/components/common/Footer';
 
 function ProfileSidebar() {
   const pathname = usePathname();
@@ -30,11 +28,10 @@ function ProfileSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`block px-4 py-3 text-sm border-b border-gray-200 transition-none ${
-                isActive
-                  ? 'bg-white text-black font-bold border-l-4 border-l-green-600'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-black'
-              }`}
+              className={`block px-4 py-3 text-sm border-b border-gray-200 transition-none ${isActive
+                ? 'bg-white text-black font-bold border-l-4 border-l-green-600'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-black'
+                }`}
             >
               {item.label}
             </Link>
@@ -58,10 +55,8 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50/50 text-zinc-900 font-sans">
-      <Navbar />
-      
-      <div className="flex-1 flex flex-col md:flex-row w-full max-w-7xl mx-auto py-12 px-6 gap-8">
+    <div className="bg-slate-50/50 text-zinc-900 font-sans">
+      <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto py-12 px-6 gap-8">
         <div className="w-full md:w-64">
           <ProfileSidebar />
         </div>
@@ -70,8 +65,6 @@ export default function ProfileLayout({
           {children}
         </main>
       </div>
-
-      <Footer />
     </div>
   );
 }

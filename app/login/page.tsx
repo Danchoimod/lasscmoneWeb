@@ -1,14 +1,10 @@
 "use client";
 
 import React from "react";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
 
 export default function Login() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#F6F6F6] font-sans text-zinc-900">
-      {/* Navbar xuất hiện cố định ở trên */}
-      <Navbar />
+    <div className="bg-[#F6F6F6] font-sans text-zinc-900">
 
       <main className="flex-grow">
         {/* Section Đăng nhập: Chiếm trung tâm màn hình */}
@@ -29,20 +25,20 @@ export default function Login() {
               <div className="flex flex-col gap-3">
                 {/* Discord Button */}
                 <button className="flex h-11 w-full items-center justify-center gap-3  border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-[0.98]">
-                  <img 
-                    src="https://www.svgrepo.com/show/353655/discord-icon.svg" 
-                    alt="Discord" 
-                    className="h-5 w-5" 
+                  <img
+                    src="https://www.svgrepo.com/show/353655/discord-icon.svg"
+                    alt="Discord"
+                    className="h-5 w-5"
                   />
                   Continue with Discord
                 </button>
 
                 {/* Google Button */}
                 <button className="flex h-11 w-full items-center justify-center gap-3  border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-[0.98]">
-                  <img 
-                    src="https://www.svgrepo.com/show/475656/google-color.svg" 
-                    alt="Google" 
-                    className="h-5 w-5" 
+                  <img
+                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    alt="Google"
+                    className="h-5 w-5"
                   />
                   Continue with Google
                 </button>
@@ -62,25 +58,25 @@ export default function Login() {
               <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                 <div>
                   <label className="sr-only" htmlFor="email">Email address</label>
-                  <input 
+                  <input
                     id="email"
-                    name="email" 
-                    type="email" 
-                    required 
-                    className="block w-full  border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black" 
-                    placeholder="Email Address" 
+                    name="email"
+                    type="email"
+                    required
+                    className="block w-full  border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black"
+                    placeholder="Email Address"
                   />
                 </div>
 
                 <div>
                   <label className="sr-only" htmlFor="password">Password</label>
-                  <input 
+                  <input
                     id="password"
-                    name="password" 
-                    type="password" 
-                    required 
-                    className="block w-full  border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black" 
-                    placeholder="Password" 
+                    name="password"
+                    type="password"
+                    required
+                    className="block w-full  border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black"
+                    placeholder="Password"
                   />
                 </div>
 
@@ -90,7 +86,7 @@ export default function Login() {
                   </a>
                 </div>
 
-                <button 
+                <button
                   type="submit"
                   className="w-full  bg-black py-3 text-sm font-bold text-white transition-all hover:bg-zinc-800 active:scale-[0.99]"
                 >

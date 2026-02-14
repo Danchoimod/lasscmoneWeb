@@ -4,8 +4,6 @@ import React from "react";
 import Image from "next/image";
 import { UserPlus, Calendar, Box, ShieldCheck } from "lucide-react";
 import ContentCard from "@/components/features/ContentCard";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
 
 const UserProfilePage = () => {
   // Sử dụng ảnh mặc định /next.svg
@@ -20,7 +18,8 @@ const UserProfilePage = () => {
   };
 
   // Tạo mảng 8 bài viết với ảnh mặc định
-  const userSubmissions = Array(3).fill({
+  const userSubmissions = Array(3).fill(null).map((_, index) => ({
+    id: `submission-${index}`,
     author: userData.name,
     authorAvatar: userData.avatar,
     rating: 4.8,
@@ -30,20 +29,19 @@ const UserProfilePage = () => {
     tags: ["Survival", "Hardcore"],
     title: "Epic Skyblock Survival Challenge v2.0",
     description: "A custom skyblock map with over 50+ unique islands and custom trading systems for a better experience.",
-  });
+  }));
 
   return (
     <div className="">
       {/* 1. Profile Header Section */}
-      <Navbar></Navbar>
       <div className="bg-white border-b border-zinc-200 pt-12 pb-8 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-end gap-6">
-          
+
           {/* Avatar - Dùng ảnh local next.svg */}
           <div className="relative w-32 h-32 md:w-40 md:h-40 bg-zinc-100 border-4 border-white shadow-lg rounded-sm overflow-hidden -mb-4 flex items-center justify-center p-4">
-            <Image 
-              src={userData.avatar} 
-              alt={userData.name} 
+            <Image
+              src={userData.avatar}
+              alt={userData.name}
               width={160}
               height={160}
               className="object-contain"
@@ -58,7 +56,7 @@ const UserProfilePage = () => {
               </h1>
               {userData.isVerified && (
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-sm">
-                   <ShieldCheck className="w-4 h-4 text-white" />
+                  <ShieldCheck className="w-4 h-4 text-white" />
                 </div>
               )}
             </div>
@@ -103,7 +101,6 @@ const UserProfilePage = () => {
           ))}
         </div>
       </div>
-        <Footer></Footer>
     </div>
   );
 };

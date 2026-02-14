@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -36,8 +34,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F6F6F6] font-sans text-zinc-900">
-      <Navbar />
+    <div className="bg-[#F6F6F6] font-sans text-zinc-900">
 
       <main className="flex-grow">
         <section className="flex flex-col items-center justify-center px-4 py-2 md:py-8">
@@ -67,60 +64,60 @@ export default function Signup() {
                 {/* Username */}
                 <div>
                   <label className="sr-only" htmlFor="username">Username</label>
-                  <input 
+                  <input
                     id="username"
-                    name="username" 
-                    type="text" 
-                    required 
+                    name="username"
+                    type="text"
+                    required
                     value={formData.username}
                     onChange={handleChange}
-                    className="block w-full ro border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black" 
-                    placeholder="Username" 
+                    className="block w-full ro border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black"
+                    placeholder="Username"
                   />
                 </div>
 
                 {/* Email */}
                 <div>
                   <label className="sr-only" htmlFor="email">Email address</label>
-                  <input 
+                  <input
                     id="email"
-                    name="email" 
-                    type="email" 
-                    required 
+                    name="email"
+                    type="email"
+                    required
                     value={formData.email}
                     onChange={handleChange}
-                    className="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black" 
-                    placeholder="Email Address" 
+                    className="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black"
+                    placeholder="Email Address"
                   />
                 </div>
 
                 {/* Password */}
                 <div>
                   <label className="sr-only" htmlFor="password">Password</label>
-                  <input 
+                  <input
                     id="password"
-                    name="password" 
-                    type="password" 
-                    required 
+                    name="password"
+                    type="password"
+                    required
                     value={formData.password}
                     onChange={handleChange}
-                    className="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black" 
-                    placeholder="Password" 
+                    className="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black"
+                    placeholder="Password"
                   />
                 </div>
 
                 {/* Confirm Password */}
                 <div>
                   <label className="sr-only" htmlFor="confirmPassword">Confirm Password</label>
-                  <input 
+                  <input
                     id="confirmPassword"
-                    name="confirmPassword" 
-                    type="password" 
-                    required 
+                    name="confirmPassword"
+                    type="password"
+                    required
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black" 
-                    placeholder="Confirm Password" 
+                    className="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition-all focus:border-black focus:ring-1 focus:ring-black"
+                    placeholder="Confirm Password"
                   />
                 </div>
 
@@ -136,13 +133,13 @@ export default function Signup() {
                     className="mt-1 h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
                   />
                   <label htmlFor="agreeTerms" className="text-xs text-slate-500 leading-relaxed">
-                    I agree to the 
-                    <a href="/terms" className="underline mx-1">Terms of Use</a> and 
+                    I agree to the
+                    <a href="/terms" className="underline mx-1">Terms of Use</a> and
                     <a href="/privacy-policy" className="underline mx-1">Privacy Policy</a>.
                   </label>
                 </div>
 
-                <button 
+                <button
                   type="submit"
                   className="w-full  bg-black py-3 text-sm font-bold text-white transition-all hover:bg-zinc-800 active:scale-[0.99]"
                 >

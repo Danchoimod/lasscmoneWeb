@@ -1,15 +1,12 @@
 "use client";
 
 import React from "react";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
 
 export default function PrivacyPolicy() {
-  const lastModified = "January 29, 2026"; 
+  const lastModified = "January 29, 2026";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#E9ECEF] font-sans text-[#333]">
-      <Navbar />
+    <div className="bg-[#E9ECEF] font-sans text-[#333]">
 
       <main className="mx-auto flex w-full max-w-[1100px] flex-grow gap-6 px-4 py-6">
         {/* Main Content (Left) */}
@@ -60,7 +57,7 @@ export default function PrivacyPolicy() {
             <section className="space-y-3">
               <h2 className="text-lg font-bold text-[#333]">4. Contact Information</h2>
               <p>
-                If you have any questions about this Privacy Policy, please contact us at: 
+                If you have any questions about this Privacy Policy, please contact us at:
                 <a href="mailto:support@lflauncher.org" className="text-[#4F8A10] hover:underline font-medium ml-1">
                   support@lflauncher.org
                 </a>
@@ -72,34 +69,7 @@ export default function PrivacyPolicy() {
             </p>
           </div>
         </div>
-
-        {/* Sidebar (Right) */}
-        <aside className="hidden w-[300px] flex-shrink-0 space-y-6 md:block text-center">
-          {/* Buttons Group */}
-
-          {/* Search Bar */}
-          <div className="relative border border-[#D1D4D7] bg-white p-2">
-            <input 
-              type="text" 
-              placeholder="Search policy content..." 
-              className="w-full border border-[#DDD] px-3 py-2 text-sm italic outline-none focus:border-[#BBB]"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-               </svg>
-            </span>
-          </div>
-
-          {/* Quick Note Box */}
-          <div className="border border-[#D1D4D7] bg-white p-4 text-left text-[13px] text-[#666]">
-            <h3 className="font-bold text-[#333] mb-2 uppercase text-[11px]">Quick Note</h3>
-            <p>Your data is encrypted and handled according to international security standards.</p>
-          </div>
-        </aside>
       </main>
-
-      <Footer />
     </div>
   );
 }
