@@ -21,7 +21,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://stardust.pikamc.vn:25461/api/categories");
+        const response = await fetch("https://stardust.pikamc.vn:25461/api/categories");
         const data = await response.json();
         setCategories(data);
       } catch (error) {
