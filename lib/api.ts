@@ -1,8 +1,30 @@
+import { cookies } from "next/headers";
+
 const API_BASE_URL = "http://localhost:25461/api";
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+    const headers: Record<string, string> = {
+        "Content-Type": "application/json"
+    };
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token")?.value;
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+    } catch (e) {
+        // cookies() might fail in client components
+    }
+    return headers;
+}
 
 export async function getCarousels() {
     try {
-        const res = await fetch(`${API_BASE_URL}/carousels`, { next: { revalidate: 3600 } });
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE_URL}/carousels`, {
+            headers,
+            next: { revalidate: 3600 }
+        });
         if (!res.ok) return [];
         const result = await res.json();
         return result.status === "success" ? result.data : [];
@@ -14,11 +36,15 @@ export async function getCarousels() {
 
 export async function getPackages(categorySlug?: string | null) {
     try {
+        const headers = await getAuthHeaders();
         let url = `${API_BASE_URL}/packages`;
         if (categorySlug) {
             url = `${API_BASE_URL}/categories/${categorySlug}/packages?page=1&limit=12`;
         }
-        const res = await fetch(url, { next: { revalidate: 60 } });
+        const res = await fetch(url, {
+            headers,
+            next: { revalidate: 60 }
+        });
         if (!res.ok) return [];
         const result = await res.json();
 
@@ -37,7 +63,11 @@ export async function getPackages(categorySlug?: string | null) {
 
 export async function searchPackages(query: string) {
     try {
-        const res = await fetch(`${API_BASE_URL}/packages/search?search=${encodeURIComponent(query)}&limit=12`, { cache: 'no-store' });
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE_URL}/packages/search?search=${encodeURIComponent(query)}&limit=12`, {
+            headers,
+            cache: 'no-store'
+        });
         if (!res.ok) return [];
         const result = await res.json();
 
@@ -54,8 +84,12 @@ export async function searchPackages(query: string) {
 
 export async function getPackageBySlug(slug: string) {
     try {
+        const headers = await getAuthHeaders();
         console.log(`[API] Fetching package: ${slug}`);
-        const res = await fetch(`${API_BASE_URL}/packages/${slug}`, { next: { revalidate: 60 } });
+        const res = await fetch(`${API_BASE_URL}/packages/${slug}`, {
+            headers,
+            next: { revalidate: 60 }
+        });
         console.log(`[API] Fetch status: ${res.status}`);
         if (!res.ok) return null;
         const result = await res.json();
@@ -72,7 +106,11 @@ export async function getPackageBySlug(slug: string) {
 
 export async function getPackageComments(packageId: number) {
     try {
-        const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}`, { next: { revalidate: 30 } });
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}`, {
+            headers,
+            next: { revalidate: 30 }
+        });
         if (!res.ok) return { comments: [], total: 0 };
         const result = await res.json();
         if (result.status === "success" && result.data) {
@@ -90,7 +128,11 @@ export async function getPackageComments(packageId: number) {
 
 export async function getCategories() {
     try {
-        const res = await fetch(`${API_BASE_URL}/categories`, { next: { revalidate: 3600 } });
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE_URL}/categories`, {
+            headers,
+            next: { revalidate: 3600 }
+        });
         if (!res.ok) return [];
         return res.json();
     } catch (error) {
