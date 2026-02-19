@@ -7,9 +7,17 @@ import ContentGrid from "@/components/features/ContentGrid";
 
 export default function HomePage() {
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleCategoryChange = (slug: string | null) => {
     setSelectedCategorySlug(slug);
+    // Optionally clear search when category changes, or vice-versa
+    if (slug) setSearchQuery("");
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    if (query) setSelectedCategorySlug(null);
   };
 
   return (
@@ -20,10 +28,16 @@ export default function HomePage() {
       {/* Main Content Area */}
       <div className="w-full pb-20">
         {/* Search and Filters */}
-        <FilterSection onCategoryChange={handleCategoryChange} />
+        <FilterSection
+          onCategoryChange={handleCategoryChange}
+          onSearchChange={handleSearchChange}
+        />
 
         {/* Content Grid */}
-        <ContentGrid categorySlug={selectedCategorySlug} />
+        <ContentGrid
+          categorySlug={selectedCategorySlug}
+          searchQuery={searchQuery}
+        />
       </div>
     </div>
   );

@@ -25,9 +25,10 @@ interface Package {
 
 interface ContentGridProps {
   categorySlug?: string | null;
+  searchQuery?: string;
 }
 
-const ContentGrid = ({ categorySlug }: ContentGridProps) => {
+const ContentGrid = ({ categorySlug, searchQuery }: ContentGridProps) => {
   const [packages, setPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +37,15 @@ const ContentGrid = ({ categorySlug }: ContentGridProps) => {
     const fetchPackages = async () => {
       try {
         setLoading(true);
-        const url = categorySlug
-          ? `/api-backend/categories/${categorySlug}/packages?page=1&limit=12`
-          : "/api-backend/packages";
+        let url = "";
+
+        if (searchQuery) {
+          url = `/api-backend/packages/search?search=${encodeURIComponent(searchQuery)}&limit=12`;
+        } else if (categorySlug) {
+          url = `/api-backend/categories/${categorySlug}/packages?page=1&limit=12`;
+        } else {
+          url = "/api-backend/packages";
+        }
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -62,7 +69,7 @@ const ContentGrid = ({ categorySlug }: ContentGridProps) => {
     };
 
     fetchPackages();
-  }, [categorySlug]);
+  }, [categorySlug, searchQuery]);
 
   if (loading) {
     return (

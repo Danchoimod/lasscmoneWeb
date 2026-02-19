@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { Search, ChevronDown, SlidersHorizontal, X } from "lucide-react";
 
 interface Category {
   id: number;
@@ -11,12 +11,15 @@ interface Category {
 
 interface FilterSectionProps {
   onCategoryChange: (categorySlug: string | null) => void;
+  onSearchChange: (query: string) => void;
   initialSlug?: string | null;
+  initialSearch?: string;
 }
 
-const FilterSection = ({ onCategoryChange, initialSlug = null }: FilterSectionProps) => {
+const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, initialSearch = "" }: FilterSectionProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategorySlug, setActiveCategorySlug] = useState<string | null>(initialSlug);
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
 
   useEffect(() => {
     if (initialSlug !== undefined) {
@@ -29,7 +32,6 @@ const FilterSection = ({ onCategoryChange, initialSlug = null }: FilterSectionPr
       try {
         const response = await fetch("/api-backend/categories");
         const data = await response.json();
-        // The API returns an array of categories directly
         setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -37,6 +39,15 @@ const FilterSection = ({ onCategoryChange, initialSlug = null }: FilterSectionPr
     };
     fetchCategories();
   }, []);
+
+  // Debounced search logic
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      onSearchChange(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, onSearchChange]);
 
   const handleCategoryClick = (slug: string | null) => {
     setActiveCategorySlug(slug);
@@ -59,7 +70,17 @@ const FilterSection = ({ onCategoryChange, initialSlug = null }: FilterSectionPr
             type="text"
             placeholder="Search for mods, maps, or creators..."
             className="bg-transparent outline-none w-full text-sm text-gray-800 placeholder-gray-400 tracking-tight"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="text-gray-400 hover:text-black transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Sort Dropdown - Khối màu xám nhạt để phân biệt với Search */}

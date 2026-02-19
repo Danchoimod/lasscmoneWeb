@@ -18,6 +18,10 @@ const Navbar = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
 
+  // Search states
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -30,6 +34,15 @@ const Navbar = () => {
     };
     fetchCategories();
   }, []);
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
 
   const navItems = categories.map(cat => ({
     name: cat.name,
@@ -56,6 +69,36 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-sm font-sans border-b border-gray-200">
+      {/* Search Overlay */}
+      {isSearchOpen && (
+        <div className="absolute inset-0 z-[100] bg-white flex items-center px-4 md:px-8 animate-in fade-in slide-in-from-top duration-200">
+          <form onSubmit={handleSearchSubmit} className="flex items-center w-full max-w-6xl mx-auto gap-4">
+            <Search className="w-5 h-5 text-gray-400" />
+            <div className="flex-1 relative">
+              <input
+                autoFocus
+                type="text"
+                placeholder="Search for projects, mods, creators..."
+                className="w-full bg-transparent border-none outline-none text-lg py-2 placeholder-gray-400 font-medium"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Escape' && setIsSearchOpen(false)}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSearchOpen(false);
+                setSearchQuery("");
+              }}
+              className="p-2 hover:bg-gray-100 rounded-none text-gray-500 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </form>
+        </div>
+      )}
+
       {/* Top Navbar */}
       <nav className="flex items-center bg-white text-gray-700 h-14 w-full text-sm px-4 gap-2">
 
@@ -63,16 +106,19 @@ const Navbar = () => {
         <Link href="/" className="flex items-center px-2 cursor-pointer shrink-0">
           <Image
             src="/icons/icon.jpg"
-            alt="LF App Icon"
+            alt="LF Launcher Logo"
             width={32}
             height={32}
-            className="rounded-none shadow-sm"
+            className="object-cover rounded-none shadow-sm"
             priority
           />
         </Link>
 
         {/* 🔍 Mobile Search Button - Changed to rounded-none */}
-        <button className="flex md:hidden flex-1 items-center bg-gray-100 hover:bg-gray-200 rounded-none px-3 h-9 text-gray-500 transition-colors">
+        <button
+          onClick={() => setIsSearchOpen(true)}
+          className="flex md:hidden flex-1 items-center bg-gray-100 hover:bg-gray-200 rounded-none px-3 h-9 text-gray-500 transition-colors"
+        >
           <Search className="w-4 h-4 mr-2" />
           <span className="text-xs">Search...</span>
         </button>
@@ -120,7 +166,9 @@ const Navbar = () => {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2 shrink-0">
-          <Search className="hidden md:block w-5 h-5 mx-2 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors" />
+          <button onClick={() => setIsSearchOpen(true)}>
+            <Search className="hidden md:block w-5 h-5 mx-2 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors" />
+          </button>
 
           {/* Download Button - Changed to rounded-none */}
           <Link
