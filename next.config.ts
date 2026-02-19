@@ -16,7 +16,7 @@ const nextConfig = {
     return [
       {
         source: '/api-backend/:path*',
-        destination: 'http://stardust.pikamc.vn:25461/api/:path*',
+        destination: 'http://localhost:25461/api/:path*',
       },
     ]
   },

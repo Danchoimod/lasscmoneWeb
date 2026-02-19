@@ -1,5 +1,6 @@
 import React from 'react';
 import { Download, Heart, CheckCircle, Star } from 'lucide-react';
+import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 
@@ -9,6 +10,7 @@ interface ProjectSidebarProps {
   event?: string;
   creator: {
     name: string;
+    slug: string;
     avatar: string;
     verified?: boolean;
   };
@@ -60,13 +62,13 @@ export default function ProjectSidebar({
         <div className="mt-8 space-y-4">
           <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
             <span className="text-gray-500 dark:text-gray-400 text-sm">Created by</span>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-semibold">{creator.name}</span>
+            <Link href={`/user/${creator.slug}`} className="flex items-center space-x-2 group/creator hover:opacity-80 transition-opacity">
+              <span className="text-sm font-semibold group-hover/creator:text-emerald-500 transition-colors">{creator.name}</span>
               {creator.verified && <CheckCircle className="w-3 h-3 text-blue-500" />}
-              <div className="relative w-6 h-6 rounded-none overflow-hidden">
+              <div className="relative w-6 h-6 rounded-none overflow-hidden border border-gray-200 group-hover/creator:border-emerald-500 transition-colors">
                 <Image src={creator.avatar} alt={creator.name} fill className="object-cover" />
               </div>
-            </div>
+            </Link>
           </div>
           <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700 text-sm">
             <span className="text-gray-500 dark:text-gray-400">Version</span>
@@ -95,8 +97,8 @@ export default function ProjectSidebar({
         <h3 className="font-bold mb-4">Tags</h3>
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
-            <span 
-              key={tag} 
+            <span
+              key={tag}
               className="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-none text-xs font-medium hover:bg-emerald-500 hover:text-white cursor-pointer transition-colors"
             >
               {tag}
