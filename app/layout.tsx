@@ -22,19 +22,22 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
+import { getCategories } from "@/lib/api";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const categories = await getCategories();
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="flex min-h-screen flex-col">
-          <Navbar />
+          <Navbar initialCategories={categories} />
           <main className="flex-1">
             {children}
           </main>

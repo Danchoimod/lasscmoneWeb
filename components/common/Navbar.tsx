@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Search, ChevronDown, Menu, X, User } from "lucide-react";
 
 interface Category {
@@ -13,32 +14,24 @@ interface Category {
   children?: Category[];
 }
 
-const Navbar = () => {
+interface NavbarProps {
+  initialCategories?: Category[];
+}
+
+const Navbar = ({ initialCategories = [] }: NavbarProps) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories] = useState<Category[]>(initialCategories);
   const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
 
   // Search states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("/api-backend/categories");
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
       setSearchQuery("");
     }

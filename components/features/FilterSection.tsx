@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Search, ChevronDown, SlidersHorizontal, X } from "lucide-react";
 
 interface Category {
@@ -10,24 +11,28 @@ interface Category {
 }
 
 interface FilterSectionProps {
-  onCategoryChange: (categorySlug: string | null) => void;
-  onSearchChange: (query: string) => void;
+  onCategoryChange?: (categorySlug: string | null) => void;
+  onSearchChange?: (query: string) => void;
   initialSlug?: string | null;
   initialSearch?: string;
+  initialCategories?: Category[];
 }
 
-const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, initialSearch = "" }: FilterSectionProps) => {
+const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, initialSearch = "", initialCategories = [] }: FilterSectionProps) => {
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategorySlug, setActiveCategorySlug] = useState<string | null>(initialSlug);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
 
   useEffect(() => {
-    if (initialSlug !== undefined) {
-      setActiveCategorySlug(initialSlug);
-    }
+    setActiveCategorySlug(initialSlug);
   }, [initialSlug]);
 
   useEffect(() => {
+    if (initialCategories.length > 0) {
+      setCategories(initialCategories);
+      return;
+    }
     const fetchCategories = async () => {
       try {
         const response = await fetch("/api-backend/categories");
@@ -40,18 +45,30 @@ const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, i
     fetchCategories();
   }, []);
 
-  // Debounced search logic
+  // Debounced search logic - Navigates to search page
   useEffect(() => {
+    if (searchTerm === initialSearch) return;
+
     const delayDebounceFn = setTimeout(() => {
-      onSearchChange(searchTerm);
+      if (searchTerm.trim()) {
+        router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+      } else if (initialSearch) {
+        // If we clear search, go back to home or the root of search
+        router.push(window.location.pathname);
+      }
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm, onSearchChange]);
+  }, [searchTerm, router, initialSearch]);
 
   const handleCategoryClick = (slug: string | null) => {
     setActiveCategorySlug(slug);
-    onCategoryChange(slug);
+    if (slug) {
+      router.push(`/?category=${slug}`);
+    } else {
+      router.push("/");
+    }
+    onCategoryChange?.(slug);
   };
 
   const activeCategoryName = activeCategorySlug

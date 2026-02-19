@@ -1,38 +1,40 @@
-"use client";
-
 import React, { Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import ContentGrid from "@/components/features/ContentGrid";
 import FilterSection from "@/components/features/FilterSection";
 import Link from "next/link";
 import { ChevronRight, Search as SearchIcon } from "lucide-react";
+import { searchPackages, getPackages, getCategories } from "@/lib/api";
 
-function SearchContent() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const initialQuery = searchParams.get("q") || "";
-
-    const [searchQuery, setSearchQuery] = React.useState(initialQuery);
-    const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
-
-    const handleSearchChange = (query: string) => {
-        setSearchQuery(query);
-        // Sync with URL without reloading
-        const params = new URLSearchParams(window.location.search);
+async function SearchResults({ query, category }: { query: string; category: string | null }) {
+    let packages = [];
+    try {
         if (query) {
-            params.set("q", query);
+            packages = await searchPackages(query);
+        } else if (category) {
+            packages = await getPackages(category);
         } else {
-            params.delete("q");
+            packages = await getPackages();
         }
-        router.replace(`/search?${params.toString()}`, { scroll: false });
-    };
+    } catch (error) {
+        console.error("Failed to fetch packages on server:", error);
+    }
 
-    const handleCategoryChange = (slug: string | null) => {
-        setSelectedCategory(slug);
-        if (slug) setSearchQuery(""); // Clear search when picking a category or keep both? 
-        // Usually on a search page, we want to filter search results by category, 
-        // but based on HomePage logic, they are exclusive.
-    };
+    return (
+        <div className="mt-8">
+            <ContentGrid packages={packages} />
+        </div>
+    );
+}
+
+export default async function SearchPage({
+    searchParams: searchParamsPromise,
+}: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+    const searchParams = await searchParamsPromise;
+    const query = typeof searchParams.q === 'string' ? searchParams.q : "";
+    const category = typeof searchParams.category === 'string' ? searchParams.category : null;
+    const categories = await getCategories();
 
     return (
         <div className="bg-[#F6F6F6] min-h-screen font-sans text-zinc-900 pb-20">
@@ -47,10 +49,10 @@ function SearchContent() {
                     <div className="flex items-end gap-3">
                         <SearchIcon className="w-8 h-8 text-green-600 mb-1" />
                         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tighter uppercase italic">
-                            {searchQuery ? (
-                                <>Search: <span className="text-green-600">{searchQuery}</span></>
-                            ) : selectedCategory ? (
-                                <>Category: <span className="text-green-600 font-black">{selectedCategory}</span></>
+                            {query ? (
+                                <>Search: <span className="text-green-600">{query}</span></>
+                            ) : category ? (
+                                <>Category: <span className="text-green-600 font-black">{category}</span></>
                             ) : (
                                 "All Projects"
                             )}
@@ -61,30 +63,19 @@ function SearchContent() {
 
             {/* Search and Filters */}
             <FilterSection
-                onCategoryChange={handleCategoryChange}
-                onSearchChange={handleSearchChange}
-                initialSearch={initialQuery}
+                initialSearch={query}
+                initialSlug={category}
+                initialCategories={categories}
             />
 
             {/* Results Section */}
-            <div className="mt-8">
-                <ContentGrid
-                    searchQuery={searchQuery}
-                    categorySlug={selectedCategory}
-                />
-            </div>
+            <Suspense fallback={
+                <div className="w-full max-w-6xl mx-auto px-4 py-8 flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
+                </div>
+            }>
+                <SearchResults query={query} category={category} />
+            </Suspense>
         </div>
-    );
-}
-
-export default function SearchPage() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-[#F6F6F6]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
-            </div>
-        }>
-            <SearchContent />
-        </Suspense>
     );
 }

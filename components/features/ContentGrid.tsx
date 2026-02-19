@@ -24,53 +24,12 @@ interface Package {
 }
 
 interface ContentGridProps {
-  categorySlug?: string | null;
-  searchQuery?: string;
+  packages?: Package[];
+  loading?: boolean;
+  error?: string | null;
 }
 
-const ContentGrid = ({ categorySlug, searchQuery }: ContentGridProps) => {
-  const [packages, setPackages] = useState<Package[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        setLoading(true);
-        let url = "";
-
-        if (searchQuery) {
-          url = `/api-backend/packages/search?search=${encodeURIComponent(searchQuery)}&limit=12`;
-        } else if (categorySlug) {
-          url = `/api-backend/categories/${categorySlug}/packages?page=1&limit=12`;
-        } else {
-          url = "/api-backend/packages";
-        }
-
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Failed to fetch packages");
-        }
-        const result = await response.json();
-
-        // Handle flexible response formats
-        const packageList = result.data?.packages || result.packages || (Array.isArray(result) ? result : []);
-
-        if (packageList) {
-          setPackages(packageList);
-        } else {
-          throw new Error("Invalid API response format");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPackages();
-  }, [categorySlug, searchQuery]);
-
+const ContentGrid = ({ packages = [], loading = false, error = null }: ContentGridProps) => {
   if (loading) {
     return (
       <div className="w-full max-w-6xl mx-auto px-4 py-8 flex justify-center items-center h-64">
@@ -126,7 +85,7 @@ const ContentGrid = ({ categorySlug, searchQuery }: ContentGridProps) => {
           <ContentCard
             key={pkg.id}
             id={pkg.id}
-            slug={pkg.slug}
+            slug={pkg.slug || pkg.id.toString()}
             author={pkg.user?.username || "Anonymous"}
             authorSlug={pkg.user?.slug || (pkg.user ? `${pkg.user.id}-${pkg.user.username.toLowerCase().replace(/\s+/g, '-')}` : "")}
             authorAvatar={pkg.user?.avatarUrl || "https://placehold.co/100x100?text=A"}

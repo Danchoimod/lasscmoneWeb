@@ -1,43 +1,39 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
 import Carousel from "@/components/features/Carousel";
 import FilterSection from "@/components/features/FilterSection";
 import ContentGrid from "@/components/features/ContentGrid";
+import { getCarousels, getPackages, getCategories } from "@/lib/api";
 
-export default function HomePage() {
-  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+export default async function HomePage({
+  searchParams: searchParamsPromise,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const searchParams = await searchParamsPromise;
+  const categorySlug = typeof searchParams.category === 'string' ? searchParams.category : null;
 
-  const handleCategoryChange = (slug: string | null) => {
-    setSelectedCategorySlug(slug);
-    // Optionally clear search when category changes, or vice-versa
-    if (slug) setSearchQuery("");
-  };
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-    if (query) setSelectedCategorySlug(null);
-  };
+  // Fetch data on the server
+  const [slides, packages, categories] = await Promise.all([
+    getCarousels(),
+    getPackages(categorySlug),
+    getCategories(),
+  ]);
 
   return (
     <div className="bg-[#F6F6F6] font-sans text-zinc-900">
-      {/* Hero Carousel Section */}
-      <Carousel />
+      {/* Hero Carousel Section - Prefetched */}
+      <Carousel initialSlides={slides} />
 
       {/* Main Content Area */}
       <div className="w-full pb-20">
-        {/* Search and Filters */}
+        {/* Search and Filters - URL based */}
         <FilterSection
-          onCategoryChange={handleCategoryChange}
-          onSearchChange={handleSearchChange}
+          initialSlug={categorySlug}
+          initialCategories={categories}
         />
 
-        {/* Content Grid */}
-        <ContentGrid
-          categorySlug={selectedCategorySlug}
-          searchQuery={searchQuery}
-        />
+        {/* Content Grid - Prefetched */}
+        <ContentGrid packages={packages} />
       </div>
     </div>
   );

@@ -24,35 +24,13 @@ interface CarouselItem {
   } | null;
 }
 
-const Carousel = () => {
+interface CarouselProps {
+  initialSlides: CarouselItem[];
+}
+
+const Carousel = ({ initialSlides }: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [slides, setSlides] = useState<CarouselItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCarousels = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api-backend/carousels");
-        if (!response.ok) {
-          throw new Error("Failed to fetch carousels");
-        }
-        const result = await response.json();
-        if (result.status === "success" && Array.isArray(result.data)) {
-          setSlides(result.data);
-        } else {
-          throw new Error("Invalid data format");
-        }
-      } catch (err) {
-        // Optionally handle error state if needed, but for this revert, we're simplifying
-        console.error("Failed to fetch carousels:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCarousels();
-  }, []);
+  const [slides] = useState<CarouselItem[]>(initialSlides);
 
   const nextSlide = () => {
     if (slides.length === 0) return;
@@ -71,7 +49,7 @@ const Carousel = () => {
     return () => clearInterval(interval);
   }, [slides.length, currentIndex]);
 
-  if (loading || slides.length === 0) {
+  if (slides.length === 0) {
     return (
       <div className="w-full max-w-6xl mx-auto h-[400px] bg-zinc-900 animate-pulse flex items-center justify-center">
         <span className="text-zinc-700 text-6xl font-bold opacity-10">MINECRAFT</span>
@@ -111,8 +89,8 @@ const Carousel = () => {
           <div
             key={index}
             className={`absolute flex flex-col items-center transition-all duration-700 ease-out ${index === currentIndex
-                ? "opacity-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 translate-y-4 pointer-events-none"
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-4 pointer-events-none"
               }`}
           >
             <Link
