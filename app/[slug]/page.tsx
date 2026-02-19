@@ -1,18 +1,20 @@
-"use client";
-
 import React from "react";
-import { useParams } from "next/navigation";
-import Carousel from "@/components/features/Carousel";
-import FilterSection from "@/components/features/FilterSection";
 import ContentGrid from "@/components/features/ContentGrid";
+import { getPackages } from "@/lib/api";
 
-export default function CategoryPage() {
-    const params = useParams();
-    const slug = params?.slug as string;
+export default async function CategoryPage({
+    params: paramsPromise
+}: {
+    params: Promise<{ slug: string }>;
+}) {
+    const params = await paramsPromise;
+    const slug = params.slug;
+
+    // Fetch packages for this specific category
+    const packages = await getPackages(slug);
 
     return (
         <div className="bg-[#F6F6F6] font-sans text-zinc-900">
-
             {/* Main Content Area */}
             <div className="w-full pb-20 pt-10">
                 <div className="max-w-6xl mx-auto px-4 mb-8">
@@ -23,7 +25,7 @@ export default function CategoryPage() {
                 </div>
 
                 {/* Content Grid */}
-                <ContentGrid categorySlug={slug} />
+                <ContentGrid packages={packages} />
             </div>
         </div>
     );
