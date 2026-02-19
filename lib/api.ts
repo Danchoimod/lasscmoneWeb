@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_BASE_URL = "http://localhost:25461/api";
+export const API_BASE_URL = process.env.BACKEND_API_URL || "http://localhost:25461/api";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
     const headers: Record<string, string> = {

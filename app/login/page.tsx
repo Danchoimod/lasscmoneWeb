@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { loginAction } from "@/lib/actions";
 
 export default function Login() {
   const router = useRouter();
@@ -16,24 +17,15 @@ export default function Login() {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await loginAction({ email, password });
 
-      const data = await response.json();
-
-      if (response.ok && data.status === "success") {
-        // Token is now set via HttpOnly cookie by the server
-        if (data.data?.user) {
-          localStorage.setItem("user", JSON.stringify(data.data.user));
+      if (result.success) {
+        if (result.user) {
+          localStorage.setItem("user", JSON.stringify(result.user));
         }
         router.push("/");
       } else {
-        setError(data.message || "Invalid credentials. Please try again.");
+        setError(result.error || "Invalid credentials. Please try again.");
       }
     } catch (err) {
       console.error("Login error:", err);
