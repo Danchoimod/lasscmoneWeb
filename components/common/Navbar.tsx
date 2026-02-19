@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Search, ChevronDown, Menu, X, User } from "lucide-react";
 
 interface Category {
@@ -20,9 +20,25 @@ interface NavbarProps {
 
 const Navbar = ({ initialCategories = [] }: NavbarProps) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [categories] = useState<Category[]>(initialCategories);
   const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Error parsing user from localStorage", e);
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+  }, [pathname]);
 
   // Search states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -171,20 +187,28 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
             DOWNLOAD
           </Link>
 
-          {/* Login Button - Changed to rounded-none */}
-          <Link
-            href="/login"
-            className="hidden md:block bg-[#4CAF50] hover:bg-[#45a049] text-white font-bold px-3 py-1 rounded-none text-xs"
-          >
-            LOGIN
-          </Link>
+          {/* Login Button - Hidden if logged in */}
+          {!user && (
+            <Link
+              href="/login"
+              className="hidden md:block bg-[#4CAF50] hover:bg-[#45a049] text-white font-bold px-3 py-1 rounded-none text-xs"
+            >
+              LOGIN
+            </Link>
+          )}
 
-          {/* 👤 User Avatar - Changed rounded-full to rounded-none */}
-          <Link href="/profile" className="p-1">
-            <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all">
-              <User className="w-5 h-5 text-gray-600" />
-            </div>
-          </Link>
+          {/* 👤 User Avatar - Only show if logged in */}
+          {user && (
+            <Link href="/profile" className="p-1">
+              <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all">
+                {user.avatarUrl ? (
+                  <Image src={user.avatarUrl} alt={user.username} width={40} height={40} className="object-cover w-full h-full" />
+                ) : (
+                  <User className="w-5 h-5 text-gray-600" />
+                )}
+              </div>
+            </Link>
+          )}
 
           {/* Hamburger Menu Mobile */}
           <button
@@ -253,13 +277,23 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
             >
               DOWNLOAD
             </Link>
-            <Link
-              href="/login"
-              className="w-full bg-[#4CAF50] text-white font-bold py-3 text-sm text-center rounded-none"
-              onClick={() => setOpen(false)}
-            >
-              LOGIN
-            </Link>
+            {user ? (
+              <Link
+                href="/profile"
+                className="w-full bg-[#4CAF50] text-white font-bold py-3 text-sm text-center rounded-none"
+                onClick={() => setOpen(false)}
+              >
+                MY PROFILE ({user.username})
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="w-full bg-[#4CAF50] text-white font-bold py-3 text-sm text-center rounded-none"
+                onClick={() => setOpen(false)}
+              >
+                LOGIN
+              </Link>
+            )}
           </div>
         </div>
       )}

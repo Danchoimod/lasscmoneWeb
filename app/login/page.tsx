@@ -23,6 +23,7 @@ export default function Login() {
         if (result.user) {
           localStorage.setItem("user", JSON.stringify(result.user));
         }
+        router.refresh();
         router.push("/");
       } else {
         setError(result.error || "Invalid credentials. Please try again.");
