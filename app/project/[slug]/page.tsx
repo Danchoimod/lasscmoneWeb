@@ -102,6 +102,7 @@ export default async function ProjectDetailPage({
               creator={mappedProjectData.creator}
               stats={mappedProjectData.stats}
               tags={mappedProjectData.tags}
+              urls={project.urls}
               otherFromCreator={mappedProjectData.otherFromCreator}
             />
           </div>

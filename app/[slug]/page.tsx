@@ -19,7 +19,7 @@ export default async function CategoryPage({
             <div className="w-full pb-20 pt-10">
                 <div className="max-w-6xl mx-auto px-4 mb-8">
                     <h1 className="text-3xl font-bold text-zinc-900 uppercase tracking-tighter mb-2">
-                        Category: {decodeURIComponent(slug).replace(/-/g, " ")}
+                        {decodeURIComponent(slug).replace(/-/g, " ")}
                     </h1>
                     <div className="w-20 h-1 bg-green-600"></div>
                 </div>

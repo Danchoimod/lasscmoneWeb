@@ -1,8 +1,14 @@
 import React from 'react';
-import { Download, Heart, CheckCircle, Star } from 'lucide-react';
+import { Download, Heart, CheckCircle, Star, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
+
+interface DownloadUrl {
+  id: number;
+  name: string;
+  url: string;
+}
 
 interface ProjectSidebarProps {
   title: string;
@@ -21,6 +27,7 @@ interface ProjectSidebarProps {
     rating: number;
   };
   tags: string[];
+  urls?: DownloadUrl[];
   otherFromCreator: {
     name: string;
     image: string;
@@ -35,6 +42,7 @@ export default function ProjectSidebar({
   creator,
   stats,
   tags,
+  urls = [],
   otherFromCreator
 }: ProjectSidebarProps) {
   return (
@@ -49,14 +57,40 @@ export default function ProjectSidebar({
         </div>
 
         <div className="space-y-4">
-          <Button className="w-full flex items-center justify-center space-x-2 py-3">
-            <Download className="w-5 h-5" />
-            <span>DOWNLOAD MOD</span>
-          </Button>
-          <Button variant="outline" className="w-full flex items-center justify-center space-x-2 py-3">
-            <Heart className="w-5 h-5 text-red-500" />
-            <span>Add to Wishlist</span>
-          </Button>
+          <div className="flex items-center space-x-2 pt-2 border-t border-gray-100 dark:border-gray-700 mt-6">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Downloads</h2>
+            <ShieldCheck className="w-5 h-5 text-orange-500 fill-orange-500/10" />
+          </div>
+
+          <ul className="space-y-3 list-none">
+            {urls.length > 0 ? (
+              urls.map((url) => (
+                <li key={url.id} className="flex items-baseline space-x-3 group text-[13px]">
+                  <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-600 rounded-none flex-shrink-0 mt-1.5" />
+                  <a
+                    href={url.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-400 font-medium transition-colors"
+                  >
+                    {url.name || 'Download'}
+                  </a>
+                </li>
+              ))
+            ) : (
+              <li className="text-gray-400 italic text-sm">No downloads available</li>
+            )}
+          </ul>
+
+          <div className="pt-2">
+            <a
+              href="#"
+              className="w-full flex items-center justify-center space-x-2 py-3 bg-white dark:bg-gray-800 text-emerald-600 border border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-95 font-bold uppercase tracking-wider transition-all rounded-none"
+            >
+              <Heart className="w-5 h-5 text-red-500" />
+              <span>Add to Wishlist</span>
+            </a>
+          </div>
         </div>
 
         <div className="mt-8 space-y-4">
