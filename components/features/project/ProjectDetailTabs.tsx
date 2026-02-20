@@ -10,6 +10,7 @@ interface Comment {
     createdAt: string;
     user: {
         id: number;
+        displayName: string;
         username: string;
         avatarUrl: string;
         slug?: string;
@@ -56,7 +57,7 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                 {activeTab === "changelog" && (
                     <div className="animate-in fade-in duration-300">
                         <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white uppercase">Version {project.changelog}</h3>
-                        <p className="text-gray-500 italic">Changelog update for version {project.changelog}.</p>
+                        <p className="text-gray-500 italic">{project.changelog}.</p>
                     </div>
                 )}
 
@@ -82,7 +83,7 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                     <div className="w-10 h-10 bg-gray-100 border border-gray-200 rounded-none overflow-hidden hover:border-green-600 transition-colors">
                                                         <img
                                                             src={comment.user.avatarUrl}
-                                                            alt={comment.user.username}
+                                                            alt={comment.user.displayName || comment.user.username}
                                                             className="w-full h-full object-cover"
                                                         />
                                                     </div>
@@ -90,7 +91,7 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                 <div className="flex-1 space-y-2">
                                                     <div className="flex items-center gap-2">
                                                         <Link href={`/user/${comment.user.slug || `${comment.user.id}-${comment.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-sm font-bold text-gray-900 dark:text-white hover:text-green-600 transition-colors">
-                                                            {comment.user.username}
+                                                            {comment.user.displayName || comment.user.username}
                                                         </Link>
                                                         <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
                                                             • {new Date(comment.createdAt).toLocaleDateString("en-GB", {
@@ -123,7 +124,7 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                                 <div className="w-8 h-8 bg-gray-100 border border-gray-200 rounded-none overflow-hidden group-hover/reply:border-green-600 transition-colors">
                                                                     <img
                                                                         src={reply.user.avatarUrl}
-                                                                        alt={reply.user.username}
+                                                                        alt={reply.user.displayName || reply.user.username}
                                                                         className="w-full h-full object-cover"
                                                                     />
                                                                 </div>
@@ -131,7 +132,7 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                             <div className="flex-1 space-y-1">
                                                                 <div className="flex items-center gap-2">
                                                                     <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-green-600 transition-colors">
-                                                                        {reply.user.username}
+                                                                        {reply.user.displayName || reply.user.username}
                                                                     </Link>
                                                                     <span className="text-[9px] text-gray-400 font-medium uppercase tracking-wider">
                                                                         • {new Date(reply.createdAt).toLocaleDateString("en-GB", {

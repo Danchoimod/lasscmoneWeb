@@ -202,7 +202,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
             <Link href="/profile" className="p-1">
               <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all">
                 {user.avatarUrl ? (
-                  <Image src={user.avatarUrl} alt={user.username} width={40} height={40} className="object-cover w-full h-full" />
+                  <Image src={user.avatarUrl} alt={user.displayName || user.username} width={40} height={40} className="object-cover w-full h-full" />
                 ) : (
                   <User className="w-5 h-5 text-gray-600" />
                 )}
@@ -283,7 +283,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
                 className="w-full bg-[#4CAF50] text-white font-bold py-3 text-sm text-center rounded-none"
                 onClick={() => setOpen(false)}
               >
-                MY PROFILE ({user.username})
+                MY PROFILE ({user.displayName || user.username})
               </Link>
             ) : (
               <Link

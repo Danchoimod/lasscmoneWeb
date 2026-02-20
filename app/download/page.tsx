@@ -9,12 +9,25 @@ export default function DownloadPage() {
 
       {/* Hero Download Section */}
       <section className="relative w-full bg-[#111] py-20 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10 bg-[url('/next.svg')] bg-repeat bg-[length:200px_200px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent" />
+        {/* Background Pattern - Đã sửa lỗi lặp và thêm Blur */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://www.chromethemer.com/download/hd-wallpapers/minecraft-3840x2160.jpg')",
+            backgroundSize: 'cover',        /* Giúp ảnh phủ kín không bị lặp vụn vặt */
+            backgroundPosition: 'center',   /* Giữ ảnh ở giữa */
+            backgroundRepeat: 'no-repeat',  /* Chặn lặp hình */
+            filter: 'blur(8px)',            /* Độ mờ (có thể chỉnh từ 4px - 20px) */
+            transform: 'scale(1.1)'         /* Phóng lớn một chút để che các mép trắng khi blur */
+          }}
+        />
+
+        {/* Lớp phủ Overlay để làm tối và tạo chiều sâu */}
+        <div className="absolute inset-0 bg-black/60 z-1" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 z-2" />
 
         <div className="relative z-10 flex flex-col items-center justify-center max-w-4xl mx-auto px-6 text-center">
-          {/* Logo Box - Changed from rounded-3xl to rounded-none */}
+          {/* Logo Box */}
           <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-none bg-zinc-100 shadow-2xl overflow-hidden border-2 border-zinc-800">
             <Image
               src="/icons/icon.jpg"
@@ -36,7 +49,7 @@ export default function DownloadPage() {
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row w-full max-w-md">
-            {/* Windows Button - Changed to rounded-none */}
+            {/* Windows Button */}
             <a
               href="#"
               className="flex-1 flex h-16 items-center justify-center gap-3 rounded-none bg-[#D4A017] hover:bg-[#C19214] text-black font-black text-lg transition-all active:scale-95 shadow-lg"
@@ -45,7 +58,7 @@ export default function DownloadPage() {
               WINDOWS
             </a>
 
-            {/* Android Button - Changed to rounded-none */}
+            {/* Android Button */}
             <a
               href="#"
               className="flex-1 flex h-16 items-center justify-center gap-3 rounded-none bg-white hover:bg-zinc-100 text-black font-black text-lg transition-all active:scale-95 shadow-lg border-b-4 border-zinc-300"

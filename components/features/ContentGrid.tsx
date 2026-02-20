@@ -13,6 +13,7 @@ interface Package {
   createdAt: string;
   user: {
     id: number;
+    displayName: string;
     username: string;
     avatarUrl: string;
     slug?: string;
@@ -86,7 +87,7 @@ const ContentGrid = ({ packages = [], loading = false, error = null }: ContentGr
             key={pkg.id}
             id={pkg.id}
             slug={pkg.slug || pkg.id.toString()}
-            author={pkg.user?.username || "Anonymous"}
+            author={pkg.user?.displayName || pkg.user?.username || "Anonymous"}
             authorSlug={pkg.user?.slug || (pkg.user ? `${pkg.user.id}-${pkg.user.username.toLowerCase().replace(/\s+/g, '-')}` : "")}
             authorAvatar={pkg.user?.avatarUrl || "https://placehold.co/100x100?text=A"}
             rating={pkg.ratingAvg || 0}

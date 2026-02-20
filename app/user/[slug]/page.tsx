@@ -8,6 +8,7 @@ import ContentCard from "@/components/features/ContentCard";
 
 interface UserData {
   id: number;
+  displayName: string;
   username: string;
   avatarUrl: string;
   status: number;
@@ -89,7 +90,7 @@ const UserProfilePage = () => {
           <div className="relative w-32 h-32 md:w-40 md:h-40 bg-zinc-100 border-4 border-white shadow-lg rounded-none overflow-hidden -mb-4 flex items-center justify-center p-0">
             <Image
               src={user.avatarUrl || "/next.svg"}
-              alt={user.username}
+              alt={user.displayName || user.username}
               fill
               className="object-cover"
             />
@@ -99,7 +100,7 @@ const UserProfilePage = () => {
           <div className="flex-1 flex flex-col items-center md:items-start pb-2">
             <div className="flex items-center gap-2 mb-2">
               <h1 className="text-3xl font-black text-zinc-900 tracking-tight uppercase">
-                {user.username}
+                {user.displayName || user.username}
               </h1>
               <div className="w-6 h-6 bg-blue-500 rounded-none flex items-center justify-center shadow-sm">
                 <ShieldCheck className="w-4 h-4 text-white" />
@@ -151,7 +152,7 @@ const UserProfilePage = () => {
                 key={pkg.id}
                 id={pkg.id}
                 slug={pkg.slug}
-                author={user.username}
+                author={user.displayName || user.username}
                 authorSlug={user.slug}
                 authorAvatar={user.avatarUrl}
                 rating={pkg.ratingAvg || 0}

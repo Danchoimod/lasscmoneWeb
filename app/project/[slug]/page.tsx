@@ -49,7 +49,7 @@ export default async function ProjectDetailPage({
     ],
     images: project.images.map((img: any) => img.url),
     creator: {
-      name: project.user.username,
+      name: project.user.displayName || project.user.username,
       slug: project.user.slug || `${project.user.id}-${project.user.username.toLowerCase().replace(/\s+/g, '-')}`,
       avatar: project.user.avatarUrl || "https://avatars.githubusercontent.com/u/113335341?v=4",
       verified: true,

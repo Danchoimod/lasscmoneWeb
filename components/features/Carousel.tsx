@@ -15,6 +15,7 @@ interface CarouselItem {
   };
   user: {
     avatar: string;
+    displayName: string;
     username: string;
     slug: string;
   };
@@ -98,9 +99,9 @@ const Carousel = ({ initialSlides }: CarouselProps) => {
               className="flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full mb-4 border border-zinc-700 hover:border-zinc-500 transition-colors"
             >
               <div className="w-6 h-6 rounded-full overflow-hidden border border-zinc-600">
-                <Image src={slide.user.avatar || "/icons/icon.jpg"} alt={slide.user.username} width={24} height={24} />
+                <Image src={slide.user.avatar || "/icons/icon.jpg"} alt={slide.user.displayName || slide.user.username} width={24} height={24} />
               </div>
-              <span className="text-sm text-zinc-300">{slide.user.username}</span>
+              <span className="text-sm text-zinc-300">{slide.user.displayName || slide.user.username}</span>
             </Link>
 
             {slide.package ? (
