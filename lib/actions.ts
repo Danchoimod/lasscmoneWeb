@@ -73,3 +73,33 @@ export async function loginAction(formData: any) {
         return { success: false, error: "Internal server error" };
     }
 }
+
+export async function getMe() {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token")?.value;
+
+        if (!token) {
+            return { success: false, error: "No token found" };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/me`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            return { success: true, data: data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to fetch profile" };
+    } catch (error) {
+        console.error("GetMe action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
