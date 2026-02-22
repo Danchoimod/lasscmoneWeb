@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Search, ChevronDown, Menu, X, User } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { getMe } from "@/lib/actions";
 
 interface Category {
   id: number;
@@ -23,10 +24,33 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
-  const user = session?.user as any;
+  const [currentUser, setCurrentUser] = useState<any>(session?.user);
   const [open, setOpen] = useState(false);
   const [categories] = useState<Category[]>(initialCategories);
   const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
+
+  // Update currentUser when session changes
+  useEffect(() => {
+    if (session?.user) {
+      setCurrentUser(session.user);
+
+      // Fetch latest data from backend
+      const fetchLatestUser = async () => {
+        try {
+          const result = await getMe();
+          if (result.success) {
+            setCurrentUser(result.data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch latest user data:", error);
+        }
+      };
+
+      fetchLatestUser();
+    } else {
+      setCurrentUser(null);
+    }
+  }, [session]);
 
   // Search states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -176,7 +200,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
           </Link>
 
           {/* Login Button - Hidden if logged in */}
-          {!user && (
+          {!currentUser && (
             <Link
               href="/login"
               className="hidden md:block bg-[#4CAF50] hover:bg-[#45a049] text-white font-bold px-3 py-1 rounded-none text-xs"
@@ -186,11 +210,11 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
           )}
 
           {/* 👤 User Avatar - Only show if logged in */}
-          {user && (
+          {currentUser && (
             <Link href="/profile" className="p-1">
               <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all">
-                {user.avatarUrl ? (
-                  <Image src={user.avatarUrl} alt={user.displayName || user.username} width={40} height={40} className="object-cover w-full h-full" />
+                {currentUser.avatarUrl ? (
+                  <Image src={currentUser.avatarUrl} alt={currentUser.displayName || currentUser.username} width={40} height={40} className="object-cover w-full h-full" />
                 ) : (
                   <User className="w-5 h-5 text-gray-600" />
                 )}
@@ -265,13 +289,13 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
             >
               DOWNLOAD
             </Link>
-            {user ? (
+            {currentUser ? (
               <Link
                 href="/profile"
                 className="w-full bg-[#4CAF50] text-white font-bold py-3 text-sm text-center rounded-none"
                 onClick={() => setOpen(false)}
               >
-                MY PROFILE ({user.displayName || user.username})
+                MY PROFILE ({currentUser.displayName || currentUser.username})
               </Link>
             ) : (
               <Link
