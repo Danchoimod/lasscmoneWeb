@@ -140,3 +140,19 @@ export async function getCategories() {
         return [];
     }
 }
+
+export async function getUserProfile(slug: string) {
+    try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE_URL}/users/${slug}/profile`, {
+            headers,
+            next: { revalidate: 60 }
+        });
+        if (!res.ok) return null;
+        const result = await res.json();
+        return result.status === "success" ? result.data : null;
+    } catch (error) {
+        console.error(`Error fetching user profile ${slug}:`, error);
+        return null;
+    }
+}

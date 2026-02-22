@@ -1,10 +1,9 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import { UserPlus, Calendar, Box, ShieldCheck, UserMinus } from "lucide-react";
+import { UserPlus, Calendar, Box, ShieldCheck } from "lucide-react";
 import ContentCard from "@/components/features/ContentCard";
+import { getUserProfile } from "@/lib/api";
+import { notFound } from "next/navigation";
 
 interface UserData {
   id: number;
@@ -20,67 +19,17 @@ interface UserData {
   slug: string;
 }
 
-const UserProfilePage = () => {
-  const params = useParams();
-  const slug = params?.slug as string;
-  const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default async function UserProfilePage({
+  params: paramsPromise
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await paramsPromise;
 
-  useEffect(() => {
-    // Scroll to top when slug changes
-    window.scrollTo(0, 0);
+  const user: UserData | null = await getUserProfile(slug);
 
-    const fetchUserProfile = async () => {
-      if (!slug) return;
-      try {
-        setLoading(true);
-        const response = await fetch(`/api-backend/users/${slug}/profile`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch user profile");
-        }
-        const result = await response.json();
-        if (result.status === "success" && result.data) {
-          setUser(result.data);
-        } else {
-          throw new Error("User not found");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <div className="min-h-[60vh] flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
-      </div>
-    );
-  }
-
-  if (error || !user) {
-    return (
-      <div className="min-h-[60vh] flex flex-col justify-center items-center px-4 text-center">
-        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-none flex items-center justify-center mb-6">
-          <ShieldCheck className="w-10 h-10" />
-        </div>
-        <h2 className="text-2xl font-bold text-zinc-800 mb-2 uppercase tracking-tight">User Not Found</h2>
-        <p className="text-zinc-500 mb-8 max-w-md italic">
-          The requested user profile could not be found. It might have been deleted or the link is incorrect.
-        </p>
-        <button
-          onClick={() => window.location.href = '/'}
-          className="px-6 py-2 bg-zinc-800 text-white font-bold text-sm tracking-tight transition-colors hover:bg-zinc-700"
-        >
-          BACK TO HOME
-        </button>
-      </div>
-    );
+  if (!user) {
+    notFound();
   }
 
   return (
@@ -171,6 +120,7 @@ const UserProfilePage = () => {
                 tags={[pkg.category?.name || "Uncategorized"]}
                 title={pkg.title}
                 description={pkg.shortSummary || pkg.description || "No description available."}
+                authorStatus={user.status}
               />
             ))}
           </div>
@@ -182,6 +132,4 @@ const UserProfilePage = () => {
       </div>
     </div>
   );
-};
-
-export default UserProfilePage;
+}
