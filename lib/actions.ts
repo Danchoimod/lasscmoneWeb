@@ -21,7 +21,7 @@ export async function loginAction(formData: any) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
-                    return { success: false, error: "Invalid credentials." };
+                    return { success: false, error: "Your email or password is incorrect." };
                 default:
                     return { success: false, error: "Something went wrong." };
             }
@@ -65,6 +65,40 @@ export async function getMe() {
         return { success: false, error: data.message || "Failed to fetch profile" };
     } catch (error) {
         console.error("GetMe action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function getFollowing() {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "No token found", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/users/me/following`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 401) {
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            return { success: true, data: data.data, pagination: data.pagination };
+        }
+
+        return { success: false, error: data.message || "Failed to fetch following list" };
+    } catch (error) {
+        console.error("GetFollowing action error:", error);
         return { success: false, error: "Internal server error" };
     }
 }

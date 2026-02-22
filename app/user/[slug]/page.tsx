@@ -28,6 +28,9 @@ const UserProfilePage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Scroll to top when slug changes
+    window.scrollTo(0, 0);
+
     const fetchUserProfile = async () => {
       if (!slug) return;
       try {
