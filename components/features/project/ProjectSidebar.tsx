@@ -43,6 +43,16 @@ interface ProjectSidebarProps {
   }[];
 }
 
+const getPlatformName = (type: string | number) => {
+  const mapping: Record<string | number, string> = {
+    "1": "Bedrock",
+    "2": "Java",
+    "bedrock": "Bedrock",
+    "java": "Java"
+  };
+  return mapping[type] || type.toString();
+};
+
 export default function ProjectSidebar({
   title,
   category,
@@ -142,7 +152,7 @@ export default function ProjectSidebar({
                 >
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none" />
                   <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300">
-                    {v.platformType.charAt(0).toUpperCase() + v.platformType.slice(1)} {v.versionNumber}
+                    {getPlatformName(v.platformType)} {v.versionNumber}
                   </span>
                 </div>
               ))}

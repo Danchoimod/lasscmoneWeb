@@ -109,7 +109,7 @@ export async function getPackageComments(packageId: number) {
         const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}`, {
             headers,
-            next: { revalidate: 30 }
+            cache: 'no-store'
         });
         if (!res.ok) return { comments: [], total: 0 };
         const result = await res.json();

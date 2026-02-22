@@ -24,6 +24,15 @@ const FormItem = ({ label, children, description }: { label: string; children: R
     </div>
 );
 
+const PLATFORM_MAPPING: Record<string | number, string> = {
+    "1": "Bedrock",
+    "2": "Java",
+    "bedrock": "Bedrock",
+    "java": "Java"
+};
+
+const getPlatformName = (type: string | number) => PLATFORM_MAPPING[type] || type.toString();
+
 export default function EditProjectPage() {
     const router = useRouter();
     const params = useParams();
@@ -118,7 +127,7 @@ export default function EditProjectPage() {
                 // For now, mapping back to the structure the user previously showed
                 versions: versions.map(v => ({
                     id: v.id,
-                    platformType: v.platformType || 'bedrock',
+                    platformType: v.platformType.toString(), // Keep as string but it will be "1" or "2"
                     versionNumber: v.name || v.versionNumber
                 }))
             };
@@ -166,13 +175,14 @@ export default function EditProjectPage() {
 
         const ver = availableVersions.find(v => v.id.toString() === selectedVersionId);
         if (ver && !versions.find(v => v.id === ver.id)) {
-            // Ask for platform type since it's not in the version list itself
-            const platformType = prompt("Enter Platform Type (e.g. bedrock, java):", "bedrock");
-            if (platformType) {
-                setVersions([...versions, { ...ver, platformType, versionNumber: ver.name }]);
-                setSelectedVersionId('');
-                setIsAddingVersion(false);
-            }
+            // platformType is already in the database/version object, no need to prompt
+            setVersions([...versions, {
+                ...ver,
+                platformType: ver.platformType || "1", // Default to Bedrock if not specified
+                versionNumber: ver.name || ver.versionNumber
+            }]);
+            setSelectedVersionId('');
+            setIsAddingVersion(false);
         } else if (ver) {
             showNotification("This version is already added", "info");
         }
@@ -379,12 +389,12 @@ export default function EditProjectPage() {
                                     <div key={v.id || index} className="flex items-center gap-3 border border-gray-300 p-3 bg-gray-50 group hover:bg-white hover:border-gray-800 transition-colors">
                                         <div className="w-8 h-8 bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
                                             <span className="text-[10px] font-bold text-emerald-600 uppercase">
-                                                {(v.platformType || 'B').substring(0, 1)}
+                                                {getPlatformName(v.platformType).substring(0, 1)}
                                             </span>
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-xs font-bold text-gray-800 uppercase tracking-tight">
-                                                {v.platformType || 'Bedrock'} / {v.name || v.versionNumber}
+                                                {getPlatformName(v.platformType)} / {v.name || v.versionNumber}
                                             </div>
                                             <div className="text-[10px] text-gray-400 italic">ID: {v.id}</div>
                                         </div>

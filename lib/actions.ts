@@ -212,3 +212,45 @@ export async function updateProject(id: string, formData: any) {
         return { success: false, error: "Internal server error" };
     }
 }
+export async function createComment(packageId: number, content: string, parentId: number | null = null) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "You must be logged in to comment.", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/comments`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                packageId,
+                content,
+                parentId: parentId || undefined
+            })
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Session expired", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            // Revalidate the project page to show the new comment
+            // We don't have the slug here, but we can revalidate by tag if implemented
+            // For now, let the client handle UI update or refresh
+            return { success: true, data: data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to post comment" };
+    } catch (error) {
+        console.error("CreateComment action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
