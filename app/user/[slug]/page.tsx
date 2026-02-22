@@ -4,6 +4,8 @@ import { UserPlus, Calendar, Box, ShieldCheck } from "lucide-react";
 import ContentCard from "@/components/features/ContentCard";
 import { getUserProfile } from "@/lib/api";
 import { notFound } from "next/navigation";
+import ReportButton from "@/components/features/ReportButton";
+import FollowButton from "@/components/features/FollowButton";
 
 interface UserData {
   id: number;
@@ -17,6 +19,7 @@ interface UserData {
   };
   packages: any[];
   slug: string;
+  isFollowing?: boolean;
 }
 
 export default async function UserProfilePage({
@@ -79,10 +82,14 @@ export default async function UserProfilePage({
 
           {/* Action Buttons */}
           <div className="flex gap-3 pb-2">
-            <button className="flex items-center gap-2 bg-[#4CAF50] hover:bg-green-600 text-white px-6 py-2.5 font-bold uppercase text-sm transition-all shadow-sm active:scale-95">
-              <UserPlus className="w-4 h-4" />
-              follow
-            </button>
+            <FollowButton
+              userId={user.id}
+              initialFollowed={user.isFollowing}
+            />
+            <ReportButton
+              targetUserId={user.id}
+              className="bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200"
+            />
           </div>
         </div>
       </div>

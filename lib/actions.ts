@@ -254,3 +254,109 @@ export async function createComment(packageId: number, content: string, parentId
         return { success: false, error: "Internal server error" };
     }
 }
+export async function deleteComment(commentId: number) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "You must be logged in to delete comments.", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            }
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Session expired", isUnauthorized: true };
+        }
+
+        if (response.status === 204 || response.ok) {
+            return { success: true };
+        }
+
+        if (response.status === 403) {
+            return { success: false, error: "Not authorized to delete this comment" };
+        }
+
+        const data = await response.json().catch(() => ({}));
+        return { success: false, error: data.message || "Failed to delete comment" };
+    } catch (error) {
+        console.error("DeleteComment action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function createReport(data: { reason: string; packageId?: number; targetUserId?: number }) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "You must be logged in to report.", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/reports`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Session expired", isUnauthorized: true };
+        }
+
+        if (response.ok) {
+            return { success: true };
+        }
+
+        const result = await response.json().catch(() => ({}));
+        return { success: false, error: result.message || "Failed to submit report" };
+    } catch (error) {
+        console.error("CreateReport action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function followUser(followingId: number) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "You must be logged in to follow users.", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/users/follow`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ followingId })
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Session expired", isUnauthorized: true };
+        }
+
+        const result = await response.json();
+        if (response.ok && result.status === "success") {
+            return { success: true, followed: result.data.followed };
+        }
+
+        return { success: false, error: result.message || "Failed to process follow request" };
+    } catch (error) {
+        console.error("FollowUser action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}

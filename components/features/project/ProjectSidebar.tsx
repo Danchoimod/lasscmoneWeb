@@ -3,6 +3,7 @@ import { Download, Heart, CheckCircle, Star, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
+import ReportButton from '../ReportButton';
 
 interface DownloadUrl {
   id: number;
@@ -17,6 +18,7 @@ interface ProjectVersion {
 }
 
 interface ProjectSidebarProps {
+  packageId: number;
   title: string;
   category: string;
   shortSummary?: string;
@@ -54,6 +56,7 @@ const getPlatformName = (type: string | number) => {
 };
 
 export default function ProjectSidebar({
+  packageId,
   title,
   category,
   shortSummary,
@@ -79,6 +82,14 @@ export default function ProjectSidebar({
           {event && <span className="text-emerald-500 font-semibold">{event}</span>}
           {event && <span>•</span>}
           <span>{category}</span>
+        </div>
+
+        <div className="flex gap-2 mb-6">
+          <ReportButton
+            packageId={packageId}
+            label="Report Project"
+            className="flex-1 bg-zinc-50 hover:bg-zinc-100 text-zinc-500 border border-zinc-200"
+          />
         </div>
 
         <div className="space-y-4">

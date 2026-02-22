@@ -3,7 +3,8 @@
 import React, { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { createComment } from "@/lib/actions";
+import { useSession } from "next-auth/react";
+import { createComment, deleteComment, createReport } from "@/lib/actions";
 import ProjectTabs from "./ProjectTabs";
 
 interface Comment {
@@ -18,6 +19,7 @@ interface Comment {
         slug?: string;
         status?: number;
     };
+    isMine?: boolean;
     replies: Comment[];
 }
 
@@ -40,6 +42,7 @@ const getPlatformName = (type: string | number) => {
 
 export default function ProjectDetailTabs({ project, comments, commentCount, tabs }: ProjectDetailTabsProps) {
     const router = useRouter();
+    const { data: session } = useSession();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [isPending, startTransition] = useTransition();
@@ -99,6 +102,40 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
             console.error("Error posting comment:", err);
         } finally {
             setSubmittingComment(false);
+        }
+    };
+
+    const handleDeleteComment = async (commentId: number) => {
+        if (!confirm("Are you sure you want to delete this comment?")) return;
+
+        try {
+            const result = await deleteComment(commentId);
+            if (result.success) {
+                startTransition(() => {
+                    router.refresh();
+                });
+            } else {
+                alert(result.error || "Failed to delete comment");
+            }
+        } catch (err) {
+            console.error("Error deleting comment:", err);
+        }
+    };
+
+    const handleReportUser = async (targetUserId: number, username: string) => {
+        const reason = prompt(`Reason for reporting ${username}:`);
+        if (!reason || !reason.trim()) return;
+
+        try {
+            const result = await createReport({ reason, targetUserId });
+            if (result.success) {
+                alert("Report submitted successfully.");
+            } else {
+                alert(result.error || "Failed to submit report");
+            }
+        } catch (err) {
+            console.error("Error reporting user:", err);
+            alert("An error occurred while submitting the report.");
         }
     };
 
@@ -218,6 +255,32 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                             {replyToId === comment.id ? "Cancel Reply" : "Reply"}
                                                         </button>
 
+                                                        {comment.isMine && (
+                                                            <button
+                                                                onClick={() => handleDeleteComment(comment.id)}
+                                                                className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-500 transition-all duration-200 group-hover:scale-110"
+                                                                title="Delete comment"
+                                                            >
+                                                                <img
+                                                                    src="https://img.icons8.com/?size=100&id=68064&format=png&color=EF4444"
+                                                                    alt="Delete"
+                                                                    className="w-5 h-5 object-contain"
+                                                                />
+                                                            </button>
+                                                        )}
+
+                                                        {!comment.isMine && (
+                                                            <button
+                                                                onClick={() => handleReportUser(comment.user.id, comment.user.displayName || comment.user.username)}
+                                                                className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                                                                title="Report User"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-1.243-10.43V5.452a48.367 48.367 0 0 1-2.916-.406L15 4.5a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                                                </svg>
+                                                            </button>
+                                                        )}
+
                                                         {replyToId === comment.id && (
                                                             <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                                                                 <textarea
@@ -255,7 +318,7 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                                     />
                                                                 </div>
                                                             </Link>
-                                                            <div className="flex-1 space-y-1">
+                                                            <div className="flex-1 space-y-1 relative">
                                                                 <div className="flex items-center gap-2">
                                                                     <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-green-600 transition-colors flex items-center gap-1">
                                                                         {reply.user.displayName || reply.user.username}
@@ -284,6 +347,32 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                                 >
                                                                     {replyToId === reply.id ? "Cancel Reply" : "Reply"}
                                                                 </button>
+
+                                                                {reply.isMine && (
+                                                                    <button
+                                                                        onClick={() => handleDeleteComment(reply.id)}
+                                                                        className="absolute top-1 right-1 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-none transition-all duration-200 group-hover/reply:scale-110"
+                                                                        title="Delete reply"
+                                                                    >
+                                                                        <img
+                                                                            src="https://img.icons8.com/?size=100&id=68064&format=png&color=EF4444"
+                                                                            alt="Delete"
+                                                                            className="w-4 h-4 object-contain"
+                                                                        />
+                                                                    </button>
+                                                                )}
+
+                                                                {!reply.isMine && (
+                                                                    <button
+                                                                        onClick={() => handleReportUser(reply.user.id, reply.user.displayName || reply.user.username)}
+                                                                        className="absolute top-1 right-1 p-1 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover/reply:opacity-100"
+                                                                        title="Report User"
+                                                                    >
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-1.243-10.43V5.452a48.367 48.367 0 0 1-2.916-.406L15 4.5a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                                                        </svg>
+                                                                    </button>
+                                                                )}
 
                                                                 {replyToId === reply.id && (
                                                                     <div className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">

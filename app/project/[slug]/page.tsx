@@ -49,10 +49,12 @@ export default async function ProjectDetailPage({
     ],
     images: project.images.map((img: any) => img.url),
     creator: {
+      id: project.user.id,
       name: project.user.displayName || project.user.username,
       slug: project.user.slug || `${project.user.id}-${project.user.username.toLowerCase().replace(/\s+/g, '-')}`,
       avatar: project.user.avatarUrl || "https://avatars.githubusercontent.com/u/113335341?v=4",
       verified: project.user.status === 4,
+      isFollowing: project.user.isFollowing,
     },
     stats: {
       version: project.changelog || "1.0.0",
@@ -96,6 +98,7 @@ export default async function ProjectDetailPage({
           {/* Right Column */}
           <div className="lg:col-span-1">
             <ProjectSidebar
+              packageId={project.id}
               title={mappedProjectData.title}
               category={mappedProjectData.category}
               shortSummary={project.shortSummary}
