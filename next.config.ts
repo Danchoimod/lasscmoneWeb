@@ -13,10 +13,11 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:25461/api';
     return [
       {
         source: '/api-backend/:path*',
-        destination: 'http://localhost:25461/api/:path*',
+        destination: `${backendUrl}/:path*`,
       },
     ]
   },
