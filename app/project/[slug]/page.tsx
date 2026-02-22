@@ -98,11 +98,13 @@ export default async function ProjectDetailPage({
             <ProjectSidebar
               title={mappedProjectData.title}
               category={mappedProjectData.category}
+              shortSummary={project.shortSummary}
               event={mappedProjectData.event}
               creator={mappedProjectData.creator}
               stats={mappedProjectData.stats}
               tags={mappedProjectData.tags}
               urls={project.urls}
+              versions={project.versions}
               otherFromCreator={mappedProjectData.otherFromCreator}
             />
           </div>

@@ -1,24 +1,71 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getMyPackages } from '@/lib/actions';
+import Link from 'next/link';
 
 // Thành phần tiêu đề Section kiểu Classic
 const SectionHeading = ({ children }: { children: React.ReactNode }) => (
   <div className="mb-6 border-b-2 border-gray-800 pb-2">
-    <h2 className="text-xl font-bold text-gray-800">{children}</h2>
+    <h2 className="text-xl font-bold text-gray-800 uppercase tracking-tight italic">{children}</h2>
   </div>
 );
 
+interface Project {
+  id: number;
+  title: string;
+  status: number;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
 export default function ProjectPage() {
   const router = useRouter();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const mockProjects = [
-    { id: 1, name: 'Advanced Machinery', game: 'Minecraft', status: 'Published', date: '2024-02-10' },
-    { id: 2, name: 'Magic Wands Pro', game: 'Minecraft', status: 'Draft', date: '2024-02-12' },
-    { id: 3, name: 'Skyblock Extreme', game: 'Terraria', status: 'Reviewing', date: '2024-02-13' },
-    { id: 4, name: 'Industrial Expansion', game: 'Minecraft', status: 'Published', date: '2024-02-14' },
-  ];
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const result = await getMyPackages();
+        if (result.success) {
+          setProjects(result.data || []);
+        } else {
+          setError(result.error || "Failed to load projects");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching projects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const getStatusLabel = (status: number) => {
+    switch (status) {
+      case 1:
+        return { label: 'Published', class: 'bg-green-50 text-green-700 border-green-200' };
+      case 2:
+        return { label: 'Reviewing', class: 'bg-amber-50 text-amber-700 border-amber-200' };
+      case 0:
+      default:
+        return { label: 'Draft', class: 'bg-gray-50 text-gray-600 border-gray-200' };
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white p-20 flex justify-center items-center h-full border border-gray-300">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-3 sm:p-8 border border-gray-300 transition-none min-h-screen rounded-none">
@@ -35,50 +82,68 @@ export default function ProjectPage() {
           </button>
         </div>
 
-        <div className="border border-gray-300 overflow-x-auto">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-300">
-                <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600">Project</th>
-                <th className="p-3 font-bold text-[10px] uppercase text-gray-600 hidden md:table-cell">Platform</th>
-                <th className="p-3 font-bold text-[10px] uppercase text-gray-600">Status</th>
-                <th className="p-3 font-bold text-[10px] uppercase text-gray-600 hidden sm:table-cell">Updated</th>
-                <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {mockProjects.map(project => (
-                <tr key={project.id} className="hover:bg-gray-50 group">
-                  <td className="p-3">
-                    <div className="font-bold text-[13px] sm:text-sm text-blue-600 hover:underline cursor-pointer truncate max-w-[120px] sm:max-w-none">{project.name}</div>
-                    <div className="text-[9px] text-gray-400 md:hidden uppercase font-bold">{project.game}</div>
-                  </td>
-                  <td className="p-3 text-xs font-medium text-gray-600 hidden md:table-cell">{project.game}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${project.status === 'Published' ? 'bg-green-50 text-green-700 border-green-200' :
-                      project.status === 'Draft' ? 'bg-gray-50 text-gray-600 border-gray-200' :
-                        'bg-amber-50 text-amber-700 border-amber-200'
-                      }`}>
-                      {project.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-gray-500 text-[10px] sm:text-[11px] font-medium hidden sm:table-cell">{project.date}</td>
-                  <td className="p-3 text-right">
-                    <div className="flex justify-end gap-3">
-                      <button
-                        onClick={() => router.push(`/profile/project/edit/${project.id}`)}
-                        className="text-[10px] font-bold uppercase text-gray-500 hover:text-gray-800"
-                      >
-                        Edit
-                      </button>
-                      <button className="text-[10px] font-bold uppercase text-red-500 hover:text-red-700">Delete</button>
-                    </div>
-                  </td>
+        {error ? (
+          <div className="text-center py-10 bg-red-50 border border-red-100 text-red-500">
+            <p className="text-sm font-bold">{error}</p>
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="text-center py-20 bg-gray-50 border border-dashed border-gray-300">
+            <p className="text-gray-400 italic text-sm">You haven't created any projects yet.</p>
+          </div>
+        ) : (
+          <div className="border border-gray-300 overflow-x-auto">
+            <table className="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-300">
+                  <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600">Project</th>
+                  <th className="p-3 font-bold text-[10px] uppercase text-gray-600">Status</th>
+                  <th className="p-3 font-bold text-[10px] uppercase text-gray-600 hidden sm:table-cell">Created At</th>
+                  <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {projects.map(project => {
+                  const statusInfo = getStatusLabel(project.status);
+                  return (
+                    <tr key={project.id} className="hover:bg-gray-50 group">
+                      <td className="p-3">
+                        <Link
+                          href={`/project/${project.slug}`}
+                          className="font-bold text-[13px] sm:text-sm text-blue-600 hover:underline cursor-pointer truncate max-w-[200px] sm:max-w-none block"
+                        >
+                          {project.title}
+                        </Link>
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${statusInfo.class}`}>
+                          {statusInfo.label}
+                        </span>
+                      </td>
+                      <td className="p-3 text-gray-500 text-[10px] sm:text-[11px] font-medium hidden sm:table-cell">
+                        {new Date(project.createdAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td className="p-3 text-right">
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => router.push(`/profile/project/edit/${project.id}`)}
+                            className="text-[10px] font-bold uppercase text-gray-500 hover:text-gray-800"
+                          >
+                            Edit
+                          </button>
+                          <button className="text-[10px] font-bold uppercase text-red-500 hover:text-red-700">Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

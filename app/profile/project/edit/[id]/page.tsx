@@ -1,7 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { getMyPackageById, updateProject } from '@/lib/actions';
+import { getCategories, getVersions } from '@/lib/api';
+import Toast, { ToastType } from '@/components/common/Notification';
+import { Trash2, Plus, Link as LinkIcon, Image as ImageIcon, ExternalLink } from 'lucide-react';
 
 // Section Heading component for consistency
 const SectionHeader = ({ title, subtitle }: { title: string; subtitle?: string }) => (
@@ -23,25 +27,182 @@ const FormItem = ({ label, children, description }: { label: string; children: R
 export default function EditProjectPage() {
     const router = useRouter();
     const params = useParams();
-    const id = params?.id;
+    const id = params?.id as string;
 
-    // Mock initial data - in a real app, this would be fetched based on 'id'
-    const [formData, setFormData] = useState({
-        name: 'Advanced Machinery',
-        summary: 'A comprehensive technical mod for automation.',
-        platform: 'Minecraft',
-        class: 'Mod',
-        category: 'Technology',
-        features: ['Optimization', 'Storage'],
-        description: 'This is a long description of the Advanced Machinery project. It includes many details about how the machinery works and what blocks are added.',
-        license: 'MIT License'
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [availableVersions, setAvailableVersions] = useState<any[]>([]);
+    const [isAddingVersion, setIsAddingVersion] = useState(false);
+    const [selectedVersionId, setSelectedVersionId] = useState('');
+
+    // Notification state
+    const [notification, setNotification] = useState<{
+        isVisible: boolean;
+        message: string;
+        type: ToastType;
+    }>({
+        isVisible: false,
+        message: "",
+        type: "info",
     });
 
-    const handleSave = () => {
-        console.log('Saving project:', formData);
-        alert('Project settings saved successfully!');
-        router.push('/profile/project');
+    const showNotification = (message: string, type: ToastType = "info") => {
+        setNotification({ isVisible: true, message, type });
     };
+
+    const [formData, setFormData] = useState({
+        title: '',
+        shortSummary: '',
+        description: '',
+        catId: '',
+        status: 0,
+        changelog: '',
+    });
+
+    const [images, setImages] = useState<any[]>([]);
+    const [urls, setUrls] = useState<any[]>([]);
+    const [versions, setVersions] = useState<any[]>([]);
+
+    useEffect(() => {
+        const loadPageData = async () => {
+            if (!id) return;
+            try {
+                setLoading(true);
+
+                // Fetch project, categories and available versions in parallel
+                const [projectResult, categoriesList, versionsList] = await Promise.all([
+                    getMyPackageById(id),
+                    getCategories(),
+                    getVersions()
+                ]);
+
+                if (projectResult.success) {
+                    const pkg = projectResult.data;
+                    setFormData({
+                        title: pkg.title || '',
+                        shortSummary: pkg.shortSummary || '',
+                        description: pkg.description || '',
+                        catId: pkg.catId?.toString() || '',
+                        status: pkg.status || 0,
+                        changelog: pkg.changelog || '',
+                    });
+                    setImages(pkg.images || []);
+                    setUrls(pkg.urls || []);
+                    setVersions(pkg.versions || []);
+                } else {
+                    setError(projectResult.error || "Failed to load project");
+                }
+
+                setCategories(categoriesList || []);
+                setAvailableVersions(versionsList || []);
+            } catch (err) {
+                setError("An error occurred while loading project data");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPageData();
+    }, [id]);
+
+    const handleSave = async () => {
+        try {
+            setSubmitting(true);
+            const payload = {
+                ...formData,
+                images: images.map(img => typeof img === 'string' ? img : img.url),
+                urls: urls.map(u => ({ name: u.name, url: u.url })),
+                // Send version IDs if we have them, otherwise fallback to names if that's what the API expects
+                // For now, mapping back to the structure the user previously showed
+                versions: versions.map(v => ({
+                    id: v.id,
+                    platformType: v.platformType || 'bedrock',
+                    versionNumber: v.name || v.versionNumber
+                }))
+            };
+            const result = await updateProject(id, payload);
+            if (result.success) {
+                showNotification("Project updated successfully!", "success");
+                setTimeout(() => {
+                    router.push('/profile/project');
+                }, 1500);
+            } else {
+                showNotification(result.error || "Failed to update project", "error");
+            }
+        } catch (err) {
+            showNotification("An error occurred while saving", "error");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleRemoveImage = (index: number) => {
+        setImages(images.filter((_, i) => i !== index));
+    };
+
+    const handleAddImage = () => {
+        const url = prompt("Enter Image URL:");
+        if (url) {
+            setImages([...images, { url }]);
+        }
+    };
+
+    const handleAddUrl = () => {
+        const name = prompt("Enter Link Name (e.g. Mediafire):");
+        const url = prompt("Enter Download URL:");
+        if (name && url) {
+            setUrls([...urls, { name, url }]);
+        }
+    };
+
+    const handleRemoveUrl = (index: number) => {
+        setUrls(urls.filter((_, i) => i !== index));
+    };
+
+    const handleAddVersion = () => {
+        if (!selectedVersionId) return;
+
+        const ver = availableVersions.find(v => v.id.toString() === selectedVersionId);
+        if (ver && !versions.find(v => v.id === ver.id)) {
+            // Ask for platform type since it's not in the version list itself
+            const platformType = prompt("Enter Platform Type (e.g. bedrock, java):", "bedrock");
+            if (platformType) {
+                setVersions([...versions, { ...ver, platformType, versionNumber: ver.name }]);
+                setSelectedVersionId('');
+                setIsAddingVersion(false);
+            }
+        } else if (ver) {
+            showNotification("This version is already added", "info");
+        }
+    };
+
+    const handleRemoveVersion = (index: number) => {
+        setVersions(versions.filter((_, i) => i !== index));
+    };
+
+    if (loading) {
+        return (
+            <div className="bg-white p-20 flex justify-center items-center h-full border border-gray-100 min-h-[60vh]">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="bg-white p-12 border border-gray-200 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                <p className="text-red-500 font-bold mb-4">{error}</p>
+                <button
+                    onClick={() => router.push('/profile/project')}
+                    className="bg-gray-800 text-white px-6 py-2 text-xs font-bold uppercase tracking-widest"
+                >
+                    Back to Projects
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white border border-gray-300 shadow-sm p-4 sm:p-12 mb-12">
@@ -50,7 +211,7 @@ export default function EditProjectPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start mb-10 sm:mb-12 gap-6">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tighter uppercase">Edit Project</h1>
-                    <p className="text-[11px] sm:text-sm text-gray-400 sm:text-gray-500 font-medium mt-1 uppercase tracking-wider italic">ID: {id} &bull; Updated 2h ago</p>
+                    <p className="text-[11px] sm:text-sm text-gray-400 sm:text-gray-500 font-medium mt-1 uppercase tracking-wider italic">ID: {id}</p>
                 </div>
                 <div className="flex w-full sm:w-auto gap-3">
                     <button
@@ -61,9 +222,10 @@ export default function EditProjectPage() {
                     </button>
                     <button
                         onClick={handleSave}
-                        className="flex-[2] sm:flex-none px-6 sm:px-8 py-2 bg-gray-800 text-white border border-gray-800 text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-black transition-none shadow-sm"
+                        disabled={submitting}
+                        className={`flex-[2] sm:flex-none px-6 sm:px-8 py-2 bg-[#4CAF50] text-white border border-green-600 text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-none shadow-sm ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        Save Changes
+                        {submitting ? 'Saving...' : 'Save Changes'}
                     </button>
                 </div>
             </div>
@@ -77,8 +239,8 @@ export default function EditProjectPage() {
                         <div className="md:col-span-2">
                             <FormItem label="Project Name" description="Do not include tags like [MOD] in the title.">
                                 <input
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    value={formData.title}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                     className="w-full border border-gray-300 bg-gray-50 p-3 text-sm outline-none focus:bg-white focus:border-gray-800 transition-none"
                                     placeholder="e.g. My Awesome Mod"
                                 />
@@ -87,8 +249,8 @@ export default function EditProjectPage() {
                         <div className="md:col-span-2">
                             <FormItem label="Summary" description="A brief overview that appears in search results.">
                                 <input
-                                    value={formData.summary}
-                                    onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                                    value={formData.shortSummary}
+                                    onChange={(e) => setFormData({ ...formData, shortSummary: e.target.value })}
                                     className="w-full border border-gray-300 bg-gray-50 p-3 text-sm outline-none focus:bg-white focus:border-gray-800 transition-none"
                                     placeholder="Describe your project in a few words..."
                                 />
@@ -97,129 +259,216 @@ export default function EditProjectPage() {
                     </div>
                 </section>
 
-                {/* Platform & Visuals */}
+                {/* Category & Status */}
                 <section>
-                    <SectionHeader title="02. Platform & Visuals" subtitle="Select where your project runs and how it looks" />
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="md:col-span-2 space-y-8">
-                            <FormItem label="Game Platform">
-                                <select
-                                    value={formData.platform}
-                                    onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-                                    className="w-full border border-gray-300 bg-gray-50 p-3 text-sm focus:bg-white outline-none"
-                                >
-                                    <option>Minecraft</option>
-                                    <option>Terraria</option>
-                                    <option>Stardew Valley</option>
-                                    <option>Other</option>
-                                </select>
-                            </FormItem>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <FormItem label="Project Class">
-                                    <select
-                                        value={formData.class}
-                                        onChange={(e) => setFormData({ ...formData, class: e.target.value })}
-                                        className="w-full border border-gray-300 bg-gray-50 p-3 text-sm focus:bg-white outline-none"
-                                    >
-                                        <option>Mod</option>
-                                        <option>Modpack</option>
-                                        <option>World</option>
-                                    </select>
-                                </FormItem>
-                                <FormItem label="Primary Category">
-                                    <select
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full border border-gray-300 bg-gray-50 p-3 text-sm focus:bg-white outline-none"
-                                    >
-                                        <option>Technology</option>
-                                        <option>Magic</option>
-                                        <option>Adventure</option>
-                                        <option>Visuals</option>
-                                    </select>
-                                </FormItem>
-                            </div>
-                        </div>
-
-                        <div className="order-first md:order-last">
-                            <FormItem label="Project Logo">
-                                <div className="aspect-square w-full max-w-[200px] md:max-w-none mx-auto border border-gray-300 bg-gray-50 flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-gray-100 border-dashed group transition-none">
-                                    <div className="w-10 h-10 md:w-12 md:h-12 mb-3 border border-gray-300 rounded-full flex items-center justify-center text-gray-400 group-hover:border-gray-800 group-hover:text-gray-800 transition-none">
-                                        <span className="font-bold text-xl">+</span>
-                                    </div>
-                                    <span className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-tighter leading-tight">400x400 Recommended<br />JPG, PNG, GIF</span>
-                                </div>
-                            </FormItem>
-                        </div>
+                    <SectionHeader title="02. Category & Status" subtitle="Select where your project belongs and its current state" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <FormItem label="Primary Category">
+                            <select
+                                value={formData.catId}
+                                onChange={(e) => setFormData({ ...formData, catId: e.target.value })}
+                                className="w-full border border-gray-300 bg-gray-50 p-3 text-sm focus:bg-white outline-none"
+                            >
+                                <option value="">Select Category</option>
+                                {categories.map((cat: any) => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </FormItem>
+                        <FormItem label="Publication Status" description="Status cannot be changed manually for security reasons.">
+                            <select
+                                value={formData.status}
+                                disabled
+                                className="w-full border border-gray-300 bg-gray-200 p-3 text-sm outline-none font-bold italic opacity-70 cursor-not-allowed"
+                            >
+                                <option value={0}>Draft</option>
+                                <option value={1}>Published</option>
+                                <option value={2}>Under Review</option>
+                            </select>
+                        </FormItem>
                     </div>
                 </section>
 
-                {/* Features Section */}
+                {/* Gallery Section */}
                 <section>
-                    <SectionHeader title="03. Project Features" subtitle="Select tags that best describe your project" />
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {['Optimization', 'Visuals', 'Library', 'Storage', 'Power', 'Magic', 'Tools', 'World Gen'].map(tag => (
-                            <label key={tag} className="flex items-center gap-3 border border-gray-200 p-3 bg-gray-50 cursor-pointer hover:bg-white hover:border-gray-800 transition-none select-none">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.features.includes(tag)}
-                                    onChange={(e) => {
-                                        const newFeatures = e.target.checked
-                                            ? [...formData.features, tag]
-                                            : formData.features.filter(f => f !== tag);
-                                        setFormData({ ...formData, features: newFeatures });
-                                    }}
-                                    className="w-4 h-4 accent-gray-800"
-                                />
-                                <span className="text-xs font-bold text-gray-700 uppercase tracking-tighter">{tag}</span>
-                            </label>
+                    <SectionHeader title="03. Project Gallery" subtitle="Manage screenshots and visuals (Max 5 images)" />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                        {images.map((img, index) => (
+                            <div key={img.id || index} className="aspect-video relative group border border-gray-200 bg-gray-50">
+                                <img src={img.url} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <button
+                                        onClick={() => handleRemoveImage(index)}
+                                        className="p-1.5 bg-red-600 text-white hover:bg-red-700 transition-colors"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                                {index === 0 && (
+                                    <div className="absolute top-0 left-0 bg-blue-600 text-white text-[8px] font-bold px-1.5 py-0.5 uppercase">
+                                        Cover
+                                    </div>
+                                )}
+                            </div>
                         ))}
+                        {images.length < 5 && (
+                            <button
+                                onClick={handleAddImage}
+                                className="aspect-video border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center hover:bg-gray-100 hover:border-gray-800 transition-all group"
+                            >
+                                <Plus size={20} className="text-gray-400 group-hover:text-gray-800" />
+                                <span className="text-[10px] font-bold text-gray-400 group-hover:text-gray-800 uppercase mt-1">Add Image</span>
+                            </button>
+                        )}
+                    </div>
+                </section>
+
+                {/* Download Links Section */}
+                <section>
+                    <SectionHeader title="04. Download Links" subtitle="Manage external download locations" />
+                    <div className="space-y-4">
+                        {urls.length === 0 ? (
+                            <div className="p-8 border border-dashed border-gray-200 text-center bg-gray-50">
+                                <p className="text-xs text-gray-400 italic">No download links added yet.</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-3">
+                                {urls.map((u, index) => (
+                                    <div key={u.id || index} className="flex items-center gap-4 border border-gray-300 p-3 bg-gray-50 group hover:bg-white hover:border-gray-800 transition-colors">
+                                        <div className="w-10 h-10 bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
+                                            <LinkIcon size={18} className="text-blue-600" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <span className="text-sm font-bold text-gray-800 truncate uppercase tracking-tight">{u.name}</span>
+                                                <a href={u.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600">
+                                                    <ExternalLink size={12} />
+                                                </a>
+                                            </div>
+                                            <div className="text-[10px] text-gray-400 truncate font-mono">{u.url}</div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handleRemoveUrl(index)}
+                                                className="text-[10px] font-bold uppercase text-red-500 hover:text-red-700"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <button
+                            onClick={handleAddUrl}
+                            className="flex items-center gap-2 text-xs font-bold uppercase text-blue-600 hover:text-blue-700 transition-colors border border-blue-100 bg-blue-50 px-4 py-2 hover:bg-blue-100"
+                        >
+                            <Plus size={14} />
+                            Add Download Link
+                        </button>
+                    </div>
+                </section>
+
+                {/* Supported Versions Section */}
+                <section>
+                    <SectionHeader title="05. Supported Versions" subtitle="What versions of Minecraft does this support?" />
+                    <div className="space-y-6">
+                        {versions.length > 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {versions.map((v, index) => (
+                                    <div key={v.id || index} className="flex items-center gap-3 border border-gray-300 p-3 bg-gray-50 group hover:bg-white hover:border-gray-800 transition-colors">
+                                        <div className="w-8 h-8 bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+                                            <span className="text-[10px] font-bold text-emerald-600 uppercase">
+                                                {(v.platformType || 'B').substring(0, 1)}
+                                            </span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-xs font-bold text-gray-800 uppercase tracking-tight">
+                                                {v.platformType || 'Bedrock'} / {v.name || v.versionNumber}
+                                            </div>
+                                            <div className="text-[10px] text-gray-400 italic">ID: {v.id}</div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleRemoveVersion(index)}
+                                            className="text-gray-400 hover:text-red-500 transition-colors"
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {isAddingVersion ? (
+                            <div className="bg-gray-50 border border-emerald-200 p-4 space-y-4 max-w-md animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase text-gray-500">Select Version</label>
+                                    <select
+                                        value={selectedVersionId}
+                                        onChange={(e) => setSelectedVersionId(e.target.value)}
+                                        className="w-full border border-gray-300 bg-white p-2 text-sm outline-none focus:border-emerald-500"
+                                    >
+                                        <option value="">-- Select a version --</option>
+                                        {availableVersions
+                                            .filter(av => !versions.find(v => v.id === av.id))
+                                            .map(av => (
+                                                <option key={av.id} value={av.id}>{av.name}</option>
+                                            ))
+                                        }
+                                    </select>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleAddVersion}
+                                        disabled={!selectedVersionId}
+                                        className="px-4 py-2 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 disabled:opacity-50"
+                                    >
+                                        Confirm
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setIsAddingVersion(false);
+                                            setSelectedVersionId('');
+                                        }}
+                                        className="px-4 py-2 border border-gray-300 text-[10px] font-bold uppercase tracking-widest hover:bg-white"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsAddingVersion(true)}
+                                className="flex items-center gap-2 text-xs font-bold uppercase text-emerald-600 hover:text-emerald-700 transition-colors border border-emerald-100 bg-emerald-50 px-4 py-2 hover:bg-emerald-100"
+                            >
+                                <Plus size={14} />
+                                Add Supported Version
+                            </button>
+                        )}
                     </div>
                 </section>
 
                 {/* Description Section */}
                 <section>
-                    <SectionHeader title="04. Detailed Description" subtitle="Describe your project in detail using markdown" />
-                    <FormItem label="Long Description">
-                        <textarea
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full min-h-[400px] border border-gray-300 bg-gray-50 p-6 text-sm outline-none focus:bg-white focus:border-gray-800 leading-relaxed transition-none font-mono"
-                            placeholder="Provide a detailed explanation of your project..."
-                        />
-                    </FormItem>
-                </section>
-
-                {/* License Section */}
-                <section>
-                    <SectionHeader title="05. Software & Licensing" subtitle="Legal details and usage rights" />
-                    <div className="max-w-md space-y-4">
-                        <FormItem label="Project License">
-                            <select
-                                value={formData.license}
-                                onChange={(e) => setFormData({ ...formData, license: e.target.value })}
-                                className="w-full border border-gray-300 bg-gray-50 p-3 text-sm focus:bg-white outline-none"
-                            >
-                                <option>MIT License</option>
-                                <option>GNU GPL v3</option>
-                                <option>Apache License 2.0</option>
-                                <option>All Rights Reserved</option>
-                                <option>Custom</option>
-                            </select>
+                    <SectionHeader title="06. Detailed Description" subtitle="Describe your project in detail" />
+                    <div className="space-y-8">
+                        <FormItem label="Long Description">
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full min-h-[300px] border border-gray-300 bg-gray-50 p-6 text-sm outline-none focus:bg-white focus:border-gray-800 leading-relaxed transition-none font-mono"
+                                placeholder="Provide a detailed explanation of your project..."
+                            />
                         </FormItem>
-                        <div className="bg-amber-50 border-l-4 border-amber-400 p-4">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <span className="text-amber-800 font-bold">!</span>
-                                </div>
-                                <div className="ml-3">
-                                    <p className="text-[11px] font-medium text-amber-800 leading-tight italic">
-                                        Changing the license after publication may have legal implications. Ensure you have the rights to all content.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+
+                        <FormItem label="Changelog (Optional)" description="What's new in the current version?">
+                            <textarea
+                                value={formData.changelog}
+                                onChange={(e) => setFormData({ ...formData, changelog: e.target.value })}
+                                className="w-full min-h-[150px] border border-gray-300 bg-gray-50 p-6 text-sm outline-none focus:bg-white focus:border-gray-800 leading-relaxed transition-none font-mono"
+                                placeholder="Release notes..."
+                            />
+                        </FormItem>
                     </div>
                 </section>
 
@@ -235,11 +484,19 @@ export default function EditProjectPage() {
                 </button>
                 <button
                     onClick={handleSave}
-                    className="w-full sm:w-auto px-10 sm:px-12 py-3 bg-gray-800 text-white border border-gray-800 text-[11px] sm:text-xs font-bold uppercase tracking-widest hover:bg-black transition-none shadow-lg order-1 sm:order-2"
+                    disabled={submitting}
+                    className={`w-full sm:w-auto px-10 sm:px-12 py-3 bg-[#4CAF50] text-white border border-green-600 text-[11px] sm:text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-none shadow-lg order-1 sm:order-2 ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Save Everything
+                    {submitting ? 'Saving...' : 'Save All Changes'}
                 </button>
             </div>
+
+            <Toast
+                isVisible={notification.isVisible}
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification((prev) => ({ ...prev, isVisible: false }))}
+            />
         </div>
     );
 }

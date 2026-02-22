@@ -156,3 +156,18 @@ export async function getUserProfile(slug: string) {
         return null;
     }
 }
+export async function getVersions() {
+    try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE_URL}/versions`, {
+            headers,
+            next: { revalidate: 3600 }
+        });
+        if (!res.ok) return [];
+        const result = await res.json();
+        return result.status === "success" ? result.data.versions : [];
+    } catch (error) {
+        console.error("Error fetching versions:", error);
+        return [];
+    }
+}

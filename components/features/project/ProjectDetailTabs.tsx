@@ -181,8 +181,37 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                 )}
 
                 {activeTab === "installation" && (
-                    <div className="animate-in fade-in duration-300">
-                        <p className="text-gray-500 italic">Installation guide coming soon...</p>
+                    <div className="animate-in fade-in duration-300 space-y-6">
+                        <div>
+                            <h2 className="text-xl font-bold mb-4 italic text-gray-900 dark:text-white uppercase tracking-tight">
+                                Supported Versions
+                            </h2>
+                            {project.versions && project.versions.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {project.versions.map((v: any) => (
+                                        <div key={v.id} className="flex items-center p-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-700">
+                                            <div className="w-8 h-8 rounded-none bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3 shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-green-600 dark:text-green-500">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">{v.platformType}</p>
+                                                <p className="text-sm font-bold text-gray-900 dark:text-white">v{v.versionNumber}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-400 italic text-sm font-medium">No specific version requirements listed.</p>
+                            )}
+                        </div>
+                        <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
+                            <h2 className="text-xl font-bold mb-4 italic text-gray-900 dark:text-white uppercase tracking-tight">
+                                Guide
+                            </h2>
+                            <p className="text-gray-500 italic">Installation guide coming soon...</p>
+                        </div>
                     </div>
                 )}
             </div>

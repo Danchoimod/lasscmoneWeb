@@ -10,9 +10,16 @@ interface DownloadUrl {
   url: string;
 }
 
+interface ProjectVersion {
+  id: number;
+  platformType: string;
+  versionNumber: string;
+}
+
 interface ProjectSidebarProps {
   title: string;
   category: string;
+  shortSummary?: string;
   event?: string;
   creator: {
     name: string;
@@ -28,6 +35,7 @@ interface ProjectSidebarProps {
   };
   tags: string[];
   urls?: DownloadUrl[];
+  versions?: ProjectVersion[];
   otherFromCreator: {
     name: string;
     image: string;
@@ -38,11 +46,13 @@ interface ProjectSidebarProps {
 export default function ProjectSidebar({
   title,
   category,
+  shortSummary,
   event,
   creator,
   stats,
   tags,
   urls = [],
+  versions = [],
   otherFromCreator
 }: ProjectSidebarProps) {
   return (
@@ -50,6 +60,11 @@ export default function ProjectSidebar({
       {/* Main Info Card */}
       <div className="bg-white dark:bg-gray-800 rounded-none shadow-sm p-6">
         <h1 className="text-2xl font-bold mb-2">{title}</h1>
+        {shortSummary && (
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 italic leading-relaxed">
+            {shortSummary}
+          </p>
+        )}
         <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-6">
           {event && <span className="text-emerald-500 font-semibold">{event}</span>}
           {event && <span>•</span>}
@@ -114,6 +129,26 @@ export default function ProjectSidebar({
             </div>
           </div>
         </div>
+
+        {/* Supported Versions Section */}
+        {versions.length > 0 && (
+          <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 uppercase tracking-wider mb-4">Supported Versions</h3>
+            <div className="flex flex-wrap gap-2">
+              {versions.map((v) => (
+                <div
+                  key={v.id}
+                  className="flex items-center space-x-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-2.5 py-1.5"
+                >
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-none" />
+                  <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300">
+                    {v.platformType.charAt(0).toUpperCase() + v.platformType.slice(1)} {v.versionNumber}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tags Card */}

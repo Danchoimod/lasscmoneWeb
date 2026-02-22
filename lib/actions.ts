@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn, auth } from "@/auth";
+import { signIn, signOut, auth } from "@/auth";
 import { API_BASE_URL } from "./api";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
@@ -53,6 +53,7 @@ export async function getMe() {
         });
 
         if (response.status === 401) {
+            await signOut({ redirect: false });
             return { success: false, error: "Unauthorized", isUnauthorized: true };
         }
 
@@ -87,6 +88,7 @@ export async function getFollowing() {
         });
 
         if (response.status === 401) {
+            await signOut({ redirect: false });
             return { success: false, error: "Unauthorized", isUnauthorized: true };
         }
 
@@ -99,6 +101,114 @@ export async function getFollowing() {
         return { success: false, error: data.message || "Failed to fetch following list" };
     } catch (error) {
         console.error("GetFollowing action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function getMyPackages() {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "No token found", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/packages/me`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            return { success: true, data: data.packages || [], pagination: data.pagination };
+        }
+
+        return { success: false, error: data.message || "Failed to fetch internal packages" };
+    } catch (error) {
+        console.error("GetMyPackages action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function getMyPackageById(id: string) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "No token found", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/packages/me/${id}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            return { success: true, data: data.data.package || data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to fetch project details" };
+    } catch (error) {
+        console.error(`GetMyPackageById action error (${id}):`, error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function updateProject(id: string, formData: any) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "No token found", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/packages/me/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            revalidatePath(`/project/${data.data?.slug || id}`);
+            revalidatePath("/profile/project");
+            return { success: true, data: data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to update project" };
+    } catch (error) {
+        console.error(`UpdateProject action error (${id}):`, error);
         return { success: false, error: "Internal server error" };
     }
 }

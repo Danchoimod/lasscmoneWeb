@@ -40,6 +40,9 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
           const result = await getMe();
           if (result.success) {
             setCurrentUser(result.data);
+          } else if (result.isUnauthorized) {
+            setCurrentUser(null);
+            router.push("/login");
           }
         } catch (error) {
           console.error("Failed to fetch latest user data:", error);

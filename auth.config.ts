@@ -12,7 +12,8 @@ export const authConfig = {
                 if (isLoggedIn) return true;
                 return false; // Redirect unauthenticated users to login page
             } else if (isLoggedIn && nextUrl.pathname.startsWith("/login")) {
-                return Response.redirect(new URL("/", nextUrl));
+                // Allow access to login page even if session exists to handle expired tokens
+                return true;
             }
             return true;
         },

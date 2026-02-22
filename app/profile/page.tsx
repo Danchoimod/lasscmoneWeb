@@ -100,7 +100,7 @@ export default function ProfilePage() {
 
   // Handle saving profile with notification
   const handleSave = () => {
-    showNotification("Thông tin tài khoản đã được cập nhật thành công!", "success");
+    showNotification("Profile updated successfully!", "success");
   };
 
   if (loading) {
