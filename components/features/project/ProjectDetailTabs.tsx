@@ -14,6 +14,7 @@ interface Comment {
         username: string;
         avatarUrl: string;
         slug?: string;
+        status?: number;
     };
     replies: Comment[];
 }
@@ -90,8 +91,15 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                 </Link>
                                                 <div className="flex-1 space-y-2">
                                                     <div className="flex items-center gap-2">
-                                                        <Link href={`/user/${comment.user.slug || `${comment.user.id}-${comment.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-sm font-bold text-gray-900 dark:text-white hover:text-green-600 transition-colors">
+                                                        <Link href={`/user/${comment.user.slug || `${comment.user.id}-${comment.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-sm font-bold text-gray-900 dark:text-white hover:text-green-600 transition-colors flex items-center gap-1">
                                                             {comment.user.displayName || comment.user.username}
+                                                            {comment.user.status === 4 && (
+                                                                <div className="w-3 h-3 bg-blue-500 rounded-none flex items-center justify-center shrink-0">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="white" className="w-2 h-2">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                                    </svg>
+                                                                </div>
+                                                            )}
                                                         </Link>
                                                         <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
                                                             • {new Date(comment.createdAt).toLocaleDateString("en-GB", {
@@ -131,8 +139,15 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                                                             </Link>
                                                             <div className="flex-1 space-y-1">
                                                                 <div className="flex items-center gap-2">
-                                                                    <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-green-600 transition-colors">
+                                                                    <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-green-600 transition-colors flex items-center gap-1">
                                                                         {reply.user.displayName || reply.user.username}
+                                                                        {reply.user.status === 4 && (
+                                                                            <div className="w-2.5 h-2.5 bg-blue-500 rounded-none flex items-center justify-center shrink-0">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={5} stroke="white" className="w-1.5 h-1.5">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                                                </svg>
+                                                                            </div>
+                                                                        )}
                                                                     </Link>
                                                                     <span className="text-[9px] text-gray-400 font-medium uppercase tracking-wider">
                                                                         • {new Date(reply.createdAt).toLocaleDateString("en-GB", {

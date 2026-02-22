@@ -52,7 +52,7 @@ export default async function ProjectDetailPage({
       name: project.user.displayName || project.user.username,
       slug: project.user.slug || `${project.user.id}-${project.user.username.toLowerCase().replace(/\s+/g, '-')}`,
       avatar: project.user.avatarUrl || "https://avatars.githubusercontent.com/u/113335341?v=4",
-      verified: true,
+      verified: project.user.status === 4,
     },
     stats: {
       version: project.changelog || "1.0.0",

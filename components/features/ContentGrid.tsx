@@ -17,6 +17,7 @@ interface Package {
     username: string;
     avatarUrl: string;
     slug?: string;
+    status?: number;
   };
   category: {
     name: string;
@@ -101,6 +102,7 @@ const ContentGrid = ({ packages = [], loading = false, error = null }: ContentGr
             tags={[pkg.category?.name || "Uncategorized"]} // API doesn't seem to have explicit tags, using category for now
             title={pkg.title}
             description={pkg.shortSummary || pkg.description}
+            authorStatus={pkg.user?.status}
           />
         ))}
       </div>

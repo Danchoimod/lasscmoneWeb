@@ -105,9 +105,11 @@ const UserProfilePage = () => {
               <h1 className="text-3xl font-black text-zinc-900 tracking-tight uppercase">
                 {user.displayName || user.username}
               </h1>
-              <div className="w-6 h-6 bg-blue-500 rounded-none flex items-center justify-center shadow-sm">
-                <ShieldCheck className="w-4 h-4 text-white" />
-              </div>
+              {user.status === 4 && (
+                <div className="w-6 h-6 bg-blue-500 rounded-none flex items-center justify-center shadow-sm">
+                  <ShieldCheck className="w-4 h-4 text-white" />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-zinc-500 font-medium">

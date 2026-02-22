@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
+import { useEffect } from 'react';
 
 function ProfileSidebar() {
   const pathname = usePathname();
@@ -67,6 +68,12 @@ export default function ProfileLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <div className="bg-slate-50/50 text-zinc-900 font-sans">
       <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto py-12 px-6 gap-8">

@@ -5,6 +5,7 @@ import { getMe } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import Toast, { ToastType } from '@/components/common/Notification';
 import { useSession, signOut } from 'next-auth/react';
+import { ShieldCheck } from 'lucide-react';
 
 // 1. Định nghĩa Interface cho Props
 interface SectionHeadingProps {
@@ -156,7 +157,16 @@ export default function ProfilePage() {
             </div>
           </div>
           <div className="flex-1 space-y-2 py-4">
-            <h3 className="text-2xl font-black text-zinc-900 tracking-tight break-all">{userData?.displayName || userData?.username}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-2xl font-black text-zinc-900 tracking-tight break-all">
+                {userData?.displayName || userData?.username}
+              </h3>
+              {userData?.status === 4 && (
+                <div className="w-5 h-5 bg-blue-500 rounded-none flex items-center justify-center shadow-sm">
+                  <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                </div>
+              )}
+            </div>
             <p className="text-sm text-gray-500 italic">User ID: #{userData?.id}</p>
           </div>
         </div>

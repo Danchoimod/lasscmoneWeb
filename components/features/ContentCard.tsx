@@ -18,6 +18,7 @@ interface ContentCardProps {
   tags: string[];
   title: string;
   description: string;
+  authorStatus?: number;
 }
 
 const ContentCard = ({
@@ -33,6 +34,7 @@ const ContentCard = ({
   tags,
   title,
   description,
+  authorStatus,
 }: ContentCardProps) => {
   return (
     <div className="block group h-full">
@@ -77,9 +79,11 @@ const ContentCard = ({
             <div className="flex flex-col">
               <div className="flex items-center gap-1">
                 <span className="text-[#3b82f6] font-bold text-[13px] leading-none group-hover/user:text-blue-700">By {author}</span>
-                <div className="w-3 h-3 bg-orange-500 rounded-none flex items-center justify-center shrink-0">
-                  <span className="text-[7px] text-white font-black">✓</span>
-                </div>
+                {authorStatus === 4 && (
+                  <div className="w-3 h-3 bg-orange-500 rounded-none flex items-center justify-center shrink-0">
+                    <span className="text-[7px] text-white font-black">✓</span>
+                  </div>
+                )}
               </div>
               <span className="text-[10px] text-zinc-500 mt-0.5">{date}</span>
             </div>
