@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Search, ChevronDown, Menu, X, User } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 interface Category {
   id: number;
@@ -21,24 +22,11 @@ interface NavbarProps {
 const Navbar = ({ initialCategories = [] }: NavbarProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const user = session?.user as any;
   const [open, setOpen] = useState(false);
   const [categories] = useState<Category[]>(initialCategories);
   const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Error parsing user from localStorage", e);
-        setUser(null);
-      }
-    } else {
-      setUser(null);
-    }
-  }, [pathname]);
 
   // Search states
   const [isSearchOpen, setIsSearchOpen] = useState(false);

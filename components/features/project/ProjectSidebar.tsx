@@ -81,16 +81,6 @@ export default function ProjectSidebar({
               <li className="text-gray-400 italic text-sm">No downloads available</li>
             )}
           </ul>
-
-          <div className="pt-2">
-            <a
-              href="#"
-              className="w-full flex items-center justify-center space-x-2 py-3 bg-white dark:bg-gray-800 text-emerald-600 border border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-95 font-bold uppercase tracking-wider transition-all rounded-none"
-            >
-              <Heart className="w-5 h-5 text-red-500" />
-              <span>Add to Wishlist</span>
-            </a>
-          </div>
         </div>
 
         <div className="mt-8 space-y-4">

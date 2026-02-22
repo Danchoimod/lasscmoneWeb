@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { auth } from "@/auth";
 
 export const API_BASE_URL = process.env.BACKEND_API_URL || "http://localhost:25461/api";
 
@@ -7,13 +7,13 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
         "Content-Type": "application/json"
     };
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token")?.value;
+        const session = await auth();
+        const token = (session as any)?.accessToken;
         if (token) {
             headers["Authorization"] = `Bearer ${token}`;
         }
     } catch (e) {
-        // cookies() might fail in client components
+        // auth() might fail or session might not be available
     }
     return headers;
 }

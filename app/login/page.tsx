@@ -20,11 +20,7 @@ export default function Login() {
       const result = await loginAction({ email, password });
 
       if (result.success) {
-        if (result.user) {
-          localStorage.setItem("user", JSON.stringify(result.user));
-        }
-        router.refresh();
-        router.push("/");
+        window.location.href = "/";
       } else {
         setError(result.error || "Invalid credentials. Please try again.");
       }

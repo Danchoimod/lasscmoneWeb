@@ -2,26 +2,18 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { logoutAction } from '@/lib/actions';
+import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 function ProfileSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!confirm('Are you sure you want to logout?')) return;
 
     try {
-      const result = await logoutAction();
-      if (result.success) {
-        localStorage.removeItem('user');
-        router.push('/login');
-        router.refresh();
-      } else {
-        alert('Logout failed on server');
-      }
+      await signOut({ callbackUrl: '/login' });
     } catch (error) {
       console.error('Logout failed:', error);
       alert('Failed to logout. Please try again.');

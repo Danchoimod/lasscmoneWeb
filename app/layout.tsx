@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { getCategories } from "@/lib/api";
+import Providers from "@/components/providers/SessionProvider";
 
 export default async function RootLayout({
   children,
@@ -36,13 +37,15 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex min-h-screen flex-col">
-          <Navbar initialCategories={categories} />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Navbar initialCategories={categories} />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

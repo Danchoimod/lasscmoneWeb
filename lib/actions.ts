@@ -1,86 +1,47 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { signIn, auth } from "@/auth";
 import { API_BASE_URL } from "./api";
-
-export async function logoutAction() {
-    try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token")?.value;
-
-        if (token) {
-            // Notify backend if needed
-            await fetch(`${API_BASE_URL}/auth/logout`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
-        }
-
-        // Clear cookie
-        cookieStore.delete("token");
-
-        return { success: true };
-    } catch (error) {
-        console.error("Logout action error:", error);
-        return { success: false, error: "Logout failed" };
-    }
-}
+import { AuthError } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 export async function loginAction(formData: any) {
     try {
         const { email, password } = formData;
 
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
+        await signIn("credentials", {
+            email,
+            password,
+            redirect: false,
         });
 
-        const data = await response.json();
-
-        if (response.ok && (data.status === "success" || data.idToken)) {
-            const token = data.data?.token || data.idToken;
-
-            if (!token) {
-                return { success: false, error: "No token received" };
-            }
-
-            const cookieStore = await cookies();
-            cookieStore.set({
-                name: "token",
-                value: token,
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "lax",
-                path: "/",
-                maxAge: data.expiresIn ? parseInt(data.expiresIn) : 60 * 60 * 24 * 7,
-            });
-
-            return {
-                success: true,
-                user: data.data?.user || { email: data.email, localId: data.localId }
-            };
-        }
-
-        return { success: false, error: data.message || "Login failed" };
+        revalidatePath("/");
+        return { success: true, user: null }; // user will be in session
     } catch (error) {
+        if (error instanceof AuthError) {
+            switch (error.type) {
+                case "CredentialsSignin":
+                    return { success: false, error: "Invalid credentials." };
+                default:
+                    return { success: false, error: "Something went wrong." };
+            }
+        }
+        // In Auth.js v5, redirecting might throw an error that should be rethrown
+        if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+            throw error;
+        }
         console.error("Login action error:", error);
-        return { success: false, error: "Internal server error" };
+        return { success: false, error: "Login failed" };
     }
 }
 
 export async function getMe() {
     try {
-        const cookieStore = await cookies();
-        const token = cookieStore.get("token")?.value;
+        const session = await auth();
+        const token = (session as any)?.accessToken;
 
         if (!token) {
-            return { success: false, error: "No token found" };
+            return { success: false, error: "No token found", isUnauthorized: true };
         }
 
         const response = await fetch(`${API_BASE_URL}/me`, {
@@ -90,6 +51,10 @@ export async function getMe() {
                 "Content-Type": "application/json",
             },
         });
+
+        if (response.status === 401) {
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
 
         const data = await response.json();
 
