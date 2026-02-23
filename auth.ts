@@ -7,23 +7,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Credentials({
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
+                const idToken = (credentials as any).idToken;
+                const email = credentials?.email;
+                const password = credentials?.password;
 
-                const { email, password } = credentials;
+                if (!idToken && (!email || !password)) {
+                    return null;
+                }
 
                 try {
-                    const response = await fetch(`${process.env.BACKEND_API_URL}/auth/login`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ email, password }),
-                    });
+                    let response;
+                    if ((credentials as any).idToken) {
+                        response = await fetch(`${process.env.BACKEND_API_URL}/auth/google`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ idToken: (credentials as any).idToken }),
+                        });
+                    } else {
+                        const { email, password } = credentials as any;
+                        response = await fetch(`${process.env.BACKEND_API_URL}/auth/login`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ email, password }),
+                        });
+                    }
 
                     const data = await response.json();
+                    console.log("[Auth] Backend response:", data);
 
-                    if (response.ok && (data.status === "success" || data.idToken)) {
-                        const token = data.data?.token || data.idToken;
+                    if (response.ok && (data.status === "success" || data.success === true || data.idToken || data.data?.idToken || data.data?.token)) {
+                        const token = data.data?.idToken || data.data?.token || data.idToken;
                         const user = data.data?.user || { email: data.email, localId: data.localId };
 
                         if (!token) return null;

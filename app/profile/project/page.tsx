@@ -52,10 +52,10 @@ export default function ProjectPage() {
       case 1:
         return { label: 'Published', class: 'bg-green-50 text-green-700 border-green-200' };
       case 2:
-        return { label: 'Reviewing', class: 'bg-amber-50 text-amber-700 border-amber-200' };
+        return { label: 'Rejected', class: 'bg-amber-50 text-amber-700 border-amber-200' };
       case 0:
       default:
-        return { label: 'Draft', class: 'bg-gray-50 text-gray-600 border-gray-200' };
+        return { label: 'Pending', class: 'bg-gray-50 text-gray-600 border-gray-200' };
     }
   };
 

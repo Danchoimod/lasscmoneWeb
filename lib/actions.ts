@@ -35,6 +35,24 @@ export async function loginAction(formData: any) {
     }
 }
 
+export async function googleLoginAction(idToken: string) {
+    try {
+        await signIn("credentials", {
+            idToken,
+            redirect: false,
+        });
+
+        revalidatePath("/");
+        return { success: true };
+    } catch (error) {
+        if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+            throw error;
+        }
+        console.error("Google login action error:", error);
+        return { success: false, error: "Google login failed" };
+    }
+}
+
 export async function getMe() {
     try {
         const session = await auth();
@@ -209,6 +227,43 @@ export async function updateProject(id: string, formData: any) {
         return { success: false, error: data.message || "Failed to update project" };
     } catch (error) {
         console.error(`UpdateProject action error (${id}):`, error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function createProject(formData: any) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "No token found", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/packages/me`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            revalidatePath("/profile/project");
+            return { success: true, data: data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to create project" };
+    } catch (error) {
+        console.error("CreateProject action error:", error);
         return { success: false, error: "Internal server error" };
     }
 }

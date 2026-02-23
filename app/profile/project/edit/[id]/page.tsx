@@ -291,7 +291,7 @@ export default function EditProjectPage() {
                                 disabled
                                 className="w-full border border-gray-300 bg-gray-200 p-3 text-sm outline-none font-bold italic opacity-70 cursor-not-allowed"
                             >
-                                <option value={0}>Draft</option>
+                                <option value={0}>Pending</option>
                                 <option value={1}>Published</option>
                                 <option value={2}>Under Review</option>
                             </select>
