@@ -1,0 +1,62 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
+
+export default function ProfileSidebar() {
+    const pathname = usePathname();
+
+    const handleLogout = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (!confirm('Are you sure you want to logout?')) return;
+
+        try {
+            await signOut({ callbackUrl: '/login' });
+        } catch (error) {
+            console.error('Logout failed:', error);
+            alert('Failed to logout. Please try again.');
+        }
+    };
+
+    const menuItems = [
+        { href: '/profile', label: 'User Profile' },
+        { href: '/profile/follow', label: 'Following List' },
+        { href: '/profile/project', label: 'My Projects' },
+        { href: '/profile/status', label: 'Account Status' },
+    ];
+
+    return (
+        <div className="flex flex-col h-full uppercase font-bold">
+            <div className="p-4 bg-gray-200 border-b border-gray-300">
+                <h2 className="text-sm font-bold text-gray-700">Account Settings</h2>
+            </div>
+
+            <nav className="flex-1">
+                {menuItems.map((item) => {
+                    const isActive = pathname === item.href;
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`block px-4 py-4 text-xs border-b border-gray-200 transition-none ${isActive
+                                ? 'bg-white text-black font-bold border-l-4 border-l-green-600'
+                                : 'text-gray-600 hover:bg-gray-100 hover:text-black'
+                                }`}
+                        >
+                            {item.label}
+                        </Link>
+                    );
+                })}
+
+                <button
+                    onClick={handleLogout}
+                    className="w-full text-left block px-4 py-4 text-xs text-red-600 hover:bg-red-50 border-b border-gray-200 transition-colors"
+                >
+                    Logout / Exit
+                </button>
+            </nav>
+        </div>
+    );
+}
