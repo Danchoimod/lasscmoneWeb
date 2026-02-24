@@ -88,7 +88,7 @@ export async function getPackageBySlug(slug: string) {
         console.log(`[API] Fetching package: ${slug}`);
         const res = await fetch(`${API_BASE_URL}/packages/${slug}`, {
             headers,
-            next: { revalidate: 60 }
+            cache: 'no-store'
         });
         console.log(`[API] Fetch status: ${res.status}`);
         if (!res.ok) return null;
@@ -131,10 +131,16 @@ export async function getCategories() {
         const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/categories`, {
             headers,
-            next: { revalidate: 3600 }
+            cache: 'no-store'
         });
         if (!res.ok) return [];
-        return res.json();
+        const result = await res.json();
+
+        // Bóc tách dữ liệu từ cấu trúc { status, data }
+        if (result.status === "success") {
+            return Array.isArray(result.data) ? result.data : (result.data?.categories || []);
+        }
+        return Array.isArray(result) ? result : [];
     } catch (error) {
         console.error("Error fetching categories:", error);
         return [];

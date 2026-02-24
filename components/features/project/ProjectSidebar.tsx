@@ -1,5 +1,6 @@
 import React from 'react';
 import { Download, Heart, CheckCircle, Star, ShieldCheck } from 'lucide-react';
+import RatingInteractive from './RatingInteractive';
 import Link from 'next/link';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
@@ -34,6 +35,7 @@ interface ProjectSidebarProps {
     lastUpdated: string;
     downloads: string;
     rating: number;
+    ratingCount: number;
   };
   tags: string[];
   urls?: DownloadUrl[];
@@ -142,12 +144,13 @@ export default function ProjectSidebar({
             <span className="text-gray-500 dark:text-gray-400">Downloads</span>
             <span className="font-medium">{stats.downloads}</span>
           </div>
-          <div className="flex justify-between items-center py-3 text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Rating</span>
-            <div className="flex items-center text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-none">
-              <span className="font-bold mr-1">{stats.rating}</span>
-              <Star className="w-4 h-4 fill-current" />
-            </div>
+          <div className="flex flex-col py-3 text-sm">
+            <span className="text-gray-500 dark:text-gray-400 mb-2">Rating</span>
+            <RatingInteractive
+              packageId={packageId}
+              initialRating={stats.rating}
+              ratingCount={stats.ratingCount}
+            />
           </div>
         </div>
 

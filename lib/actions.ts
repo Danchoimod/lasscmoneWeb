@@ -53,6 +53,43 @@ export async function googleLoginAction(idToken: string) {
     }
 }
 
+export async function updateProfile(formData: { displayName?: string, username?: string, avatarUrl?: string }) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "No token found", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+            method: "PATCH",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            revalidatePath("/profile");
+            return { success: true, data: data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to update profile" };
+    } catch (error) {
+        console.error("UpdateProfile action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
 export async function getMe() {
     try {
         const session = await auth();
@@ -412,6 +449,77 @@ export async function followUser(followingId: number) {
         return { success: false, error: result.message || "Failed to process follow request" };
     } catch (error) {
         console.error("FollowUser action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function rateProject(packageId: number, rating: number) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "You must be logged in to rate.", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/packages/${packageId}/rate`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ score: rating })
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Session expired", isUnauthorized: true };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            revalidatePath("/profile/project");
+            return { success: true, data: data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to submit rating" };
+    } catch (error) {
+        console.error("RateProject action error:", error);
+        return { success: false, error: "Internal server error" };
+    }
+}
+
+export async function getMyRating(packageId: number) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: true, data: { rating: null } };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/packages/${packageId}/my-rate`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 401) {
+            return { success: true, data: { rating: null } };
+        }
+
+        const data = await response.json();
+
+        if (response.ok && data.status === "success") {
+            return { success: true, data: data.data };
+        }
+
+        return { success: false, error: data.message || "Failed to fetch your rating" };
+    } catch (error) {
+        console.error("GetMyRating action error:", error);
         return { success: false, error: "Internal server error" };
     }
 }

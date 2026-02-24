@@ -36,8 +36,10 @@ const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, i
     const fetchCategories = async () => {
       try {
         const response = await fetch("/api-backend/categories");
-        const data = await response.json();
-        setCategories(data);
+        const result = await response.json();
+        // Bóc tách data tương tự như trong lib/api.ts
+        const cats = result.status === "success" ? (result.data?.categories || result.data) : result;
+        setCategories(Array.isArray(cats) ? cats : []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }

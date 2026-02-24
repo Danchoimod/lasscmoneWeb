@@ -65,6 +65,7 @@ export default async function ProjectDetailPage({
       }),
       downloads: "0",
       rating: project.ratingAvg || 0,
+      ratingCount: project.ratingCount || 0,
     },
     tags: [project.category.name],
     otherFromCreator: [],

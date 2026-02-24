@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ReactNode, useState, useEffect, useCallback } from 'react';
-import { getMe } from '@/lib/actions';
+import { getMe, updateProfile } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import Toast, { ToastType } from '@/components/common/Notification';
 import { useSession, signOut } from 'next-auth/react';
@@ -48,7 +48,13 @@ export default function ProfilePage() {
   const router = useRouter();
   const { data: session } = useSession();
   const [userData, setUserData] = useState<any>(null);
+  const [profileForm, setProfileForm] = useState({
+    displayName: '',
+    username: '',
+    avatarUrl: ''
+  });
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Notification state
@@ -81,6 +87,11 @@ export default function ProfilePage() {
         const result = await getMe();
         if (result.success) {
           setUserData(result.data);
+          setProfileForm({
+            displayName: result.data.displayName || '',
+            username: result.data.username || '',
+            avatarUrl: result.data.avatarUrl || ''
+          });
         } else {
           // Bắt lỗi 401 -> Gọi hàm handleLogout()
           if (result.isUnauthorized) {
@@ -99,8 +110,26 @@ export default function ProfilePage() {
   }, [handleLogout]);
 
   // Handle saving profile with notification
-  const handleSave = () => {
-    showNotification("Profile updated successfully!", "success");
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      const result = await updateProfile({
+        displayName: profileForm.displayName,
+        username: profileForm.username,
+        avatarUrl: profileForm.avatarUrl
+      });
+
+      if (result.success) {
+        setUserData({ ...userData, ...result.data });
+        showNotification("Profile updated successfully!", "success");
+      } else {
+        showNotification(result.error || "Failed to update profile", "error");
+      }
+    } catch (err) {
+      showNotification("An error occurred while updating profile", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -145,14 +174,20 @@ export default function ProfilePage() {
         <div className="flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
           <div className="flex flex-col gap-3 group shrink-0">
             <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Avatar</label>
-            <div className="relative w-32 h-32 border-2 border-gray-100 bg-gray-50 flex items-center justify-center cursor-pointer hover:border-green-600 transition-all duration-300 overflow-hidden shadow-inner">
-              {userData?.avatarUrl ? (
-                <img src={userData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            <div
+              onClick={() => {
+                const url = prompt("Enter new Avatar URL:", profileForm.avatarUrl);
+                if (url !== null) setProfileForm({ ...profileForm, avatarUrl: url });
+              }}
+              className="relative w-32 h-32 border-2 border-gray-100 bg-gray-50 flex items-center justify-center cursor-pointer hover:border-green-600 transition-all duration-300 overflow-hidden shadow-inner"
+            >
+              {profileForm.avatarUrl ? (
+                <img src={profileForm.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-gray-400 font-bold text-[10px] uppercase">No Image</span>
               )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                <span className="text-white font-bold text-[10px] uppercase tracking-widest">Change</span>
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-center p-2">
+                <span className="text-white font-bold text-[10px] uppercase tracking-widest leading-tight">Change<br />Avatar</span>
               </div>
             </div>
           </div>
@@ -172,21 +207,37 @@ export default function ProfilePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 max-w-4xl">
-          <ClassicInput label="Username" value={userData?.username} disabled />
-          <ClassicInput label="Display Name" value={userData?.displayName} />
+          <ClassicInput
+            label="Username"
+            value={profileForm.username}
+            disabled
+          />
+          <ClassicInput
+            label="Display Name"
+            value={profileForm.displayName}
+            onChange={(val) => setProfileForm({ ...profileForm, displayName: val })}
+          />
           <div className="md:col-span-2">
-            <ClassicInput label="Email Address" type="email" value={userData?.email} />
+            <ClassicInput label="Email Address" type="email" value={userData?.email} disabled />
           </div>
         </div>
 
         <div className="pt-8 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
           <button
             onClick={handleSave}
-            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-10 py-3 text-xs font-bold uppercase tracking-[0.2em] transition-all hover:translate-y-[-2px] active:translate-y-[0] shadow-md shadow-green-100"
+            disabled={saving}
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-10 py-3 text-xs font-bold uppercase tracking-[0.2em] transition-all hover:translate-y-[-2px] active:translate-y-[0] shadow-md shadow-green-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0"
           >
-            Save Changes
+            {saving ? "Saving..." : "Save Changes"}
           </button>
-          <button className="w-full sm:w-auto bg-gray-50 hover:bg-gray-100 text-gray-500 px-10 py-3 text-xs font-bold uppercase tracking-[0.2em] transition-all">
+          <button
+            onClick={() => setProfileForm({
+              displayName: userData?.displayName || '',
+              username: userData?.username || '',
+              avatarUrl: userData?.avatarUrl || ''
+            })}
+            className="w-full sm:w-auto bg-gray-50 hover:bg-gray-100 text-gray-500 px-10 py-3 text-xs font-bold uppercase tracking-[0.2em] transition-all"
+          >
             Cancel
           </button>
         </div>
