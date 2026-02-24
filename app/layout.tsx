@@ -24,6 +24,7 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { getCategories } from "@/lib/api";
 import Providers from "@/components/providers/SessionProvider";
+import NextTopLoader from 'nextjs-toploader';
 
 export default async function RootLayout({
   children,
@@ -37,6 +38,17 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextTopLoader
+          color="#00a63e"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={2}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #3b82f6,0 0 5px #3b82f6"
+        />
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Navbar initialCategories={categories} />

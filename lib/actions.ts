@@ -523,3 +523,36 @@ export async function getMyRating(packageId: number) {
         return { success: false, error: "Internal server error" };
     }
 }
+export async function deleteProject(id: number | string) {
+    try {
+        const session = await auth();
+        const token = (session as any)?.accessToken;
+
+        if (!token) {
+            return { success: false, error: "No token found", isUnauthorized: true };
+        }
+
+        const response = await fetch(`${API_BASE_URL}/packages/me/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+        });
+
+        if (response.status === 401) {
+            await signOut({ redirect: false });
+            return { success: false, error: "Unauthorized", isUnauthorized: true };
+        }
+
+        if (response.status === 204 || response.ok) {
+            revalidatePath("/profile/project");
+            return { success: true };
+        }
+
+        const data = await response.json().catch(() => ({}));
+        return { success: false, error: data.message || "Failed to delete project" };
+    } catch (error) {
+        console.error(`DeleteProject action error (${id}):`, error);
+        return { success: false, error: "Internal server error" };
+    }
+}

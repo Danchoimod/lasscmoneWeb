@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { deleteProject } from '@/lib/actions';
 
 const SectionHeading = ({ children }: { children: React.ReactNode }) => (
     <div className="mb-6 border-b-2 border-gray-800 pb-2">
@@ -33,6 +34,26 @@ const getStatusLabel = (status: number) => {
 
 export default function ProjectClient({ initialProjects }: { initialProjects: Project[] }) {
     const router = useRouter();
+    const [isDeleting, setIsDeleting] = useState<number | null>(null);
+
+    const handleDelete = async (id: number, title: string) => {
+        if (!confirm(`Are you sure you want to delete "${title}"? This action will permanently remove the project and all associated data.`)) {
+            return;
+        }
+
+        setIsDeleting(id);
+        try {
+            const result = await deleteProject(id);
+            if (!result.success) {
+                alert(result.error || "Failed to delete project");
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+            alert("An error occurred while deleting the project");
+        } finally {
+            setIsDeleting(null);
+        }
+    };
 
     return (
         <div className="bg-white p-3 sm:p-8 border border-gray-300 transition-none min-h-screen rounded-none animate-in fade-in duration-500">
@@ -97,7 +118,13 @@ export default function ProjectClient({ initialProjects }: { initialProjects: Pr
                                                     >
                                                         Edit
                                                     </button>
-                                                    <button className="text-[10px] font-bold uppercase text-red-500 hover:text-red-700">Delete</button>
+                                                    <button
+                                                        onClick={() => handleDelete(project.id, project.title)}
+                                                        disabled={isDeleting === project.id}
+                                                        className={`text-[10px] font-bold uppercase ${isDeleting === project.id ? 'text-gray-400' : 'text-red-500 hover:text-red-700'}`}
+                                                    >
+                                                        {isDeleting === project.id ? 'Deleting...' : 'Delete'}
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
