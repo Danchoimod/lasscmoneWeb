@@ -10,6 +10,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 const idToken = (credentials as any).idToken;
                 const email = credentials?.email;
                 const password = credentials?.password;
+                const preAuthUser = (credentials as any).user ? JSON.parse((credentials as any).user as string) : null;
+                const accessToken = (credentials as any).accessToken;
+
+                if (preAuthUser && accessToken) {
+                    return {
+                        id: preAuthUser.id || preAuthUser.localId || preAuthUser.uid || preAuthUser.email,
+                        email: preAuthUser.email,
+                        name: preAuthUser.username || preAuthUser.displayName,
+                        accessToken: accessToken,
+                        user: preAuthUser,
+                    };
+                }
 
                 if (!idToken && (!email || !password)) {
                     return null;
@@ -17,16 +29,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 try {
                     let response;
-                    if ((credentials as any).idToken) {
+                    if (idToken) {
                         response = await fetch(`${process.env.BACKEND_API_URL}/auth/google`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                             },
-                            body: JSON.stringify({ idToken: (credentials as any).idToken }),
+                            body: JSON.stringify({ idToken }),
                         });
                     } else {
-                        const { email, password } = credentials as any;
                         response = await fetch(`${process.env.BACKEND_API_URL}/auth/login`, {
                             method: "POST",
                             headers: {

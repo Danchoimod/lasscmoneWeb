@@ -53,6 +53,25 @@ export async function googleLoginAction(idToken: string) {
     }
 }
 
+export async function discordLoginAction(idToken: string, user: any) {
+    try {
+        await signIn("credentials", {
+            accessToken: idToken,
+            user: JSON.stringify(user),
+            redirect: false,
+        });
+
+        revalidatePath("/");
+        return { success: true };
+    } catch (error) {
+        if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+            throw error;
+        }
+        console.error("Discord login action error:", error);
+        return { success: false, error: "Discord login failed" };
+    }
+}
+
 export async function updateProfile(formData: { displayName?: string, username?: string, avatarUrl?: string }) {
     try {
         const session = await auth();

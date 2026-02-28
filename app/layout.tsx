@@ -47,7 +47,6 @@ export default async function RootLayout({
           showSpinner={false}
           easing="ease"
           speed={200}
-          shadow="0 0 10px #3b82f6,0 0 5px #3b82f6"
         />
         <Providers>
           <div className="flex min-h-screen flex-col">

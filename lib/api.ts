@@ -177,3 +177,44 @@ export async function getVersions() {
         return [];
     }
 }
+
+export async function getDiscordAuthUrl() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/auth/discord/url`);
+        if (!res.ok) return null;
+        const result = await res.json();
+
+        // Handle both standard { status, data: { url } } and direct { url } formats
+        if (result.status === "success" && result.data?.url) return result.data.url;
+        if (result.url) return result.url;
+
+        return null;
+    } catch (error) {
+        console.error("Error fetching Discord auth URL:", error);
+        return null;
+    }
+}
+
+export async function loginWithDiscord(code: string) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/auth/discord`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ code }),
+        });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { success: false, error: errorData.message || "Failed to login with Discord" };
+        }
+        const result = await res.json();
+        if (result.status === "success" && result.data?.idToken) {
+            return { success: true, data: result.data };
+        }
+        return { success: false, error: result.message || "Invalid response from server" };
+    } catch (error) {
+        console.error("Error logging in with Discord:", error);
+        return { success: false, error: "Network error during Discord login" };
+    }
+}

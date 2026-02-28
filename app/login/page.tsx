@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginAction, googleLoginAction } from "@/lib/actions";
+import { getDiscordAuthUrl } from "@/lib/api";
 import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
 
@@ -34,6 +35,24 @@ export default function Login() {
       } else {
         setError("An error occurred during Google login.");
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDiscordLogin = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const url = await getDiscordAuthUrl();
+      if (url) {
+        window.location.href = url;
+      } else {
+        setError("Failed to get Discord authorization URL.");
+      }
+    } catch (err) {
+      console.error("Discord login error:", err);
+      setError("An error occurred during Discord login.");
     } finally {
       setLoading(false);
     }
@@ -82,9 +101,13 @@ export default function Login() {
               )}
 
               <div className="flex flex-col gap-3">
-                <button className="flex h-11 w-full items-center justify-center gap-3 border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-[0.98]">
+                <button
+                  onClick={handleDiscordLogin}
+                  disabled={loading}
+                  className="flex h-11 w-full items-center justify-center gap-3 border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <img src="https://www.svgrepo.com/show/353655/discord-icon.svg" alt="Discord" className="h-5 w-5" />
-                  Continue with Discord
+                  {loading ? "Redirecting..." : "Continue with Discord"}
                 </button>
                 <button
                   onClick={handleGoogleLogin}
