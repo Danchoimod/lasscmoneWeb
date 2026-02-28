@@ -19,5 +19,5 @@ export default async function ProjectPage() {
     );
   }
 
-  return <ProjectClient initialProjects={result.data || []} />;
+  return <ProjectClient initialProjects={result.data || []} initialPagination={result.pagination} />;
 }

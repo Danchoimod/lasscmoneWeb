@@ -24,7 +24,6 @@ export default function ProfileSidebar() {
         { href: '/profile', label: 'User Profile' },
         { href: '/profile/follow', label: 'Following List' },
         { href: '/profile/project', label: 'My Projects' },
-        { href: '/profile/status', label: 'Account Status' },
     ];
 
     return (

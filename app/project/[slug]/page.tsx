@@ -26,7 +26,7 @@ export default async function ProjectDetailPage({
     notFound();
   }
 
-  let commentsData = { comments: [], total: 0 };
+  let commentsData: any = { comments: [], total: 0, pagination: null };
   if (project.id) {
     try {
       commentsData = await getPackageComments(project.id);
@@ -34,7 +34,7 @@ export default async function ProjectDetailPage({
       console.error(`Failed to fetch comments for project ${project.id}:`, err);
     }
   }
-  const { comments, total: commentCount } = commentsData;
+  const { comments, total: commentCount, pagination: initialPagination } = commentsData;
 
   const mappedProjectData = {
     id: project.id,
@@ -92,6 +92,7 @@ export default async function ProjectDetailPage({
               project={project}
               comments={comments}
               commentCount={commentCount}
+              initialPagination={initialPagination}
               tabs={mappedProjectData.tabs}
             />
           </div>

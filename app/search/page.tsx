@@ -7,21 +7,25 @@ import { searchPackages, getPackages, getCategories } from "@/lib/api";
 
 async function SearchResults({ query, category }: { query: string; category: string | null }) {
     let packages = [];
+    let initialPagination = null;
     try {
+        let result;
         if (query) {
-            packages = await searchPackages(query);
+            result = await searchPackages(query);
         } else if (category) {
-            packages = await getPackages(category);
+            result = await getPackages(category);
         } else {
-            packages = await getPackages();
+            result = await getPackages();
         }
+        packages = result.packages;
+        initialPagination = result.pagination;
     } catch (error) {
         console.error("Failed to fetch packages on server:", error);
     }
 
     return (
         <div className="mt-8">
-            <ContentGrid packages={packages} />
+            <ContentGrid packages={packages} initialPagination={initialPagination} query={query} category={category} />
         </div>
     );
 }

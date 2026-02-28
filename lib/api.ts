@@ -34,51 +34,58 @@ export async function getCarousels() {
     }
 }
 
-export async function getPackages(categorySlug?: string | null) {
+export async function getPackages(categorySlug?: string | null, page: number = 1) {
     try {
         const headers = await getAuthHeaders();
-        let url = `${API_BASE_URL}/packages`;
+        let url = `${API_BASE_URL}/packages?page=${page}&limit=10`;
         if (categorySlug) {
-            url = `${API_BASE_URL}/categories/${categorySlug}/packages?page=1&limit=12`;
+            url = `${API_BASE_URL}/categories/${categorySlug}/packages?page=${page}&limit=10`;
         }
         const res = await fetch(url, {
             headers,
             next: { revalidate: 60 }
         });
-        if (!res.ok) return [];
+        if (!res.ok) return { packages: [], pagination: null };
         const result = await res.json();
 
-        // Handle flexible response formats from backend
-        if (result.status === "success" && result.data?.packages) return result.data.packages;
-        if (result.packages) return result.packages;
-        if (Array.isArray(result)) return result;
-        if (result.data && Array.isArray(result.data)) return result.data;
+        let packages = [];
+        if (result.status === "success" && result.data?.packages) packages = result.data.packages;
+        else if (result.packages) packages = result.packages;
+        else if (Array.isArray(result)) packages = result;
+        else if (result.data && Array.isArray(result.data)) packages = result.data;
 
-        return [];
+        return {
+            packages,
+            pagination: result.data?.pagination || result.pagination || null
+        };
     } catch (error) {
         console.error("Error fetching packages:", error);
-        return [];
+        return { packages: [], pagination: null };
     }
 }
 
-export async function searchPackages(query: string) {
+export async function searchPackages(query: string, page: number = 1) {
     try {
         const headers = await getAuthHeaders();
-        const res = await fetch(`${API_BASE_URL}/packages/search?search=${encodeURIComponent(query)}&limit=12`, {
+        const res = await fetch(`${API_BASE_URL}/packages/search?search=${encodeURIComponent(query)}&page=${page}&limit=10`, {
             headers,
             cache: 'no-store'
         });
-        if (!res.ok) return [];
+        if (!res.ok) return { packages: [], pagination: null };
         const result = await res.json();
 
-        if (result.status === "success" && result.data?.packages) return result.data.packages;
-        if (result.packages) return result.packages;
-        if (Array.isArray(result)) return result;
+        let packages = [];
+        if (result.status === "success" && result.data?.packages) packages = result.data.packages;
+        else if (result.packages) packages = result.packages;
+        else if (Array.isArray(result)) packages = result;
 
-        return [];
+        return {
+            packages,
+            pagination: result.data?.pagination || result.pagination || null
+        };
     } catch (error) {
         console.error("Error searching packages:", error);
-        return [];
+        return { packages: [], pagination: null };
     }
 }
 
@@ -104,25 +111,28 @@ export async function getPackageBySlug(slug: string) {
     }
 }
 
-export async function getPackageComments(packageId: number) {
+export async function getPackageComments(packageId: number, page: number = 1) {
     try {
         const headers = await getAuthHeaders();
-        const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}`, {
+        const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}?page=${page}&limit=10`, {
             headers,
             cache: 'no-store'
         });
-        if (!res.ok) return { comments: [], total: 0 };
+        if (!res.ok) return { comments: [], total: 0, pagination: null };
         const result = await res.json();
+
         if (result.status === "success" && result.data) {
             return {
                 comments: result.data.comments || [],
-                total: result.data.pagination?.total || 0
+                total: result.data.total || 0,
+                pagination: result.data.pagination || null
             };
         }
-        return { comments: [], total: 0 };
+
+        return { comments: [], total: 0, pagination: null };
     } catch (error) {
-        console.error(`Error fetching comments for package ${packageId}:`, error);
-        return { comments: [], total: 0 };
+        console.error("Error fetching comments:", error);
+        return { comments: [], total: 0, pagination: null };
     }
 }
 
@@ -152,7 +162,7 @@ export async function getUserProfile(slug: string) {
         const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/users/${slug}/profile`, {
             headers,
-            next: { revalidate: 60 }
+            cache: 'no-store'
         });
         if (!res.ok) return null;
         const result = await res.json();
@@ -216,5 +226,19 @@ export async function loginWithDiscord(code: string) {
     } catch (error) {
         console.error("Error logging in with Discord:", error);
         return { success: false, error: "Network error during Discord login" };
+    }
+}
+
+export async function getLatestUpdates() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/app-updates/latest/all`, {
+            next: { revalidate: 3600 }
+        });
+        if (!res.ok) return { windows: null, android: null };
+        const result = await res.json();
+        return result.status === "success" ? result.data : { windows: null, android: null };
+    } catch (e) {
+        console.error("Error fetching latest app updates:", e);
+        return { windows: null, android: null };
     }
 }

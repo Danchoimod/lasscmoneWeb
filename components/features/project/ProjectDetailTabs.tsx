@@ -6,6 +6,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { createComment, deleteComment, createReport } from "@/lib/actions";
 import ProjectTabs from "./ProjectTabs";
+import Pagination from "@/components/common/Pagination";
 
 interface Comment {
     id: number;
@@ -27,6 +28,12 @@ interface ProjectDetailTabsProps {
     project: any;
     comments: Comment[];
     commentCount: number;
+    initialPagination?: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    } | null;
     tabs: any[];
 }
 
@@ -40,7 +47,7 @@ const getPlatformName = (type: string | number) => {
     return mapping[type] || type.toString();
 };
 
-export default function ProjectDetailTabs({ project, comments, commentCount, tabs }: ProjectDetailTabsProps) {
+export default function ProjectDetailTabs({ project, comments: initialComments, commentCount, initialPagination, tabs }: ProjectDetailTabsProps) {
     const router = useRouter();
     const { data: session } = useSession();
     const searchParams = useSearchParams();
@@ -51,6 +58,10 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
     const currentTab = searchParams.get("tab") || "description";
     const [activeTab, setActiveTab] = useState(currentTab);
 
+    const [comments, setComments] = useState<Comment[]>(initialComments);
+    const [pagination, setPagination] = useState(initialPagination);
+    const [isFetching, setIsFetching] = useState(false);
+
     const [commentContent, setCommentContent] = useState("");
     const [submittingComment, setSubmittingComment] = useState(false);
     const [replyToId, setReplyToId] = useState<number | null>(null);
@@ -59,10 +70,12 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
     // Local temporary comments for faster UI
     const [optimisticComments, setOptimisticComments] = useState<Comment[]>([]);
 
-    // Clear optimistic comments when actual comments prop updates
+    // Update state when actual comments prop updates
     useEffect(() => {
+        setComments(initialComments);
+        setPagination(initialPagination);
         setOptimisticComments([]);
-    }, [comments]);
+    }, [initialComments, initialPagination]);
 
     // Update state when URL changes
     useEffect(() => {
@@ -70,6 +83,31 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
             setActiveTab(currentTab);
         }
     }, [currentTab]);
+
+    const onPageChange = async (pageNum: number) => {
+        if (!pagination || isFetching) return;
+
+        setIsFetching(true);
+        try {
+            const { getPackageComments } = await import("@/lib/api");
+            const result = await getPackageComments(project.id, pageNum);
+
+            if (result.comments) {
+                setComments(result.comments);
+                setPagination(result.pagination);
+
+                // Scroll to top of comments
+                const commentsElement = document.getElementById('comments-start');
+                if (commentsElement) {
+                    commentsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load page:", err);
+        } finally {
+            setIsFetching(false);
+        }
+    };
 
     const handleTabChange = (tabId: string) => {
         setActiveTab(tabId);
@@ -199,213 +237,227 @@ export default function ProjectDetailTabs({ project, comments, commentCount, tab
                             </div>
                         </div>
 
-                        <div className={`space-y-8 relative ${isPending ? 'grayscale-[0.5] opacity-80' : ''} transition-all duration-500`}>
-                            {isPending && (
-                                <div className="absolute top-0 right-0 animate-pulse text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 z-10">
-                                    Refreshing list...
-                                </div>
-                            )}
+                        <div className="relative">
+                            <div id="comments-start" className="absolute -top-32 h-0 w-0"></div>
+                            <div className={`space-y-8 transition-all duration-500 ${isPending || isFetching ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+                                {isPending && (
+                                    <div className="absolute top-0 right-0 animate-pulse text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 z-10">
+                                        Refreshing list...
+                                    </div>
+                                )}
 
-                            {(comments.length > 0) ? (
-                                <div className="space-y-8">
-                                    {comments.map((comment) => (
-                                        <div key={comment.id} className="space-y-4">
-                                            {/* Main Comment */}
-                                            <div className="flex gap-4 group">
-                                                <Link href={`/user/${comment.user.slug || `${comment.user.id}-${comment.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="shrink-0 hover:opacity-80 transition-opacity">
-                                                    <div className="w-10 h-10 bg-gray-100 border border-gray-200 rounded-none overflow-hidden hover:border-green-600 transition-colors">
-                                                        <img
-                                                            src={comment.user.avatarUrl}
-                                                            alt={comment.user.displayName || comment.user.username}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
-                                                </Link>
-                                                <div className="flex-1 space-y-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <Link href={`/user/${comment.user.slug || `${comment.user.id}-${comment.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-sm font-bold text-gray-900 dark:text-white hover:text-green-600 transition-colors flex items-center gap-1">
-                                                            {comment.user.displayName || comment.user.username}
-                                                            {comment.user.status === 4 && (
-                                                                <div className="w-3 h-3 bg-blue-500 rounded-none flex items-center justify-center shrink-0">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="white" className="w-2 h-2">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                                                    </svg>
-                                                                </div>
-                                                            )}
-                                                        </Link>
-                                                        <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                                                            • {new Date(comment.createdAt).toLocaleDateString("en-GB", {
-                                                                day: "2-digit",
-                                                                month: "short",
-                                                                year: "numeric",
-                                                            })}
-                                                        </span>
-                                                    </div>
-                                                    <div className="relative">
-                                                        <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-4 border-l-2 border-gray-200 dark:border-gray-700 group-hover:border-green-600 transition-all duration-300">
-                                                            {comment.content}
-                                                        </p>
-                                                        <button
-                                                            onClick={() => setReplyToId(replyToId === comment.id ? null : comment.id)}
-                                                            className="mt-2 text-[10px] font-bold text-gray-400 hover:text-green-600 uppercase tracking-[0.15em] flex items-center gap-1 transition-colors"
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                                                            </svg>
-                                                            {replyToId === comment.id ? "Cancel Reply" : "Reply"}
-                                                        </button>
-
-                                                        {comment.isMine && (
-                                                            <button
-                                                                onClick={() => handleDeleteComment(comment.id)}
-                                                                className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-500 transition-all duration-200 group-hover:scale-110"
-                                                                title="Delete comment"
-                                                            >
-                                                                <img
-                                                                    src="https://img.icons8.com/?size=100&id=68064&format=png&color=EF4444"
-                                                                    alt="Delete"
-                                                                    className="w-5 h-5 object-contain"
-                                                                />
-                                                            </button>
-                                                        )}
-
-                                                        {!comment.isMine && (
-                                                            <button
-                                                                onClick={() => handleReportUser(comment.user.id, comment.user.displayName || comment.user.username)}
-                                                                className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover:opacity-100"
-                                                                title="Report User"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-1.243-10.43V5.452a48.367 48.367 0 0 1-2.916-.406L15 4.5a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
-                                                                </svg>
-                                                            </button>
-                                                        )}
-
-                                                        {replyToId === comment.id && (
-                                                            <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                                                                <textarea
-                                                                    value={replyContent}
-                                                                    onChange={(e) => setReplyContent(e.target.value)}
-                                                                    placeholder="Write a reply..."
-                                                                    className="w-full min-h-[80px] p-3 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:border-green-600 transition-colors"
-                                                                />
-                                                                <div className="flex justify-end">
-                                                                    <button
-                                                                        onClick={() => handlePostComment(comment.id)}
-                                                                        disabled={submittingComment || !replyContent.trim()}
-                                                                        className="text-[10px] font-bold text-green-600 hover:text-green-700 uppercase tracking-widest border border-green-600 px-4 py-1.5 hover:bg-green-50 transition-colors disabled:opacity-50"
-                                                                    >
-                                                                        {submittingComment ? "Replying..." : "Post Reply"}
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Replies */}
-                                            {comment.replies && comment.replies.length > 0 && (
-                                                <div className="ml-14 space-y-4 border-l-2 border-gray-100 dark:border-gray-800 pl-6">
-                                                    {comment.replies.map((reply) => (
-                                                        <div key={reply.id} className="flex gap-3 group/reply">
-                                                            <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="shrink-0 hover:opacity-80 transition-opacity">
-                                                                <div className="w-8 h-8 bg-gray-100 border border-gray-200 rounded-none overflow-hidden group-hover/reply:border-green-600 transition-colors">
-                                                                    <img
-                                                                        src={reply.user.avatarUrl}
-                                                                        alt={reply.user.displayName || reply.user.username}
-                                                                        className="w-full h-full object-cover"
-                                                                    />
-                                                                </div>
-                                                            </Link>
-                                                            <div className="flex-1 space-y-1 relative">
-                                                                <div className="flex items-center gap-2">
-                                                                    <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-green-600 transition-colors flex items-center gap-1">
-                                                                        {reply.user.displayName || reply.user.username}
-                                                                        {reply.user.status === 4 && (
-                                                                            <div className="w-2.5 h-2.5 bg-blue-500 rounded-none flex items-center justify-center shrink-0">
-                                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={5} stroke="white" className="w-1.5 h-1.5">
-                                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                                                                </svg>
-                                                                            </div>
-                                                                        )}
-                                                                    </Link>
-                                                                    <span className="text-[9px] text-gray-400 font-medium uppercase tracking-wider">
-                                                                        • {new Date(reply.createdAt).toLocaleDateString("en-GB", {
-                                                                            day: "2-digit",
-                                                                            month: "short",
-                                                                            year: "numeric",
-                                                                        })}
-                                                                    </span>
-                                                                </div>
-                                                                <p className="text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 p-3 border border-gray-100 dark:border-gray-700 group-hover/reply:border-green-600/30 transition-all duration-300 italic">
-                                                                    {reply.content}
-                                                                </p>
-                                                                <button
-                                                                    onClick={() => setReplyToId(replyToId === reply.id ? null : reply.id)}
-                                                                    className="mt-1 text-[9px] font-bold text-gray-400 hover:text-green-600 uppercase tracking-widest flex items-center gap-1 transition-colors"
-                                                                >
-                                                                    {replyToId === reply.id ? "Cancel Reply" : "Reply"}
-                                                                </button>
-
-                                                                {reply.isMine && (
-                                                                    <button
-                                                                        onClick={() => handleDeleteComment(reply.id)}
-                                                                        className="absolute top-1 right-1 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-none transition-all duration-200 group-hover/reply:scale-110"
-                                                                        title="Delete reply"
-                                                                    >
-                                                                        <img
-                                                                            src="https://img.icons8.com/?size=100&id=68064&format=png&color=EF4444"
-                                                                            alt="Delete"
-                                                                            className="w-4 h-4 object-contain"
-                                                                        />
-                                                                    </button>
-                                                                )}
-
-                                                                {!reply.isMine && (
-                                                                    <button
-                                                                        onClick={() => handleReportUser(reply.user.id, reply.user.displayName || reply.user.username)}
-                                                                        className="absolute top-1 right-1 p-1 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover/reply:opacity-100"
-                                                                        title="Report User"
-                                                                    >
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-1.243-10.43V5.452a48.367 48.367 0 0 1-2.916-.406L15 4.5a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                {(comments.length > 0) ? (
+                                    <div className="space-y-8">
+                                        {comments.map((comment) => (
+                                            <div key={comment.id} className="space-y-4">
+                                                {/* Main Comment */}
+                                                <div className="flex gap-4 group">
+                                                    <Link href={`/user/${comment.user.slug || `${comment.user.id}-${comment.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="shrink-0 hover:opacity-80 transition-opacity">
+                                                        <div className="w-10 h-10 bg-gray-100 border border-gray-200 rounded-none overflow-hidden hover:border-green-600 transition-colors">
+                                                            <img
+                                                                src={comment.user.avatarUrl}
+                                                                alt={comment.user.displayName || comment.user.username}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        </div>
+                                                    </Link>
+                                                    <div className="flex-1 space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Link href={`/user/${comment.user.slug || `${comment.user.id}-${comment.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-sm font-bold text-gray-900 dark:text-white hover:text-green-600 transition-colors flex items-center gap-1">
+                                                                {comment.user.displayName || comment.user.username}
+                                                                {comment.user.status === 4 && (
+                                                                    <div className="w-3 h-3 bg-blue-500 rounded-none flex items-center justify-center shrink-0">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="white" className="w-2 h-2">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                                         </svg>
-                                                                    </button>
-                                                                )}
-
-                                                                {replyToId === reply.id && (
-                                                                    <div className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
-                                                                        <textarea
-                                                                            value={replyContent}
-                                                                            onChange={(e) => setReplyContent(e.target.value)}
-                                                                            placeholder={`Reply to ${reply.user.displayName || reply.user.username}...`}
-                                                                            className="w-full min-h-[60px] p-2 text-[10px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:border-green-600 transition-colors"
-                                                                        />
-                                                                        <div className="flex justify-end">
-                                                                            <button
-                                                                                onClick={() => handlePostComment(comment.id)} // Still parent to the main comment
-                                                                                disabled={submittingComment || !replyContent.trim()}
-                                                                                className="text-[9px] font-bold text-green-600 hover:text-green-700 uppercase tracking-widest border border-green-600 px-3 py-1 hover:bg-green-50 transition-colors disabled:opacity-50"
-                                                                            >
-                                                                                {submittingComment ? "Replying..." : "Post Reply"}
-                                                                            </button>
-                                                                        </div>
                                                                     </div>
                                                                 )}
-                                                            </div>
+                                                            </Link>
+                                                            <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                                                                • {new Date(comment.createdAt).toLocaleDateString("en-GB", {
+                                                                    day: "2-digit",
+                                                                    month: "short",
+                                                                    year: "numeric",
+                                                                })}
+                                                            </span>
                                                         </div>
-                                                    ))}
+                                                        <div className="relative">
+                                                            <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 p-4 border-l-2 border-gray-200 dark:border-gray-700 group-hover:border-green-600 transition-all duration-300">
+                                                                {comment.content}
+                                                            </p>
+                                                            <button
+                                                                onClick={() => setReplyToId(replyToId === comment.id ? null : comment.id)}
+                                                                className="mt-2 text-[10px] font-bold text-gray-400 hover:text-green-600 uppercase tracking-[0.15em] flex items-center gap-1 transition-colors"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3 h-3">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                                                                </svg>
+                                                                {replyToId === comment.id ? "Cancel Reply" : "Reply"}
+                                                            </button>
+
+                                                            {comment.isMine && (
+                                                                <button
+                                                                    onClick={() => handleDeleteComment(comment.id)}
+                                                                    className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-500 transition-all duration-200 group-hover:scale-110"
+                                                                    title="Delete comment"
+                                                                >
+                                                                    <img
+                                                                        src="https://img.icons8.com/?size=100&id=68064&format=png&color=EF4444"
+                                                                        alt="Delete"
+                                                                        className="w-5 h-5 object-contain"
+                                                                    />
+                                                                </button>
+                                                            )}
+
+                                                            {!comment.isMine && (
+                                                                <button
+                                                                    onClick={() => handleReportUser(comment.user.id, comment.user.displayName || comment.user.username)}
+                                                                    className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                                                                    title="Report User"
+                                                                >
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-1.243-10.43V5.452a48.367 48.367 0 0 1-2.916-.406L15 4.5a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                                                    </svg>
+                                                                </button>
+                                                            )}
+
+                                                            {replyToId === comment.id && (
+                                                                <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                                    <textarea
+                                                                        value={replyContent}
+                                                                        onChange={(e) => setReplyContent(e.target.value)}
+                                                                        placeholder="Write a reply..."
+                                                                        className="w-full min-h-[80px] p-3 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 outline-none focus:border-green-600 transition-colors"
+                                                                    />
+                                                                    <div className="flex justify-end">
+                                                                        <button
+                                                                            onClick={() => handlePostComment(comment.id)}
+                                                                            disabled={submittingComment || !replyContent.trim()}
+                                                                            className="text-[10px] font-bold text-green-600 hover:text-green-700 uppercase tracking-widest border border-green-600 px-4 py-1.5 hover:bg-green-50 transition-colors disabled:opacity-50"
+                                                                        >
+                                                                            {submittingComment ? "Replying..." : "Post Reply"}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-10">
-                                    <p className="text-gray-400 italic text-sm font-medium">No comments yet. Be the first to share your thoughts!</p>
-                                </div>
-                            )}
+
+                                                {/* Replies */}
+                                                {comment.replies && comment.replies.length > 0 && (
+                                                    <div className="ml-14 space-y-4 border-l-2 border-gray-100 dark:border-gray-800 pl-6">
+                                                        {comment.replies.map((reply) => (
+                                                            <div key={reply.id} className="flex gap-3 group/reply">
+                                                                <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="shrink-0 hover:opacity-80 transition-opacity">
+                                                                    <div className="w-8 h-8 bg-gray-100 border border-gray-200 rounded-none overflow-hidden group-hover/reply:border-green-600 transition-colors">
+                                                                        <img
+                                                                            src={reply.user.avatarUrl}
+                                                                            alt={reply.user.displayName || reply.user.username}
+                                                                            className="w-full h-full object-cover"
+                                                                        />
+                                                                    </div>
+                                                                </Link>
+                                                                <div className="flex-1 space-y-1 relative">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <Link href={`/user/${reply.user.slug || `${reply.user.id}-${reply.user.username.toLowerCase().replace(/\s+/g, '-')}`}`} className="text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-green-600 transition-colors flex items-center gap-1">
+                                                                            {reply.user.displayName || reply.user.username}
+                                                                            {reply.user.status === 4 && (
+                                                                                <div className="w-2.5 h-2.5 bg-blue-500 rounded-none flex items-center justify-center shrink-0">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={5} stroke="white" className="w-1.5 h-1.5">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                                                    </svg>
+                                                                                </div>
+                                                                            )}
+                                                                        </Link>
+                                                                        <span className="text-[9px] text-gray-400 font-medium uppercase tracking-wider">
+                                                                            • {new Date(reply.createdAt).toLocaleDateString("en-GB", {
+                                                                                day: "2-digit",
+                                                                                month: "short",
+                                                                                year: "numeric",
+                                                                            })}
+                                                                        </span>
+                                                                    </div>
+                                                                    <p className="text-xs text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 p-3 border border-gray-100 dark:border-gray-700 group-hover/reply:border-green-600/30 transition-all duration-300 italic">
+                                                                        {reply.content}
+                                                                    </p>
+                                                                    <button
+                                                                        onClick={() => setReplyToId(replyToId === reply.id ? null : reply.id)}
+                                                                        className="mt-1 text-[9px] font-bold text-gray-400 hover:text-green-600 uppercase tracking-widest flex items-center gap-1 transition-colors"
+                                                                    >
+                                                                        {replyToId === reply.id ? "Cancel Reply" : "Reply"}
+                                                                    </button>
+
+                                                                    {reply.isMine && (
+                                                                        <button
+                                                                            onClick={() => handleDeleteComment(reply.id)}
+                                                                            className="absolute top-1 right-1 p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-none transition-all duration-200 group-hover/reply:scale-110"
+                                                                            title="Delete reply"
+                                                                        >
+                                                                            <img
+                                                                                src="https://img.icons8.com/?size=100&id=68064&format=png&color=EF4444"
+                                                                                alt="Delete"
+                                                                                className="w-4 h-4 object-contain"
+                                                                            />
+                                                                        </button>
+                                                                    )}
+
+                                                                    {!reply.isMine && (
+                                                                        <button
+                                                                            onClick={() => handleReportUser(reply.user.id, reply.user.displayName || reply.user.username)}
+                                                                            className="absolute top-1 right-1 p-1 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover/reply:opacity-100"
+                                                                            title="Report User"
+                                                                        >
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-1.243-10.43V5.452a48.367 48.367 0 0 1-2.916-.406L15 4.5a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    )}
+
+                                                                    {replyToId === reply.id && (
+                                                                        <div className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                                                                            <textarea
+                                                                                value={replyContent}
+                                                                                onChange={(e) => setReplyContent(e.target.value)}
+                                                                                placeholder={`Reply to ${reply.user.displayName || reply.user.username}...`}
+                                                                                className="w-full min-h-[60px] p-2 text-[10px] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 outline-none focus:border-green-600 transition-colors"
+                                                                            />
+                                                                            <div className="flex justify-end">
+                                                                                <button
+                                                                                    onClick={() => handlePostComment(comment.id)} // Still parent to the main comment
+                                                                                    disabled={submittingComment || !replyContent.trim()}
+                                                                                    className="text-[9px] font-bold text-green-600 hover:text-green-700 uppercase tracking-widest border border-green-600 px-3 py-1 hover:bg-green-50 transition-colors disabled:opacity-50"
+                                                                                >
+                                                                                    {submittingComment ? "Replying..." : "Post Reply"}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+
+                                        {pagination && pagination.totalPages > 1 && (
+                                            <div className="mt-12 flex justify-center">
+                                                <Pagination
+                                                    currentPage={pagination.page}
+                                                    totalPages={pagination.totalPages}
+                                                    onPageChange={onPageChange}
+                                                    isLoading={isFetching}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-10">
+                                        <p className="text-gray-400 italic text-sm font-medium">No comments yet. Be the first to share your thoughts!</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}

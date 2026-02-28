@@ -13,11 +13,13 @@ export default async function HomePage({
   const categorySlug = typeof searchParams.category === 'string' ? searchParams.category : null;
 
   // Fetch data on the server
-  const [slides, packages, categories] = await Promise.all([
+  const [slides, packagesData, categories] = await Promise.all([
     getCarousels(),
     getPackages(categorySlug),
     getCategories(),
   ]);
+
+  const packages = packagesData.packages;
 
   return (
     <div className="bg-[#F6F6F6] font-sans text-zinc-900">
@@ -33,7 +35,11 @@ export default async function HomePage({
         />
 
         {/* Content Grid - Prefetched */}
-        <ContentGrid packages={packages} />
+        <ContentGrid
+          packages={packages}
+          initialPagination={packagesData.pagination}
+          category={categorySlug}
+        />
       </div>
     </div>
   );

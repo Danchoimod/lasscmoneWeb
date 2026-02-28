@@ -1,9 +1,15 @@
-"use client";
-
 import Image from "next/image";
 import { Download, ChevronRight, ShieldCheck, Zap, Heart } from "lucide-react";
+import { getLatestUpdates } from "@/lib/api";
 
-export default function DownloadPage() {
+export default async function DownloadPage() {
+  const { windows: windowsUpdate, android: androidUpdate } = await getLatestUpdates();
+
+  const latestUpdate = windowsUpdate || androidUpdate;
+  const versionInfo = latestUpdate 
+    ? `Version ${latestUpdate.versionName} • Updated on ${new Date(latestUpdate.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}`
+    : "Version 1.2.4 (Stable) • Updated on Jan 27, 2026";
+
   return (
     <div className="bg-[#F6F6F6] font-sans text-zinc-900">
 
@@ -51,7 +57,9 @@ export default function DownloadPage() {
           <div className="flex flex-col gap-4 sm:flex-row w-full max-w-md">
             {/* Windows Button */}
             <a
-              href="#"
+              href={windowsUpdate?.downloadUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 flex h-16 items-center justify-center gap-3 rounded-none bg-[#D4A017] hover:bg-[#C19214] text-black font-black text-lg transition-all active:scale-95 shadow-lg"
             >
               <Download size={24} />
@@ -60,7 +68,9 @@ export default function DownloadPage() {
 
             {/* Android Button */}
             <a
-              href="#"
+              href={androidUpdate?.downloadUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 flex h-16 items-center justify-center gap-3 rounded-none bg-white hover:bg-zinc-100 text-black font-black text-lg transition-all active:scale-95 shadow-lg border-b-4 border-zinc-300"
             >
               <ChevronRight size={24} />
@@ -69,7 +79,7 @@ export default function DownloadPage() {
           </div>
 
           <p className="mt-4 text-xs text-zinc-500 uppercase tracking-widest font-bold">
-            Version 1.2.4 (Stable) • Updated on Jan 27, 2026
+            {versionInfo}
           </p>
         </div>
       </section>

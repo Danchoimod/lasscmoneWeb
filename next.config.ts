@@ -1,14 +1,18 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   images: {
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Cho phép tất cả các domain dùng https
+        hostname: '**',
       },
       {
         protocol: 'http',
-        hostname: '**', // Cho phép tất cả các domain dùng http (nếu cần)
+        hostname: '**',
       },
     ],
   },
@@ -19,7 +23,7 @@ const nextConfig = {
         source: '/api-backend/:path*',
         destination: `${backendUrl}/:path*`,
       },
-    ]
+    ];
   },
 };
 

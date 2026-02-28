@@ -12,7 +12,7 @@ const Footer = () => {
             LASSCMONE<span className="text-zinc-500 font-light italic">STUDIO</span>
           </h2>
           <p className="text-zinc-500 text-sm max-w-sm leading-relaxed">
-            Stay Humble — Build Eternity
+            Built from zero. Waiting for my miracle.
           </p>
         </div>
 

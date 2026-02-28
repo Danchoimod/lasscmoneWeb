@@ -144,7 +144,7 @@ export async function getMe() {
     }
 }
 
-export async function getFollowing() {
+export async function getFollowing(page: number = 1) {
     try {
         const session = await auth();
         const token = (session as any)?.accessToken;
@@ -153,7 +153,7 @@ export async function getFollowing() {
             return { success: false, error: "No token found", isUnauthorized: true };
         }
 
-        const response = await fetch(`${API_BASE_URL}/users/me/following`, {
+        const response = await fetch(`${API_BASE_URL}/users/me/following?page=${page}&limit=8`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -169,7 +169,10 @@ export async function getFollowing() {
         const data = await response.json();
 
         if (response.ok && data.status === "success") {
-            return { success: true, data: data.data, pagination: data.pagination };
+            const resultData = data.data;
+            const users = Array.isArray(resultData) ? resultData : (resultData?.following || resultData?.users || []);
+            const pagination = data.pagination || resultData?.pagination || null;
+            return { success: true, data: users, pagination };
         }
 
         return { success: false, error: data.message || "Failed to fetch following list" };
@@ -179,7 +182,7 @@ export async function getFollowing() {
     }
 }
 
-export async function getMyPackages() {
+export async function getMyPackages(page: number = 1) {
     try {
         const session = await auth();
         const token = (session as any)?.accessToken;
@@ -188,7 +191,7 @@ export async function getMyPackages() {
             return { success: false, error: "No token found", isUnauthorized: true };
         }
 
-        const response = await fetch(`${API_BASE_URL}/packages/me`, {
+        const response = await fetch(`${API_BASE_URL}/packages/me?page=${page}&limit=5`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -204,7 +207,9 @@ export async function getMyPackages() {
         const data = await response.json();
 
         if (response.ok && data.status === "success") {
-            return { success: true, data: data.packages || [], pagination: data.pagination };
+            const packages = data.packages || data.data?.packages || (Array.isArray(data.data) ? data.data : []);
+            const pagination = data.pagination || data.data?.pagination || null;
+            return { success: true, data: packages, pagination };
         }
 
         return { success: false, error: data.message || "Failed to fetch internal packages" };

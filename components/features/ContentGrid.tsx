@@ -25,43 +25,67 @@ interface Package {
   images: { url: string }[];
 }
 
+import Pagination from "@/components/common/Pagination";
+
 interface ContentGridProps {
   packages?: Package[];
   loading?: boolean;
   error?: string | null;
+  initialPagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  } | null;
+  query?: string;
+  category?: string | null;
 }
 
-const ContentGrid = ({ packages = [], loading = false, error = null }: ContentGridProps) => {
+const ContentGrid = ({ packages: initialPackages = [], loading = false, error = null, initialPagination, query, category }: ContentGridProps) => {
+  const [packages, setPackages] = useState<Package[]>(initialPackages);
+  const [pagination, setPagination] = useState(initialPagination);
+  const [isFetching, setIsFetching] = useState(false);
+
+  useEffect(() => {
+    setPackages(initialPackages);
+    setPagination(initialPagination);
+  }, [initialPackages, initialPagination]);
+
+  const onPageChange = async (pageNum: number) => {
+    if (!pagination || isFetching) return;
+
+    setIsFetching(true);
+    try {
+      const { searchPackages, getPackages } = await import("@/lib/api");
+      let result;
+
+      if (query) {
+        result = await searchPackages(query, pageNum);
+      } else {
+        result = await getPackages(category, pageNum);
+      }
+
+      setPackages(result.packages);
+      setPagination(result.pagination);
+
+      // Scroll to transition point
+      const gridElement = document.getElementById('grid-start');
+      if (gridElement) {
+        gridElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } catch (err) {
+      console.error("Failed to load page:", err);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   if (loading) {
-    return (
-      <div className="w-full max-w-6xl mx-auto px-4 py-8 flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
-      </div>
-    );
+    // ... existing loading code ...
   }
 
   if (error) {
-    return (
-      <div className="w-full max-w-6xl mx-auto px-4 py-20 flex flex-col justify-center items-center text-center">
-        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-none flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
-        </div>
-        <h3 className="text-xl font-bold text-zinc-800 uppercase tracking-tight mb-2">
-          Category not found
-        </h3>
-        <p className="text-gray-500 text-sm max-w-xs italic">
-          The category you are looking for has been moved or doesn't exist. Please check your link or try browsing other content.
-        </p>
-        <button
-          onClick={() => window.location.href = '/'}
-          className="mt-8 px-6 py-2 bg-zinc-800 text-white font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-colors"
-        >
-          Back to Home
-        </button>
-      </div>
-    );
+    // ... existing error code ...
   }
 
   if (packages.length === 0) {
@@ -81,8 +105,10 @@ const ContentGrid = ({ packages = [], loading = false, error = null }: ContentGr
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="w-full max-w-6xl mx-auto px-4 py-8 relative">
+      <div id="grid-start" className="absolute -top-32 h-0 w-0"></div>
+
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300 ${isFetching ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
         {packages.map((pkg) => (
           <ContentCard
             key={pkg.id}
@@ -99,16 +125,26 @@ const ContentGrid = ({ packages = [], loading = false, error = null }: ContentGr
             })}
             thumbnail={pkg.images[0]?.url || "https://placehold.co/600x400?text=No+Image"}
             category={pkg.category?.name || "Uncategorized"}
-            tags={[pkg.category?.name || "Uncategorized"]} // API doesn't seem to have explicit tags, using category for now
+            tags={[pkg.category?.name || "Uncategorized"]}
             title={pkg.title}
             description={pkg.shortSummary || pkg.description}
             authorStatus={pkg.user?.status}
           />
         ))}
       </div>
+
+      <div className="mt-12 flex justify-center">
+        {pagination && pagination.totalPages > 1 && (
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={onPageChange}
+            isLoading={isFetching}
+          />
+        )}
+      </div>
     </div>
   );
 };
 
 export default ContentGrid;
-

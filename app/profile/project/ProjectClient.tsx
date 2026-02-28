@@ -32,9 +32,50 @@ const getStatusLabel = (status: number) => {
     }
 };
 
-export default function ProjectClient({ initialProjects }: { initialProjects: Project[] }) {
+import Pagination from '@/components/common/Pagination';
+
+export default function ProjectClient({
+    initialProjects,
+    initialPagination
+}: {
+    initialProjects: Project[],
+    initialPagination?: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    } | null
+}) {
     const router = useRouter();
+    const [projects, setProjects] = useState<Project[]>(initialProjects);
+    const [pagination, setPagination] = useState(initialPagination);
     const [isDeleting, setIsDeleting] = useState<number | null>(null);
+    const [isFetching, setIsFetching] = useState(false);
+
+    const onPageChange = async (pageNum: number) => {
+        if (!pagination || isFetching) return;
+
+        setIsFetching(true);
+        try {
+            const { getMyPackages } = await import("@/lib/actions");
+            const result = await getMyPackages(pageNum);
+
+            if (result.success) {
+                setProjects(result.data);
+                setPagination(result.pagination);
+
+                // Scroll to table start
+                const tableElement = document.getElementById('project-table');
+                if (tableElement) {
+                    tableElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load page:", err);
+        } finally {
+            setIsFetching(false);
+        }
+    };
 
     const handleDelete = async (id: number, title: string) => {
         if (!confirm(`Are you sure you want to delete "${title}"? This action will permanently remove the project and all associated data.`)) {
@@ -44,7 +85,9 @@ export default function ProjectClient({ initialProjects }: { initialProjects: Pr
         setIsDeleting(id);
         try {
             const result = await deleteProject(id);
-            if (!result.success) {
+            if (result.success) {
+                setProjects((prev) => prev.filter(p => p.id !== id));
+            } else {
                 alert(result.error || "Failed to delete project");
             }
         } catch (error) {
@@ -70,69 +113,82 @@ export default function ProjectClient({ initialProjects }: { initialProjects: Pr
                     </button>
                 </div>
 
-                {initialProjects.length === 0 ? (
+                {projects.length === 0 ? (
                     <div className="text-center py-20 bg-gray-50 border border-dashed border-gray-300">
                         <p className="text-gray-400 italic text-sm">You haven't created any projects yet.</p>
                     </div>
                 ) : (
-                    <div className="border border-gray-300 overflow-x-auto">
-                        <table className="w-full text-left text-sm border-collapse">
-                            <thead>
-                                <tr className="bg-gray-50 border-b border-gray-300">
-                                    <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600">Project</th>
-                                    <th className="p-3 font-bold text-[10px] uppercase text-gray-600">Status</th>
-                                    <th className="p-3 font-bold text-[10px] uppercase text-gray-600 hidden sm:table-cell">Created At</th>
-                                    <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {initialProjects.map(project => {
-                                    const statusInfo = getStatusLabel(project.status);
-                                    return (
-                                        <tr key={project.id} className="hover:bg-gray-50 group">
-                                            <td className="p-3">
-                                                <Link
-                                                    href={`/project/${project.slug}`}
-                                                    className="font-bold text-[13px] sm:text-sm text-blue-600 hover:underline cursor-pointer truncate max-w-[200px] sm:max-w-none block"
-                                                >
-                                                    {project.title}
-                                                </Link>
-                                            </td>
-                                            <td className="p-3">
-                                                <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${statusInfo.class}`}>
-                                                    {statusInfo.label}
-                                                </span>
-                                            </td>
-                                            <td className="p-3 text-gray-500 text-[10px] sm:text-[11px] font-medium hidden sm:table-cell">
-                                                {new Date(project.createdAt).toLocaleDateString("en-GB", {
-                                                    day: "2-digit",
-                                                    month: "short",
-                                                    year: "numeric",
-                                                })}
-                                            </td>
-                                            <td className="p-3 text-right">
-                                                <div className="flex justify-end gap-3">
-                                                    <button
-                                                        onClick={() => router.push(`/profile/project/edit/${project.id}`)}
-                                                        className="text-[10px] font-bold uppercase text-gray-500 hover:text-gray-800"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(project.id, project.title)}
-                                                        disabled={isDeleting === project.id}
-                                                        className={`text-[10px] font-bold uppercase ${isDeleting === project.id ? 'text-gray-400' : 'text-red-500 hover:text-red-700'}`}
-                                                    >
-                                                        {isDeleting === project.id ? 'Deleting...' : 'Delete'}
-                                                    </button>
-                                                </div>
-                                            </td>
+                    <>
+                        <div id="project-table" className="border border-gray-300 overflow-x-auto relative min-h-[400px]">
+                            <div className={`transition-all duration-300 ${isFetching ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+                                <table className="w-full text-left text-sm border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-50 border-b border-gray-300">
+                                            <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600">Project</th>
+                                            <th className="p-3 font-bold text-[10px] uppercase text-gray-600">Status</th>
+                                            <th className="p-3 font-bold text-[10px] uppercase text-gray-600 hidden sm:table-cell">Created At</th>
+                                            <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600 text-right">Actions</th>
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                        {projects.map(project => {
+                                            const statusInfo = getStatusLabel(project.status);
+                                            return (
+                                                <tr key={project.id} className="hover:bg-gray-50 group">
+                                                    <td className="p-3">
+                                                        <Link
+                                                            href={`/project/${project.slug}`}
+                                                            className="font-bold text-[13px] sm:text-sm text-blue-600 hover:underline cursor-pointer truncate max-w-[200px] sm:max-w-none block"
+                                                        >
+                                                            {project.title}
+                                                        </Link>
+                                                    </td>
+                                                    <td className="p-3">
+                                                        <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border ${statusInfo.class}`}>
+                                                            {statusInfo.label}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-3 text-gray-500 text-[10px] sm:text-[11px] font-medium hidden sm:table-cell">
+                                                        {new Date(project.createdAt).toLocaleDateString("en-GB", {
+                                                            day: "2-digit",
+                                                            month: "short",
+                                                            year: "numeric",
+                                                        })}
+                                                    </td>
+                                                    <td className="p-3 text-right">
+                                                        <div className="flex justify-end gap-3">
+                                                            <button
+                                                                onClick={() => router.push(`/profile/project/edit/${project.id}`)}
+                                                                className="text-[10px] font-bold uppercase text-gray-500 hover:text-gray-800"
+                                                            >
+                                                                Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(project.id, project.title)}
+                                                                disabled={isDeleting === project.id}
+                                                                className={`text-[10px] font-bold uppercase ${isDeleting === project.id ? 'text-gray-400' : 'text-red-500 hover:text-red-700'}`}
+                                                            >
+                                                                {isDeleting === project.id ? 'Deleting...' : 'Delete'}
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        {pagination && pagination.totalPages > 1 && (
+                            <Pagination
+                                currentPage={pagination.page}
+                                totalPages={pagination.totalPages}
+                                onPageChange={onPageChange}
+                                isLoading={isFetching}
+                            />
+                        )}
+                    </>
                 )}
             </div>
         </div>

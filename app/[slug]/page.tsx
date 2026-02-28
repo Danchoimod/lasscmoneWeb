@@ -11,7 +11,7 @@ export default async function CategoryPage({
     const slug = params.slug;
 
     // Fetch packages for this specific category
-    const packages = await getPackages(slug);
+    const { packages, pagination: initialPagination } = await getPackages(slug);
 
     return (
         <div className="bg-[#F6F6F6] font-sans text-zinc-900">
@@ -25,7 +25,11 @@ export default async function CategoryPage({
                 </div>
 
                 {/* Content Grid */}
-                <ContentGrid packages={packages} />
+                <ContentGrid
+                    packages={packages}
+                    initialPagination={initialPagination}
+                    category={slug}
+                />
             </div>
         </div>
     );
