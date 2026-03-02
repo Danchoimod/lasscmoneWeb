@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loginAction, googleLoginAction } from "@/lib/actions";
 import { getDiscordAuthUrl } from "@/lib/api";
 import { auth, googleProvider } from "@/lib/firebase";
@@ -13,6 +13,18 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const errorCode = searchParams.get("error");
+    if (errorCode === "account_exists") {
+      setError("An account with this email already exists. Please login using your original method.");
+    } else if (errorCode === "auth_failed") {
+      setError("Authentication failed. Please try again.");
+    } else if (errorCode === "no_code") {
+      setError("Authorization code was not provided by Discord.");
+    }
+  }, [searchParams]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
