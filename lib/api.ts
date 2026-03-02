@@ -1,6 +1,9 @@
 import { auth } from "@/auth";
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || process.env.BACKEND_API_URL || "http://localhost:25461/api";
+const IS_SERVER = typeof window === 'undefined';
+export const API_BASE_URL = IS_SERVER
+    ? (process.env.NEXT_PUBLIC_BACKEND_API_URL || process.env.BACKEND_API_URL || "http://localhost:25461/api")
+    : "/api-backend";
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
     const headers: Record<string, string> = {
