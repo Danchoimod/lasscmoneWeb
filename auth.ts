@@ -67,8 +67,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         };
                     }
 
+                    // If not ok, throw error with backend message
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
                     return null;
                 } catch (error) {
+                    if (error instanceof Error) {
+                        throw error;
+                    }
                     console.error("Auth authorize error:", error);
                     return null;
                 }

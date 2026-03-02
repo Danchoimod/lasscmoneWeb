@@ -19,6 +19,12 @@ export async function loginAction(formData: any) {
         return { success: true, user: null }; // user will be in session
     } catch (error) {
         if (error instanceof AuthError) {
+            // Check for specific error message from authorize
+            const message = (error.cause as any)?.err?.message;
+            if (message && message !== "Read more at https://errors.authjs.dev#credentialssignin") {
+                return { success: false, error: message };
+            }
+
             switch (error.type) {
                 case "CredentialsSignin":
                     return { success: false, error: "Your email or password is incorrect." };
@@ -48,7 +54,18 @@ export async function googleLoginAction(idToken: string) {
         if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
             throw error;
         }
+
         console.error("Google login action error:", error);
+
+        if (error instanceof AuthError) {
+            // Auth.js v5 stores the thrown error from authorize in error.cause.err
+            const message = (error.cause as any)?.err?.message || (error as any).message;
+            if (message && message !== "Read more at https://errors.authjs.dev#credentialssignin") {
+                return { success: false, error: message };
+            }
+            return { success: false, error: "Google login failed" };
+        }
+
         return { success: false, error: "Google login failed" };
     }
 }
@@ -67,7 +84,17 @@ export async function discordLoginAction(idToken: string, user: any) {
         if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
             throw error;
         }
+
         console.error("Discord login action error:", error);
+
+        if (error instanceof AuthError) {
+            const message = (error.cause as any)?.err?.message || (error as any).message;
+            if (message && message !== "Read more at https://errors.authjs.dev#credentialssignin") {
+                return { success: false, error: message };
+            }
+            return { success: false, error: "Discord login failed" };
+        }
+
         return { success: false, error: "Discord login failed" };
     }
 }
