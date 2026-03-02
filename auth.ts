@@ -2,6 +2,8 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 
+const BACKEND_API_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:25461/api";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig,
     providers: [
@@ -30,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 try {
                     let response;
                     if (idToken) {
-                        response = await fetch(`${process.env.BACKEND_API_URL}/auth/google`, {
+                        response = await fetch(`${BACKEND_API_URL}/auth/google`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -38,7 +40,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             body: JSON.stringify({ idToken }),
                         });
                     } else {
-                        response = await fetch(`${process.env.BACKEND_API_URL}/auth/login`, {
+                        response = await fetch(`${BACKEND_API_URL}/auth/login`, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
