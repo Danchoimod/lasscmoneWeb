@@ -23,6 +23,8 @@ function LoginForm() {
       setError("Authentication failed. Please try again.");
     } else if (errorCode === "no_code") {
       setError("Authorization code was not provided by Discord.");
+    } else if (errorCode === "token_exchange_failed") {
+      setError("Failed to exchange authentication token. Please try again.");
     }
   }, [searchParams]);
 
