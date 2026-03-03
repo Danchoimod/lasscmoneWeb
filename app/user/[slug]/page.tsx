@@ -36,107 +36,114 @@ export default async function UserProfilePage({
   }
 
   return (
-    <div className="animate-in fade-in duration-500">
-      {/* 1. Profile Header Section */}
-      <div className="bg-white border-b border-zinc-200 pt-12 pb-8 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center md:items-end gap-6">
-
-          {/* Avatar */}
-          <div className="relative w-32 h-32 md:w-40 md:h-40 bg-zinc-100 border-4 border-white shadow-lg rounded-none overflow-hidden -mb-4 flex items-center justify-center p-0">
-            <Image
-              src={user.avatarUrl || "/next.svg"}
-              alt={user.displayName || user.username}
-              fill
-              className="object-cover"
-            />
+    <div className="bg-[#E9ECEF] font-sans text-[#333] min-h-screen">
+      <main className="mx-auto flex w-full max-w-[1100px] flex-grow gap-6 px-4 py-6">
+        {/* Main Content Column */}
+        <div className="flex-grow rounded-sm border border-[#D1D4D7] bg-white overflow-hidden">
+          {/* Header */}
+          <div className="border-b border-[#EEE] bg-[#F8F9FA] px-6 py-3">
+            <h1 className="text-sm font-bold uppercase tracking-wide text-[#555]">
+              USER PROFILE: {user.displayName || user.username}
+            </h1>
           </div>
 
-          {/* User Info */}
-          <div className="flex-1 flex flex-col items-center md:items-start pb-2">
-            <div className="flex items-center gap-2 mb-2">
-              <h1 className="text-3xl font-black text-zinc-900 tracking-tight uppercase">
-                {user.displayName || user.username}
-              </h1>
-              {user.status === 4 && (
-                <div className="w-6 h-6 bg-blue-500 rounded-none flex items-center justify-center shadow-sm">
-                  <ShieldCheck className="w-4 h-4 text-white" />
+          {/* Profile Info Section */}
+          <div className="p-6 md:p-10 border-b border-[#EEE]">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+              {/* Avatar - High quality square */}
+              <div className="relative w-32 h-32 md:w-36 md:h-36 bg-gray-100 border border-[#D1D4D7] shrink-0">
+                <Image
+                  src={user.avatarUrl || "/icons/icon.jpg"}
+                  alt={user.displayName || user.username}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Info Details */}
+              <div className="flex-1 text-center md:text-left space-y-4">
+                <div>
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
+                    <h2 className="text-2xl font-bold text-[#333]">
+                      {user.displayName || user.username}
+                    </h2>
+                    {user.status === 4 && (
+                      <ShieldCheck className="w-5 h-5 text-blue-600" />
+                    )}
+                  </div>
+                  <p className="text-sm text-[#777]">@{user.username}</p>
                 </div>
-              )}
+
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2 text-[14px] text-[#555]">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-[#999]" />
+                    <span>Joined {new Date(user.createdAt).toLocaleDateString("en-US", { month: 'long', year: 'numeric' })}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Box className="w-4 h-4 text-[#999]" />
+                    <span><strong>{user.packages?.length || 0}</strong> Submissions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="w-4 h-4 text-[#999]" />
+                    <span><strong>{user._count?.followers || 0}</strong> Followers</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center md:justify-start gap-3 pt-2">
+                  <FollowButton
+                    userId={user.id}
+                    initialFollowed={user.isFollowing}
+                  />
+                  <ReportButton
+                    targetUserId={user.id}
+                    className="bg-white hover:bg-gray-100 text-[#555] border border-[#D1D4D7] text-xs font-bold h-9 px-4 uppercase"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Submissions Section */}
+          <div className="p-6 md:p-8">
+            <div className="border-b border-[#EEE] pb-3 mb-6">
+              <h3 className="text-sm font-bold uppercase text-[#555] tracking-wider">
+                User Submissions
+              </h3>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-zinc-500 font-medium">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" />
-                Joined {new Date(user.createdAt).toLocaleDateString("en-US", { month: 'long', year: 'numeric' })}
+            {user.packages && user.packages.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {user.packages.map((pkg) => (
+                  <ContentCard
+                    key={pkg.id}
+                    id={pkg.id}
+                    slug={pkg.slug}
+                    author={user.displayName || user.username}
+                    authorSlug={user.slug}
+                    authorAvatar={user.avatarUrl}
+                    rating={pkg.ratingAvg || 0}
+                    date={new Date(pkg.createdAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                    thumbnail={pkg.images?.[0]?.url || "https://placehold.co/600x400?text=No+Image"}
+                    category={pkg.category?.name || "Uncategorized"}
+                    tags={[pkg.category?.name || "Uncategorized"]}
+                    title={pkg.title}
+                    description={pkg.shortSummary || pkg.description || "No description available."}
+                    authorStatus={user.status}
+                  />
+                ))}
               </div>
-              <div className="flex items-center gap-1.5">
-                <Box className="w-4 h-4" />
-                {user.packages?.length || 0} submissions
+            ) : (
+              <div className="text-center py-20 bg-[#F9F9F9] border border-dashed border-[#DDD]">
+                <p className="text-[#999] italic text-sm">This user hasn't submitted any packages yet.</p>
               </div>
-              <div className="flex items-center gap-1.5">
-                <UserPlus className="w-4 h-4 text-zinc-400" />
-                {user._count?.followers || 0} followers
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pb-2">
-            <FollowButton
-              userId={user.id}
-              initialFollowed={user.isFollowing}
-            />
-            <ReportButton
-              targetUserId={user.id}
-              className="bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200"
-            />
+            )}
           </div>
         </div>
-      </div>
-
-      {/* 2. Submissions Grid Section */}
-      <div className="max-w-6xl mx-auto px-4 mt-12 pb-20">
-        <div className="flex items-center justify-between mb-8 border-b border-zinc-200 pb-4">
-          <h2 className="text-xl font-black uppercase tracking-widest text-zinc-800 italic">
-            user submissions
-          </h2>
-          <span className="bg-zinc-800 text-white text-xs px-3 py-1 font-bold">
-            {user.packages?.length || 0} items
-          </span>
-        </div>
-
-        {/* Submissions Grid */}
-        {user.packages && user.packages.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {user.packages.map((pkg) => (
-              <ContentCard
-                key={pkg.id}
-                id={pkg.id}
-                slug={pkg.slug}
-                author={user.displayName || user.username}
-                authorSlug={user.slug}
-                authorAvatar={user.avatarUrl}
-                rating={pkg.ratingAvg || 0}
-                date={new Date(pkg.createdAt).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
-                thumbnail={pkg.images?.[0]?.url || "/next.svg"}
-                category={pkg.category?.name || "Uncategorized"}
-                tags={[pkg.category?.name || "Uncategorized"]}
-                title={pkg.title}
-                description={pkg.shortSummary || pkg.description || "No description available."}
-                authorStatus={user.status}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20 bg-white border border-dashed border-zinc-200">
-            <p className="text-zinc-400 italic font-medium">This user hasn't submitted any packages yet.</p>
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 }
