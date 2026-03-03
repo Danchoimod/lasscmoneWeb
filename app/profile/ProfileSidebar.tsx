@@ -27,11 +27,13 @@ export default function ProfileSidebar() {
     ];
 
     return (
-        <div className="flex flex-col h-full uppercase font-bold">
-            <div className="p-4 bg-gray-200 border-b border-gray-300">
-                <h2 className="text-sm font-bold text-gray-700">Account Settings</h2>
+        <div className="flex flex-col bg-white border border-[#D1D4D7] overflow-hidden">
+            {/* Sidebar Header */}
+            <div className="p-4 bg-[#F8F9FA] border-b border-[#EEE]">
+                <h2 className="text-[11px] font-bold text-[#555] uppercase tracking-wider">Account Settings</h2>
             </div>
 
+            {/* Navigation Menu */}
             <nav className="flex-1">
                 {menuItems.map((item) => {
                     const isActive = pathname === item.href;
@@ -39,9 +41,9 @@ export default function ProfileSidebar() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`block px-4 py-4 text-xs border-b border-gray-200 transition-none ${isActive
-                                ? 'bg-white text-black font-bold border-l-4 border-l-green-600'
-                                : 'text-gray-600 hover:bg-gray-100 hover:text-black'
+                            className={`block px-5 py-4 text-[11px] font-bold uppercase tracking-wide border-b border-[#EEE] transition-colors ${isActive
+                                ? 'bg-[#FDFDFD] text-[#111] border-l-[4px] border-l-[#333]'
+                                : 'text-[#666] hover:bg-[#F9F9F9] hover:text-[#111]'
                                 }`}
                         >
                             {item.label}
@@ -49,9 +51,10 @@ export default function ProfileSidebar() {
                     );
                 })}
 
+                {/* Logout Action */}
                 <button
                     onClick={handleLogout}
-                    className="w-full text-left block px-4 py-4 text-xs text-red-600 hover:bg-red-50 border-b border-gray-200 transition-colors"
+                    className="w-full text-left block px-5 py-4 text-[11px] font-bold uppercase tracking-wide text-red-600 hover:bg-red-50 border-b border-[#EEE] transition-colors"
                 >
                     Logout / Exit
                 </button>
