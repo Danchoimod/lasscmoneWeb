@@ -99,7 +99,7 @@ export async function discordLoginAction(idToken: string, user: any) {
     }
 }
 
-export async function updateProfile(formData: { displayName?: string, username?: string, avatarUrl?: string }) {
+export async function updateProfile(formData: { displayName?: string, username?: string, avatarUrl?: string, skinUrl?: string }) {
     try {
         const session = await auth();
         const token = (session as any)?.accessToken;
