@@ -23,7 +23,7 @@ const SimpleInput = ({ label, value, onChange, disabled, placeholder }: any) => 
             onChange={(e) => onChange?.(e.target.value)}
             disabled={disabled}
             placeholder={placeholder}
-            className={`w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-green-500 outline-none transition-all ${disabled ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'hover:border-gray-300'}`}
+            className={`w-full px-3 py-2 border border-gray-200 rounded-none text-sm focus:ring-1 focus:ring-green-500 outline-none transition-all ${disabled ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'hover:border-gray-300'}`}
         />
     </div>
 );
@@ -67,12 +67,6 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                     <h1 className="text-2xl font-bold text-gray-800">User Profile</h1>
                     <p className="text-sm text-gray-500 mt-1">Manage account information and characters</p>
                 </div>
-                <button
-                    onClick={() => signOut()}
-                    className="flex items-center gap-2 text-xs font-medium text-gray-400 hover:text-red-500 transition-colors"
-                >
-                    <LogOut size={14} /> Sign Out
-                </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -82,7 +76,7 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                     <div className="flex flex-col items-center">
                         <FieldLabel>Avatar</FieldLabel>
                         <div className="relative group mt-2">
-                            <div className="w-32 h-32 rounded-full border-2 border-gray-100 overflow-hidden bg-gray-50">
+                            <div className="w-32 h-32 border-2 border-gray-100 overflow-hidden bg-gray-50">
                                 {profileForm.avatarUrl ? (
                                     <img src={profileForm.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
@@ -94,28 +88,28 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                                     const url = prompt("Enter image link:", profileForm.avatarUrl);
                                     if (url !== null) setProfileForm({ ...profileForm, avatarUrl: url });
                                 }}
-                                className="absolute bottom-1 right-1 bg-white border border-gray-200 rounded-full p-2 shadow-sm hover:bg-gray-50 transition-colors"
+                                className="absolute bottom-1 right-1 bg-white border border-gray-200 p-2 shadow-sm hover:bg-gray-50 transition-colors"
                             >
                                 <Camera size={16} className="text-gray-600" />
                             </button>
                         </div>
                     </div>
 
-                    <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+                    <div className="border border-gray-100 p-4 bg-gray-50/50">
                         <FieldLabel>Skin Preview</FieldLabel>
-                        <div className="aspect-[3/4] flex items-center justify-center bg-white rounded-lg border border-gray-100 mb-4 overflow-hidden">
+                        <div className="aspect-[3/4] flex items-center justify-center bg-white border border-gray-100 mb-4 overflow-hidden">
                             {profileForm.skinUrl ? (
                                 <SkinPreview skinUrl={profileForm.skinUrl} model={skinModel} />
                             ) : (
                                 <span className="text-xs text-gray-400 italic">No Skin</span>
                             )}
                         </div>
-                        <div className="flex bg-gray-200/50 p-1 rounded-md">
+                        <div className="flex bg-gray-200/50 p-1">
                             {(['steve', 'alex'] as const).map((m) => (
                                 <button
                                     key={m}
                                     onClick={() => setSkinModel(m)}
-                                    className={`flex-1 py-1.5 text-xs font-medium rounded capitalize transition-all ${skinModel === m ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`flex-1 py-1.5 text-xs font-medium capitalize transition-all ${skinModel === m ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                                 >
                                     {m}
                                 </button>
@@ -126,7 +120,7 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
 
                 {/* Right column: Input Form */}
                 <div className="md:col-span-2 space-y-6">
-                    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
+                    <div className="bg-white border border-gray-200 p-6 space-y-5">
                         <h3 className="text-sm font-bold text-gray-800 border-b pb-3 mb-2">Basic Information</h3>
 
                         <SimpleInput
@@ -149,7 +143,7 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                         />
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
+                    <div className="bg-white border border-gray-200 p-6 space-y-5">
                         <h3 className="text-sm font-bold text-gray-800 border-b pb-3 mb-2">Character Customization</h3>
 
                         <SimpleInput
@@ -168,7 +162,7 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-2 px-8 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition-all shadow-sm disabled:opacity-50"
+                            className="flex items-center gap-2 px-8 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold transition-all shadow-sm disabled:opacity-50"
                         >
                             <Save size={16} />
                             {saving ? "Saving..." : "Save Changes"}
