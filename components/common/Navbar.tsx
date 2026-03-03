@@ -85,8 +85,8 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
       hasDropdown: true,
       param: "", // Set to empty string if you don't want the parent "Help" to be a link
       children: [
-        { id: 1, name: "Terms", param: "terms", parentId: null },
-        { id: 2, name: "Privacy", param: "privacy-policy", parentId: null },
+        { id: 1, name: "Terms of Service", param: "terms", parentId: null },
+        { id: 2, name: "Privacy Policy", param: "privacy-policy", parentId: null },
         { id: 3, name: "Windows Install Guide", param: "windows-install-guide", parentId: null },
         { id: 4, name: "Android Install Guide", param: "android-install-guide", parentId: null },
       ],
