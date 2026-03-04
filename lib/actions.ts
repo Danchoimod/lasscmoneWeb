@@ -41,6 +41,36 @@ export async function loginAction(formData: any) {
     }
 }
 
+export async function signupAction(formData: any) {
+    try {
+        const { email, password, username, displayName } = formData;
+
+        const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email,
+                password,
+                username,
+                displayName: displayName || username,
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return { success: true, data: data };
+        }
+
+        return { success: false, error: data.error || data.details || "Signup failed" };
+    } catch (error) {
+        console.error("Signup action error:", error);
+        return { success: false, error: "Internal server error during signup" };
+    }
+}
+
 export async function googleLoginAction(idToken: string) {
     try {
         await signIn("credentials", {
