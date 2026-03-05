@@ -43,9 +43,8 @@ export default function Signup() {
     try {
       const result = await signupAction(formData);
       if (result.success) {
-        // Sau khi đăng ký thành công, chuyển hướng người dùng về trang login hoặc thông báo thành công
-        alert("Registration successful! Please login.");
-        router.push("/login");
+        // Sau khi đăng ký thành công, chuyển hướng người dùng sang trang OTP
+        router.push(`/auth/otp?email=${encodeURIComponent(formData.email)}`);
       } else {
         setError(result.error);
       }

@@ -71,6 +71,29 @@ export async function signupAction(formData: any) {
     }
 }
 
+export async function verifyOtpAction(email: string, code: string) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, code })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            return { success: true, message: data.message };
+        }
+
+        return { success: false, error: data.error || data.details || "Verification failed" };
+    } catch (error) {
+        console.error("Verify OTP error:", error);
+        return { success: false, error: "Internal server error during verification" };
+    }
+}
+
 export async function googleLoginAction(idToken: string) {
     try {
         await signIn("credentials", {

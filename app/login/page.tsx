@@ -25,6 +25,8 @@ function LoginForm() {
       setError("Authorization code was not provided by Discord.");
     } else if (errorCode === "token_exchange_failed") {
       setError("Failed to exchange authentication token. Please try again.");
+    } else if (errorCode === "account_deactivated") {
+      setError("Your account is pending approval or has been deactivated. Please verify via OTP or contact support.");
     }
   }, [searchParams]);
 
@@ -83,7 +85,11 @@ function LoginForm() {
       if (result.success) {
         window.location.href = "/";
       } else {
-        setError(result.error || "Invalid credentials. Please try again.");
+        if (result.error === "Account deactivated") {
+          router.push(`/auth/otp?email=${encodeURIComponent(email)}`);
+        } else {
+          setError(result.error || "Invalid credentials. Please try again.");
+        }
       }
     } catch (err) {
       console.error("Login error:", err);
