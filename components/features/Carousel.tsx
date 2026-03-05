@@ -70,7 +70,7 @@ const Carousel = ({ initialSlides }: CarouselProps) => {
           >
             <div className="w-full h-full bg-zinc-900 flex items-center justify-center relative overflow-hidden">
               <Image
-                src={slide.imageUrl}
+                src={slide.imageUrl && (slide.imageUrl.startsWith('http') || slide.imageUrl.startsWith('/')) ? slide.imageUrl : "https://placehold.co/1200x600?text=Invalid+Image"}
                 alt={slide.title}
                 fill
                 className="object-cover opacity-50"
@@ -99,7 +99,12 @@ const Carousel = ({ initialSlides }: CarouselProps) => {
               className="flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full mb-4 border border-zinc-700 hover:border-zinc-500 transition-colors"
             >
               <div className="w-6 h-6 rounded-full overflow-hidden border border-zinc-600">
-                <Image src={slide.user.avatar || "/icons/icon.jpg"} alt={slide.user.displayName || slide.user.username} width={24} height={24} />
+                <Image
+                  src={slide.user.avatar && (slide.user.avatar.startsWith('http') || slide.user.avatar.startsWith('/')) ? slide.user.avatar : "/icons/icon.jpg"}
+                  alt={slide.user.displayName || slide.user.username}
+                  width={24}
+                  height={24}
+                />
               </div>
               <span className="text-sm text-zinc-300">{slide.user.displayName || slide.user.username}</span>
             </Link>

@@ -218,7 +218,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
           {currentUser && (
             <Link href="/profile" className="p-1">
               <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all">
-                {currentUser.avatarUrl ? (
+                {currentUser.avatarUrl && (currentUser.avatarUrl.startsWith('http') || currentUser.avatarUrl.startsWith('/')) ? (
                   <Image src={currentUser.avatarUrl} alt={currentUser.displayName || currentUser.username} width={40} height={40} className="object-cover w-full h-full" />
                 ) : (
                   <User className="w-5 h-5 text-gray-600" />

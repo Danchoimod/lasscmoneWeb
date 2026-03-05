@@ -43,7 +43,12 @@ const ContentCard = ({
         {/* 1. Thumbnail, Categories & Content Link */}
         <Link href={`/project/${slug}`} className="flex flex-col flex-1">
           <div className="relative aspect-video w-full bg-zinc-100">
-            <Image src={thumbnail} alt={title} fill className="object-cover" />
+            <Image
+              src={thumbnail && thumbnail.startsWith('http') || thumbnail.startsWith('/') ? thumbnail : "https://placehold.co/600x400?text=Invalid+Image"}
+              alt={title || "Image"}
+              fill
+              className="object-cover"
+            />
             <div className="absolute bottom-0 left-0 bg-[#4CAF50] text-white px-2 py-1 text-xs font-bold uppercase z-10">
               {category}
             </div>
