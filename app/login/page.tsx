@@ -36,8 +36,9 @@ function LoginForm() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
+      const refreshToken = (result.user as any).refreshToken;
 
-      const loginResult = await googleLoginAction(idToken);
+      const loginResult = await googleLoginAction(idToken, refreshToken);
 
       if (loginResult.success) {
         window.location.href = "/";

@@ -71,7 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             headers: {
                                 "Content-Type": "application/json",
                             },
-                            body: JSON.stringify({ idToken }),
+                            body: JSON.stringify({ idToken, refreshToken }),
                         });
                     } else {
                         response = await fetch(`${BACKEND_API_URL}/auth/login`, {
@@ -124,6 +124,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async jwt({ token, user }) {
             // Initial sign in
             if (user) {
+                console.log("[Auth] JWT Initial sign in. User has refreshToken:", !!(user as any).refreshToken);
                 return {
                     accessToken: (user as any).accessToken,
                     refreshToken: (user as any).refreshToken,
@@ -133,11 +134,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
 
             // Return previous token if the access token has not expired yet
-            if (Date.now() < (token.accessTokenExpires as number)) {
+            // Add a 60-second buffer to prevent race conditions with backend
+            const shouldRefresh = Date.now() >= (token.accessTokenExpires as number) - 60 * 1000;
+
+            if (!shouldRefresh) {
                 return token;
             }
 
             // Access token has expired, try to update it
+            console.log("[Auth] Token expired or nearing expiration, refreshing...");
             return refreshAccessToken(token);
         },
         async session({ session, token }) {

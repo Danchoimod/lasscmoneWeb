@@ -94,10 +94,11 @@ export async function verifyOtpAction(email: string, code: string) {
     }
 }
 
-export async function googleLoginAction(idToken: string) {
+export async function googleLoginAction(idToken: string, refreshToken?: string) {
     try {
         await signIn("credentials", {
             idToken,
+            refreshToken,
             redirect: false,
         });
 
