@@ -153,7 +153,13 @@ export default function CreateProjectPage() {
     // Helper functions for dynamic lists
     const handleAddImage = () => {
         const url = prompt("Enter Image URL:");
-        if (url) setImages([...images, { url }]);
+        if (url) {
+            if (url.length > 191) {
+                showNotification("Image URL cannot exceed 191 characters", "error");
+                return;
+            }
+            setImages([...images, { url }]);
+        }
     };
 
     const handleRemoveImage = (index: number) => {
@@ -162,8 +168,16 @@ export default function CreateProjectPage() {
 
     const handleAddUrl = () => {
         const name = prompt("Enter Link Name (e.g. Mediafire):");
+        if (!name) return;
+
         const url = prompt("Enter Download URL:");
-        if (name && url) setUrls([...urls, { name, url }]);
+        if (url) {
+            if (url.length > 191) {
+                showNotification("Download URL cannot exceed 191 characters", "error");
+                return;
+            }
+            setUrls([...urls, { name, url }]);
+        }
     };
 
     const handleRemoveUrl = (index: number) => {
@@ -222,22 +236,50 @@ export default function CreateProjectPage() {
                     <div className="space-y-8 animate-in fade-in duration-400 slide-in-from-bottom-2">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                             <div className="md:col-span-2 space-y-6">
-                                <FormItem label="Project Name" description="Give your project a clear, unique name.">
-                                    <input
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        className="w-full border border-gray-300 bg-gray-50 p-4 text-sm outline-none focus:bg-white focus:border-gray-800 transition-none"
-                                        placeholder="e.g. Extreme Survival Mod"
-                                    />
+                                <FormItem
+                                    label="Project Name"
+                                    description="Give your project a clear, unique name."
+                                >
+                                    <div className="relative">
+                                        <input
+                                            value={formData.title}
+                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                            maxLength={50}
+                                            className={`w-full border ${formData.title.length >= 50 ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-gray-800'} bg-gray-50 p-4 text-sm outline-none transition-none`}
+                                            placeholder="e.g. Extreme Survival Mod"
+                                        />
+                                        <div className={`text-[10px] font-bold absolute right-4 bottom-4 ${formData.title.length >= 50 ? 'text-red-500' : 'text-gray-400'}`}>
+                                            {formData.title.length}/50
+                                        </div>
+                                    </div>
+                                    {formData.title.length >= 50 && (
+                                        <p className="text-[10px] text-red-500 font-bold mt-1 uppercase italic tracking-tighter text-right">
+                                            Character limit exceeded (Max 50)
+                                        </p>
+                                    )}
                                 </FormItem>
 
-                                <FormItem label="Short Summary" description="A quick overview (max 150 chars).">
-                                    <input
-                                        value={formData.shortSummary}
-                                        onChange={(e) => setFormData({ ...formData, shortSummary: e.target.value })}
-                                        className="w-full border border-gray-300 bg-gray-50 p-4 text-sm outline-none focus:bg-white focus:border-gray-800 transition-none"
-                                        placeholder="Briefly explain what this project does..."
-                                    />
+                                <FormItem
+                                    label="Short Summary"
+                                    description="A quick overview (max 191 chars)."
+                                >
+                                    <div className="relative">
+                                        <input
+                                            value={formData.shortSummary}
+                                            onChange={(e) => setFormData({ ...formData, shortSummary: e.target.value })}
+                                            maxLength={191}
+                                            className={`w-full border ${formData.shortSummary.length >= 191 ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-gray-800'} bg-gray-50 p-4 text-sm outline-none transition-none`}
+                                            placeholder="Briefly explain what this project does..."
+                                        />
+                                        <div className={`text-[10px] font-bold absolute right-4 bottom-4 ${formData.shortSummary.length >= 191 ? 'text-red-500' : 'text-gray-400'}`}>
+                                            {formData.shortSummary.length}/191
+                                        </div>
+                                    </div>
+                                    {formData.shortSummary.length >= 191 && (
+                                        <p className="text-[10px] text-red-500 font-bold mt-1 uppercase italic tracking-tighter text-right">
+                                            Character limit exceeded (Max 191)
+                                        </p>
+                                    )}
                                 </FormItem>
                             </div>
 

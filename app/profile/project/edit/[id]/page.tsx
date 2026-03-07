@@ -152,14 +152,24 @@ export default function EditProjectPage() {
     const handleAddImage = () => {
         const url = prompt("Enter Image URL:");
         if (url) {
+            if (url.length > 191) {
+                showNotification("Image URL cannot exceed 191 characters", "error");
+                return;
+            }
             setImages([...images, { url }]);
         }
     };
 
     const handleAddUrl = () => {
         const name = prompt("Enter Link Name (e.g. Mediafire):");
+        if (!name) return;
+
         const url = prompt("Enter Download URL:");
-        if (name && url) {
+        if (url) {
+            if (url.length > 191) {
+                showNotification("Download URL cannot exceed 191 characters", "error");
+                return;
+            }
             setUrls([...urls, { name, url }]);
         }
     };
@@ -247,21 +257,49 @@ export default function EditProjectPage() {
                         <section>
                             <SectionHeader title="01. General Information" subtitle="Basic details about your project" />
                             <div className="grid grid-cols-1 gap-6">
-                                <FormItem label="Project Name" description="Do not include tags like [MOD] in the title.">
-                                    <input
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        className="w-full border border-[#D1D4D7] bg-[#FDFDFD] p-2.5 text-sm outline-none focus:border-[#BBB] transition-colors"
-                                        placeholder="e.g. My Awesome Mod"
-                                    />
+                                <FormItem
+                                    label="Project Name"
+                                    description="Do not include tags like [MOD] in the title."
+                                >
+                                    <div className="relative">
+                                        <input
+                                            value={formData.title}
+                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                            maxLength={50}
+                                            className={`w-full border ${formData.title.length >= 50 ? 'border-red-500 focus:border-red-600' : 'border-[#D1D4D7] focus:border-[#BBB]'} bg-[#FDFDFD] p-2.5 text-sm outline-none transition-colors`}
+                                            placeholder="e.g. My Awesome Mod"
+                                        />
+                                        <div className={`text-[9px] font-bold absolute right-2 bottom-2 ${formData.title.length >= 50 ? 'text-red-500' : 'text-[#BBB]'}`}>
+                                            {formData.title.length}/50
+                                        </div>
+                                    </div>
+                                    {formData.title.length >= 50 && (
+                                        <p className="text-[10px] text-red-500 font-bold mt-1 uppercase italic tracking-tighter">
+                                            Character limit exceeded (Max 50)
+                                        </p>
+                                    )}
                                 </FormItem>
-                                <FormItem label="Summary" description="A brief overview that appears in search results.">
-                                    <input
-                                        value={formData.shortSummary}
-                                        onChange={(e) => setFormData({ ...formData, shortSummary: e.target.value })}
-                                        className="w-full border border-[#D1D4D7] bg-[#FDFDFD] p-2.5 text-sm outline-none focus:border-[#BBB] transition-colors"
-                                        placeholder="Describe your project in a few words..."
-                                    />
+                                <FormItem
+                                    label="Summary"
+                                    description="A brief overview that appears in search results."
+                                >
+                                    <div className="relative">
+                                        <input
+                                            value={formData.shortSummary}
+                                            onChange={(e) => setFormData({ ...formData, shortSummary: e.target.value })}
+                                            maxLength={191}
+                                            className={`w-full border ${formData.shortSummary.length >= 191 ? 'border-red-500 focus:border-red-600' : 'border-[#D1D4D7] focus:border-[#BBB]'} bg-[#FDFDFD] p-2.5 text-sm outline-none transition-colors`}
+                                            placeholder="Describe your project in a few words..."
+                                        />
+                                        <div className={`text-[9px] font-bold absolute right-2 bottom-2 ${formData.shortSummary.length >= 191 ? 'text-red-500' : 'text-[#BBB]'}`}>
+                                            {formData.shortSummary.length}/191
+                                        </div>
+                                    </div>
+                                    {formData.shortSummary.length >= 191 && (
+                                        <p className="text-[10px] text-red-500 font-bold mt-1 uppercase italic tracking-tighter">
+                                            Character limit exceeded (Max 191)
+                                        </p>
+                                    )}
                                 </FormItem>
                             </div>
                         </section>

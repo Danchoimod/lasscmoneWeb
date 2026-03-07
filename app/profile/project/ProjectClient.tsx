@@ -64,10 +64,10 @@ export default function ProjectClient({
                 setProjects(result.data);
                 setPagination(result.pagination);
 
-                // Scroll to table start
-                const tableElement = document.getElementById('project-table');
-                if (tableElement) {
-                    tableElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Scroll to list start
+                const containerElement = document.getElementById('project-list-container');
+                if (containerElement) {
+                    containerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
         } catch (err) {
@@ -119,15 +119,16 @@ export default function ProjectClient({
                     </div>
                 ) : (
                     <>
-                        <div id="project-table" className="border border-gray-300 overflow-x-auto relative min-h-[400px]">
-                            <div className={`transition-all duration-300 ${isFetching ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+                        <div id="project-list-container" className={`relative min-h-[400px] transition-all duration-300 ${isFetching ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+                            {/* Desktop View Table */}
+                            <div id="project-table" className="hidden sm:block border border-gray-300">
                                 <table className="w-full text-left text-sm border-collapse">
                                     <thead>
                                         <tr className="bg-gray-50 border-b border-gray-300">
-                                            <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600">Project</th>
+                                            <th className="p-3 font-bold text-[10px] uppercase text-gray-600">Project</th>
                                             <th className="p-3 font-bold text-[10px] uppercase text-gray-600">Status</th>
-                                            <th className="p-3 font-bold text-[10px] uppercase text-gray-600 hidden sm:table-cell">Created At</th>
-                                            <th className="p-3 font-bold text-[9px] sm:text-[10px] uppercase text-gray-600 text-right">Actions</th>
+                                            <th className="p-3 font-bold text-[10px] uppercase text-gray-600">Created At</th>
+                                            <th className="p-3 font-bold text-[10px] uppercase text-gray-600 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
@@ -138,7 +139,7 @@ export default function ProjectClient({
                                                     <td className="p-3">
                                                         <Link
                                                             href={`/project/${project.slug}`}
-                                                            className="font-bold text-[13px] sm:text-sm text-blue-600 hover:underline cursor-pointer truncate max-w-[200px] sm:max-w-none block"
+                                                            className="font-bold text-sm text-blue-600 hover:underline cursor-pointer"
                                                         >
                                                             {project.title}
                                                         </Link>
@@ -148,7 +149,7 @@ export default function ProjectClient({
                                                             {statusInfo.label}
                                                         </span>
                                                     </td>
-                                                    <td className="p-3 text-gray-500 text-[10px] sm:text-[11px] font-medium hidden sm:table-cell">
+                                                    <td className="p-3 text-gray-500 text-[11px] font-medium">
                                                         {new Date(project.createdAt).toLocaleDateString("en-GB", {
                                                             day: "2-digit",
                                                             month: "short",
@@ -156,17 +157,17 @@ export default function ProjectClient({
                                                         })}
                                                     </td>
                                                     <td className="p-3 text-right">
-                                                        <div className="flex justify-end gap-3">
+                                                        <div className="flex justify-end gap-3 text-xs">
                                                             <button
                                                                 onClick={() => router.push(`/profile/project/edit/${project.id}`)}
-                                                                className="text-[10px] font-bold uppercase text-gray-500 hover:text-gray-800"
+                                                                className="font-bold uppercase text-gray-500 hover:text-gray-800"
                                                             >
                                                                 Edit
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDelete(project.id, project.title)}
                                                                 disabled={isDeleting === project.id}
-                                                                className={`text-[10px] font-bold uppercase ${isDeleting === project.id ? 'text-gray-400' : 'text-red-500 hover:text-red-700'}`}
+                                                                className={`font-bold uppercase ${isDeleting === project.id ? 'text-gray-400' : 'text-red-500 hover:text-red-700'}`}
                                                             >
                                                                 {isDeleting === project.id ? 'Deleting...' : 'Delete'}
                                                             </button>
@@ -177,6 +178,56 @@ export default function ProjectClient({
                                         })}
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {/* Mobile View Cards */}
+                            <div className="sm:hidden space-y-4">
+                                {projects.map(project => {
+                                    const statusInfo = getStatusLabel(project.status);
+                                    return (
+                                        <div key={project.id} className="border border-gray-300 p-4 bg-white hover:border-gray-400 transition-colors">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="flex-1 min-w-0 pr-2">
+                                                    <Link
+                                                        href={`/project/${project.slug}`}
+                                                        className="font-bold text-base text-blue-600 hover:underline block truncate"
+                                                    >
+                                                        {project.title}
+                                                    </Link>
+                                                    <p className="text-[10px] text-gray-500 mt-1 uppercase font-medium">
+                                                        Created: {new Date(project.createdAt).toLocaleDateString("en-GB", {
+                                                            day: "2-digit",
+                                                            month: "short",
+                                                            year: "numeric",
+                                                        })}
+                                                    </p>
+                                                </div>
+                                                <span className={`px-2 py-0.5 text-[9px] font-bold uppercase border shrink-0 ${statusInfo.class}`}>
+                                                    {statusInfo.label}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex border-t border-gray-100 pt-3 mt-3 gap-4">
+                                                <button
+                                                    onClick={() => router.push(`/profile/project/edit/${project.id}`)}
+                                                    className="flex-1 text-center py-2 text-[10px] font-bold uppercase text-gray-700 bg-gray-50 border border-gray-200 active:bg-gray-100"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(project.id, project.title)}
+                                                    disabled={isDeleting === project.id}
+                                                    className={`flex-1 text-center py-2 text-[10px] font-bold uppercase border ${isDeleting === project.id
+                                                        ? 'text-gray-400 bg-gray-50 border-gray-100'
+                                                        : 'text-red-600 bg-red-50 border-red-100 active:bg-red-100'
+                                                        }`}
+                                                >
+                                                    {isDeleting === project.id ? 'Deleting...' : 'Delete'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
 
