@@ -1,12 +1,13 @@
 import Image from "next/image";
 import { Download, ChevronRight, ShieldCheck, Zap, Heart } from "lucide-react";
 import { getLatestUpdates } from "@/lib/api";
+import FAQSection from "@/components/features/FAQSection";
 
 export default async function DownloadPage() {
   const { windows: windowsUpdate, android: androidUpdate } = await getLatestUpdates();
 
   const latestUpdate = windowsUpdate || androidUpdate;
-  const versionInfo = latestUpdate 
+  const versionInfo = latestUpdate
     ? `Version ${latestUpdate.versionName} • Updated on ${new Date(latestUpdate.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}`
     : "Version 1.2.4 (Stable) • Updated on Jan 27, 2026";
 
@@ -30,7 +31,7 @@ export default async function DownloadPage() {
 
         {/* Lớp phủ Overlay để làm tối và tạo chiều sâu */}
         <div className="absolute inset-0 bg-black/60 z-1" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 z-2" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/60 z-2" />
 
         <div className="relative z-10 flex flex-col items-center justify-center max-w-4xl mx-auto px-6 text-center">
           {/* Logo Box */}
@@ -124,6 +125,9 @@ export default async function DownloadPage() {
             </p>
           </div>
         </div>
+
+        {/* FAQ Section */}
+        <FAQSection />
 
         {/* Requirements Section - Removed overflow-hidden to ensure square corners on borders */}
         <div className="mt-16 bg-white border border-zinc-200 shadow-sm rounded-none">
