@@ -23,9 +23,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 export async function getCarousels() {
     try {
-        const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/carousels`, {
-            headers,
             next: { revalidate: 3600 }
         });
         if (!res.ok) return [];
@@ -39,13 +37,11 @@ export async function getCarousels() {
 
 export async function getPackages(categorySlug?: string | null, page: number = 1) {
     try {
-        const headers = await getAuthHeaders();
         let url = `${API_BASE_URL}/packages?page=${page}&limit=10`;
         if (categorySlug) {
             url = `${API_BASE_URL}/categories/${categorySlug}/packages?page=${page}&limit=10`;
         }
         const res = await fetch(url, {
-            headers,
             next: { revalidate: 60 }
         });
         if (!res.ok) return { packages: [], pagination: null };
@@ -94,11 +90,8 @@ export async function searchPackages(query: string, page: number = 1) {
 
 export async function getPackageBySlug(slug: string) {
     try {
-        const headers = await getAuthHeaders();
-        console.log(`[API] Fetching package: ${slug}`);
         const res = await fetch(`${API_BASE_URL}/packages/${slug}`, {
-            headers,
-            cache: 'no-store'
+            next: { revalidate: 60 }
         });
         console.log(`[API] Fetch status: ${res.status}`);
         if (!res.ok) return null;
@@ -116,10 +109,8 @@ export async function getPackageBySlug(slug: string) {
 
 export async function getPackageComments(packageId: number, page: number = 1) {
     try {
-        const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}?page=${page}&limit=10`, {
-            headers,
-            cache: 'no-store'
+            next: { revalidate: 60 }
         });
         if (!res.ok) return { comments: [], total: 0, pagination: null };
         const result = await res.json();
@@ -141,10 +132,8 @@ export async function getPackageComments(packageId: number, page: number = 1) {
 
 export async function getCategories() {
     try {
-        const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/categories`, {
-            headers,
-            cache: 'no-store'
+            next: { revalidate: 3600 }
         });
         if (!res.ok) return [];
         const result = await res.json();
@@ -162,10 +151,8 @@ export async function getCategories() {
 
 export async function getUserProfile(slug: string) {
     try {
-        const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/users/${slug}/profile`, {
-            headers,
-            cache: 'no-store'
+            next: { revalidate: 60 }
         });
         if (!res.ok) return null;
         const result = await res.json();
@@ -177,9 +164,7 @@ export async function getUserProfile(slug: string) {
 }
 export async function getVersions() {
     try {
-        const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/versions`, {
-            headers,
             next: { revalidate: 3600 }
         });
         if (!res.ok) return [];
@@ -193,7 +178,9 @@ export async function getVersions() {
 
 export async function getDiscordAuthUrl() {
     try {
-        const res = await fetch(`${API_BASE_URL}/auth/discord/url`);
+        const res = await fetch(`${API_BASE_URL}/auth/discord/url`, {
+            next: { revalidate: 3600 }
+        });
         if (!res.ok) return null;
         const result = await res.json();
 

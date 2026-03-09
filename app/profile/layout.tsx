@@ -2,6 +2,8 @@ import React from 'react';
 import ProfileSidebar from './ProfileSidebar';
 import ScrollToTop from '@/components/common/ScrollToTop';
 
+export const dynamic = 'force-dynamic';
+
 export default function ProfileLayout({
   children,
 }: {
