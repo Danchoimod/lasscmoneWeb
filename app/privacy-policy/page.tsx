@@ -8,9 +8,9 @@ export default function PrivacyPolicy() {
   return (
     <div className="bg-[#E9ECEF] font-sans text-[#333]">
 
-      <main className="mx-auto flex w-full max-w-[1100px] grow gap-6 px-4 py-6">
+      <main className="mx-auto w-full max-w-[1100px] px-4 py-8">
         {/* Main Content (Left) */}
-        <div className="grow rounded-sm border border-[#D1D4D7] bg-white">
+        <div className="w-full rounded-sm border border-[#D1D4D7] bg-white shadow-sm overflow-hidden">
           {/* Section Header */}
           <div className="border-b border-[#EEE] bg-[#F8F9FA] px-6 py-3">
             <h1 className="text-sm font-bold uppercase tracking-wide text-[#555]">
@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
           </div>
 
           {/* Content Body */}
-          <div className="p-8 text-[15px] leading-[1.7] text-[#444] space-y-6">
+          <div className="p-4 md:p-8 text-[15px] leading-[1.7] text-[#444] space-y-6 wrap-break-word overflow-hidden">
             <section className="space-y-4">
               <p>
                 At <a href="https://lflauncher.org" className="text-[#4F8A10] hover:underline font-medium">https://lflauncher.org</a>, accessible from https://lflauncher.org, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by lflauncher.org and how we use it.

@@ -8,9 +8,9 @@ export default function AboutUsPage() {
 
     return (
         <div className="bg-[#E9ECEF] font-sans text-[#333]">
-            <main className="mx-auto flex w-full max-w-[1100px] grow gap-6 px-4 py-6">
+            <main className="mx-auto w-full max-w-[1100px] px-4 py-8">
                 {/* Main Content Card */}
-                <div className="grow rounded-sm border border-[#D1D4D7] bg-white shadow-sm">
+                <div className="w-full rounded-sm border border-[#D1D4D7] bg-white shadow-sm overflow-hidden">
                     {/* Section Header */}
                     <div className="border-b border-[#EEE] bg-[#F8F9FA] px-6 py-3">
                         <h1 className="text-sm font-bold uppercase tracking-wide text-[#555]">
@@ -19,7 +19,7 @@ export default function AboutUsPage() {
                     </div>
 
                     {/* Content Body */}
-                    <div className="p-8 text-[15px] leading-[1.7] text-[#444] space-y-10">
+                    <div className="p-4 md:p-8 text-[15px] leading-[1.7] text-[#444] space-y-10 wrap-break-word overflow-hidden">
 
                         {/* Introduction */}
                         <section className="space-y-4">
