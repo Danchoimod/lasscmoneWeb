@@ -439,9 +439,8 @@ export async function createComment(packageId: number, content: string, parentId
         const data = await response.json();
 
         if (response.ok && data.status === "success") {
-            // Revalidate the project page to show the new comment
-            // We don't have the slug here, but we can revalidate by tag if implemented
-            // For now, let the client handle UI update or refresh
+            // Revalidate the project layout to refresh comments
+            revalidatePath(`/project`, 'layout');
             return { success: true, data: data.data };
         }
 
@@ -473,6 +472,7 @@ export async function deleteComment(commentId: number) {
         }
 
         if (response.status === 204 || response.ok) {
+            revalidatePath(`/project`, 'layout');
             return { success: true };
         }
 

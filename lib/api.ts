@@ -110,16 +110,17 @@ export async function getPackageBySlug(slug: string) {
 export async function getPackageComments(packageId: number, page: number = 1) {
     try {
         const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}?page=${page}&limit=10`, {
-            next: { revalidate: 60 }
+            next: { revalidate: 10, tags: [`comments-${packageId}`] }
         });
         if (!res.ok) return { comments: [], total: 0, pagination: null };
         const result = await res.json();
 
         if (result.status === "success" && result.data) {
+            const pagination = result.data.pagination || null;
             return {
                 comments: result.data.comments || [],
-                total: result.data.total || 0,
-                pagination: result.data.pagination || null
+                total: result.data.total ?? pagination?.total ?? 0,
+                pagination
             };
         }
 
