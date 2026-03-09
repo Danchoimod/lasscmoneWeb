@@ -109,7 +109,9 @@ export async function getPackageBySlug(slug: string) {
 
 export async function getPackageComments(packageId: number, page: number = 1) {
     try {
+        const headers = await getAuthHeaders();
         const res = await fetch(`${API_BASE_URL}/comments/package/${packageId}?page=${page}&limit=10`, {
+            headers,
             next: { revalidate: 10, tags: [`comments-${packageId}`] }
         });
         if (!res.ok) return { comments: [], total: 0, pagination: null };

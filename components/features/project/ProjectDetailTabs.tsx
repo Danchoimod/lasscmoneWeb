@@ -180,15 +180,11 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-none shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="w-full border-b border-gray-200 dark:border-gray-700">
-                <div className="overflow-x-auto overflow-y-hidden transition-all scrollbar-hide">
-                    <div className="min-w-max">
-                        <ProjectTabs
-                            tabs={tabs}
-                            activeTab={activeTab}
-                            onTabChange={handleTabChange}
-                        />
-                    </div>
-                </div>
+                <ProjectTabs
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    onTabChange={handleTabChange}
+                />
             </div>
 
             <div className="p-6 text-gray-700 dark:text-gray-300 max-w-none">
@@ -312,7 +308,7 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
                                                             {!comment.isMine && (
                                                                 <button
                                                                     onClick={() => handleReportUser(comment.user.id, comment.user.displayName || comment.user.username)}
-                                                                    className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                                                                    className="absolute top-2 right-2 p-1.5 text-gray-300 hover:text-yellow-600 transition-all duration-200"
                                                                     title="Report User"
                                                                 >
                                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
@@ -405,7 +401,7 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
                                                                     {!reply.isMine && (
                                                                         <button
                                                                             onClick={() => handleReportUser(reply.user.id, reply.user.displayName || reply.user.username)}
-                                                                            className="absolute top-1 right-1 p-1 text-gray-300 hover:text-yellow-600 transition-all duration-200 opacity-0 group-hover/reply:opacity-100"
+                                                                            className="absolute top-1 right-1 p-1 text-gray-300 hover:text-yellow-600 transition-all duration-200"
                                                                             title="Report User"
                                                                         >
                                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
