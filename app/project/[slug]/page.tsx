@@ -1,10 +1,36 @@
 import React from "react";
+import { Metadata } from "next";
 import ProjectBreadcrumbs from "@/components/features/project/ProjectBreadcrumbs";
 import ProjectGallery from "@/components/features/project/ProjectGallery";
 import ProjectSidebar from "@/components/features/project/ProjectSidebar";
 import ProjectDetailTabs from "@/components/features/project/ProjectDetailTabs";
 import { getPackageBySlug, getPackageComments } from "@/lib/api";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({
+  params: paramsPromise,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await paramsPromise;
+  const project = await getPackageBySlug(slug);
+
+  if (!project) {
+    return {
+      title: "Project Not Found - LF Launcher",
+    };
+  }
+
+  return {
+    title: `${project.title} - LF Launcher Minecraft Content`,
+    description: project.shortSummary || `Download ${project.title} for Minecraft. Discover more mods, maps, and skins on LF Launcher.`,
+    openGraph: {
+      title: project.title,
+      description: project.shortSummary,
+      images: project.images?.[0]?.url ? [project.images[0].url] : [],
+    },
+  };
+}
 
 export default async function ProjectDetailPage({
   params: paramsPromise,

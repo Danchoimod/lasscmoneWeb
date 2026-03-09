@@ -1,6 +1,21 @@
 import React from "react";
+import { Metadata } from "next";
 import ContentGrid from "@/components/features/ContentGrid";
-import { getPackages } from "@/lib/api";
+import { getPackages, getCategories } from "@/lib/api";
+
+export async function generateMetadata({
+    params: paramsPromise
+}: {
+    params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+    const { slug } = await paramsPromise;
+    const categoryName = decodeURIComponent(slug).replace(/-/g, " ");
+
+    return {
+        title: `${categoryName} Minecraft Content - LF Launcher`,
+        description: `Browse the best ${categoryName} for Minecraft. Download and install easily with LF Launcher.`,
+    };
+}
 
 export default async function CategoryPage({
     params: paramsPromise

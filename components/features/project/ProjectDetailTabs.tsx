@@ -490,11 +490,14 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
                                 <p className="text-gray-400 italic text-sm font-medium">No specific version requirements listed.</p>
                             )}
                         </div>
-                        <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
-                            <h2 className="text-xl font-bold mb-4 italic text-gray-900 dark:text-white uppercase tracking-tight">
-                                Guide
-                            </h2>
-                            <p className="text-gray-500 italic">Installation guide coming soon...</p>
+                        <h2 className="text-xl font-bold mb-4 italic text-gray-900 dark:text-white uppercase tracking-tight">
+                            Guide
+                        </h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            To install this {project.category?.name || "content"}, you can use the <strong>LF Launcher</strong> for an automated experience, or manually move the downloaded files to your Minecraft game directory.
+                        </p>
+                        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 text-sm text-blue-700 dark:text-blue-300 italic">
+                            Note: Make sure you have the correct Minecraft version installed before applying this {project.category?.name || "content"}.
                         </div>
                     </div>
                 )}
