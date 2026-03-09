@@ -8,9 +8,9 @@ export default function PrivacyPolicy() {
   return (
     <div className="bg-[#E9ECEF] font-sans text-[#333]">
 
-      <main className="mx-auto flex w-full max-w-[1100px] flex-grow gap-6 px-4 py-6">
+      <main className="mx-auto flex w-full max-w-[1100px] grow gap-6 px-4 py-6">
         {/* Main Content (Left) */}
-        <div className="flex-grow rounded-sm border border-[#D1D4D7] bg-white">
+        <div className="grow rounded-sm border border-[#D1D4D7] bg-white">
           {/* Section Header */}
           <div className="border-b border-[#EEE] bg-[#F8F9FA] px-6 py-3">
             <h1 className="text-sm font-bold uppercase tracking-wide text-[#555]">
