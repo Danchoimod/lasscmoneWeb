@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { UserPlus, UserMinus } from "lucide-react";
 import { followUser } from "@/lib/actions";
 import { useRouter } from "next/navigation";
+import { showAlert } from "@/lib/swal";
+
 
 interface FollowButtonProps {
     userId: number;
@@ -36,12 +38,12 @@ export default function FollowButton({
                 if (result.isUnauthorized) {
                     router.push("/login");
                 } else {
-                    alert(result.error || "Failed to process request");
+                    await showAlert("Error", result.error || "Failed to process request", "error");
                 }
             }
         } catch (err) {
             console.error("Follow error:", err);
-            alert("An error occurred. Please try again later.");
+            await showAlert("Error", "An error occurred. Please try again later.", "error");
         } finally {
             setIsLoading(false);
         }
@@ -69,8 +71,8 @@ export default function FollowButton({
             onClick={handleFollow}
             disabled={isLoading}
             className={`flex items-center gap-2 px-6 py-2.5 font-bold uppercase text-sm transition-all shadow-sm active:scale-95 disabled:opacity-50 ${followed
-                    ? "bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200"
-                    : "bg-[#4CAF50] hover:bg-green-600 text-white"
+                ? "bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-200"
+                : "bg-[#4CAF50] hover:bg-green-600 text-white"
                 } ${className}`}
         >
             {followed ? (

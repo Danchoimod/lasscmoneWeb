@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { createComment, deleteComment, createReport } from "@/lib/actions";
+import { showAlert, showConfirm, showPrompt } from "@/lib/swal";
+
 import ProjectTabs from "./ProjectTabs";
 import Pagination from "@/components/common/Pagination";
 
@@ -134,7 +136,7 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
                     router.refresh();
                 });
             } else {
-                alert(result.error || "Failed to post comment");
+                await showAlert("Error", result.error || "Failed to post comment", "error");
             }
         } catch (err) {
             console.error("Error posting comment:", err);
@@ -144,7 +146,8 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
     };
 
     const handleDeleteComment = async (commentId: number) => {
-        if (!confirm("Are you sure you want to delete this comment?")) return;
+        const confirmed = await showConfirm("Delete Comment", "Are you sure you want to delete this comment?");
+        if (!confirmed) return;
 
         try {
             const result = await deleteComment(commentId);
@@ -153,7 +156,7 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
                     router.refresh();
                 });
             } else {
-                alert(result.error || "Failed to delete comment");
+                await showAlert("Error", result.error || "Failed to delete comment", "error");
             }
         } catch (err) {
             console.error("Error deleting comment:", err);
@@ -161,19 +164,19 @@ export default function ProjectDetailTabs({ project, comments: initialComments, 
     };
 
     const handleReportUser = async (targetUserId: number, username: string) => {
-        const reason = prompt(`Reason for reporting ${username}:`);
+        const reason = await showPrompt("Report User", `Reason for reporting ${username}:`);
         if (!reason || !reason.trim()) return;
 
         try {
             const result = await createReport({ reason, targetUserId });
             if (result.success) {
-                alert("Report submitted successfully.");
+                await showAlert("Success", "Report submitted successfully.", "success");
             } else {
-                alert(result.error || "Failed to submit report");
+                await showAlert("Error", result.error || "Failed to submit report", "error");
             }
         } catch (err) {
             console.error("Error reporting user:", err);
-            alert("An error occurred while submitting the report.");
+            await showAlert("Error", "An error occurred while submitting the report.", "error");
         }
     };
 

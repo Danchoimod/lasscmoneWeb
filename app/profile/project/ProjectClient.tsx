@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { deleteProject } from '@/lib/actions';
+import { showAlert, showConfirm } from '@/lib/swal';
+
 
 const SectionHeading = ({ children }: { children: React.ReactNode }) => (
     <div className="mb-6 border-b-2 border-gray-800 pb-2">
@@ -78,9 +80,11 @@ export default function ProjectClient({
     };
 
     const handleDelete = async (id: number, title: string) => {
-        if (!confirm(`Are you sure you want to delete "${title}"? This action will permanently remove the project and all associated data.`)) {
-            return;
-        }
+        const confirmed = await showConfirm(
+            "Delete Project",
+            `Are you sure you want to delete "${title}"? This action will permanently remove the project and all associated data.`
+        );
+        if (!confirmed) return;
 
         setIsDeleting(id);
         try {
@@ -88,11 +92,11 @@ export default function ProjectClient({
             if (result.success) {
                 setProjects((prev) => prev.filter(p => p.id !== id));
             } else {
-                alert(result.error || "Failed to delete project");
+                await showAlert("Error", result.error || "Failed to delete project", "error");
             }
         } catch (error) {
             console.error("Delete error:", error);
-            alert("An error occurred while deleting the project");
+            await showAlert("Error", "An error occurred while deleting the project", "error");
         } finally {
             setIsDeleting(null);
         }

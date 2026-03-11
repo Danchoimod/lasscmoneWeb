@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Flag } from "lucide-react";
 import { createReport } from "@/lib/actions";
+import { showAlert, showPrompt } from "@/lib/swal";
+
 
 interface ReportButtonProps {
     targetUserId?: number;
@@ -15,7 +17,7 @@ export default function ReportButton({ targetUserId, packageId, label = "Report"
     const [isReporting, setIsReporting] = useState(false);
 
     const handleReport = async () => {
-        const reason = prompt("Enter the reason for your report:");
+        const reason = await showPrompt("Report", "Enter the reason for your report:");
         if (!reason || !reason.trim()) return;
 
         try {
@@ -27,13 +29,13 @@ export default function ReportButton({ targetUserId, packageId, label = "Report"
             });
 
             if (result.success) {
-                alert("Report submitted successfully. Thank you for helping keep our community safe.");
+                await showAlert("Success", "Report submitted successfully. Thank you for helping keep our community safe.", "success");
             } else {
-                alert(result.error || "Failed to submit report. Please try again later.");
+                await showAlert("Error", result.error || "Failed to submit report. Please try again later.", "error");
             }
         } catch (err) {
             console.error("Report error:", err);
-            alert("An error occurred. Please try again later.");
+            await showAlert("Error", "An error occurred. Please try again later.", "error");
         } finally {
             setIsReporting(false);
         }

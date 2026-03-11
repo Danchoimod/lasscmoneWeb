@@ -5,6 +5,8 @@ import { Star } from 'lucide-react';
 import { rateProject, getMyRating } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { showAlert } from '@/lib/swal';
+
 
 interface RatingInteractiveProps {
     packageId: number;
@@ -64,7 +66,7 @@ export default function RatingInteractive({ packageId, initialRating, ratingCoun
 
                 router.refresh();
             } else {
-                alert(result.error || "Failed to submit rating");
+                await showAlert("Error", result.error || "Failed to submit rating", "error");
                 if (result.isUnauthorized) {
                     router.push('/login');
                 }

@@ -4,6 +4,8 @@ import React, { ReactNode, useState } from 'react';
 import { updateProfile } from '@/lib/actions';
 import Toast, { ToastType } from '@/components/common/Notification';
 import { signOut } from 'next-auth/react';
+import { showPrompt } from '@/lib/swal';
+
 import { User2, Camera, Save, LogOut } from 'lucide-react';
 import SkinPreview from '@/components/features/profile/SkinPreview';
 
@@ -84,9 +86,9 @@ export default function ProfileClient({ initialData }: { initialData: any }) {
                                 )}
                             </div>
                             <button
-                                onClick={() => {
-                                    const url = prompt("Enter image link:", profileForm.avatarUrl);
-                                    if (url !== null) setProfileForm({ ...profileForm, avatarUrl: url });
+                                onClick={async () => {
+                                    const url = await showPrompt("Update Avatar", "Enter image link:");
+                                    if (url !== null && url !== undefined) setProfileForm({ ...profileForm, avatarUrl: url });
                                 }}
                                 className="absolute bottom-1 right-1 bg-white border border-gray-200 p-2 shadow-sm hover:bg-gray-50 transition-colors"
                             >

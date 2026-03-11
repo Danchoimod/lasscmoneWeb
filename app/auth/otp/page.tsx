@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { verifyOtpAction } from "@/lib/actions";
+import { showAlert } from "@/lib/swal";
+
 
 function OTPForm() {
     const router = useRouter();
@@ -69,7 +71,7 @@ function OTPForm() {
             const result = await verifyOtpAction(email, otpValue);
 
             if (result.success) {
-                alert("Verification successful! Your account is now active.");
+                await showAlert("Success", "Verification successful! Your account is now active.", "success");
                 router.push("/login");
             } else {
                 setError(result.error);

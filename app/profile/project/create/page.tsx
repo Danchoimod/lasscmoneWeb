@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createProject } from '@/lib/actions';
 import { getCategories, getVersions } from '@/lib/api';
+import { showPrompt } from '@/lib/swal';
+
 import Toast, { ToastType } from '@/components/common/Notification';
 import { Trash2, Plus, Link as LinkIcon, Image as ImageIcon, ExternalLink, ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
@@ -151,8 +153,8 @@ export default function CreateProjectPage() {
     };
 
     // Helper functions for dynamic lists
-    const handleAddImage = () => {
-        const url = prompt("Enter Image URL:");
+    const handleAddImage = async () => {
+        const url = await showPrompt("Add Image", "Enter Image URL:");
         if (url) {
             if (url.length > 191) {
                 showNotification("Image URL cannot exceed 191 characters", "error");
@@ -166,11 +168,11 @@ export default function CreateProjectPage() {
         setImages(images.filter((_, i) => i !== index));
     };
 
-    const handleAddUrl = () => {
-        const name = prompt("Enter Link Name (e.g. Mediafire):");
+    const handleAddUrl = async () => {
+        const name = await showPrompt("Add Link", "Enter Link Name (e.g. Mediafire):");
         if (!name) return;
 
-        const url = prompt("Enter Download URL:");
+        const url = await showPrompt("Add Link", "Enter Download URL:");
         if (url) {
             if (url.length > 191) {
                 showNotification("Download URL cannot exceed 191 characters", "error");

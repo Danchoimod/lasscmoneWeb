@@ -4,19 +4,22 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
+import { showAlert, showConfirm } from '@/lib/swal';
+
 
 export default function ProfileSidebar() {
     const pathname = usePathname();
 
     const handleLogout = async (e: React.MouseEvent) => {
         e.preventDefault();
-        if (!confirm('Are you sure you want to logout?')) return;
+        const confirmed = await showConfirm('Logout', 'Are you sure you want to logout?');
+        if (!confirmed) return;
 
         try {
             await signOut({ callbackUrl: '/login' });
         } catch (error) {
             console.error('Logout failed:', error);
-            alert('Failed to logout. Please try again.');
+            await showAlert('Error', 'Failed to logout. Please try again.', 'error');
         }
     };
 
