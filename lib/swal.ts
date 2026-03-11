@@ -16,7 +16,7 @@ export const showConfirm = async (title: string, text?: string) => {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#00bc7d',
-        cancelButtonColor: '#d33',
+        // cancelButtonColor: '#d33',
         confirmButtonText: 'Yes',
         cancelButtonText: 'No'
     });
@@ -29,7 +29,7 @@ export const showPrompt = async (title: string, placeholder?: string) => {
         input: 'text',
         inputPlaceholder: placeholder,
         showCancelButton: true,
-        confirmButtonColor: '#000000',
+        confirmButtonColor: '#00bc7d',
     });
     return text;
 };
