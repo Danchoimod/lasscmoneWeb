@@ -105,6 +105,50 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
+      {/* SEO Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "BreadcrumbList",
+                "itemListElement": mappedProjectData.breadcrumbs.map((item, index) => ({
+                  "@type": "ListItem",
+                  "position": index + 1,
+                  "name": item.label,
+                  "item": item.href ? `https://lflauncher.org${item.href}` : `https://lflauncher.org/project/${project.slug}`
+                }))
+              },
+              {
+                "@type": "Product",
+                "name": project.title,
+                "description": project.shortSummary,
+                "image": project.images?.[0]?.url,
+                "brand": {
+                  "@type": "Brand",
+                  "name": "LF Launcher"
+                },
+                "offers": {
+                  "@type": "Offer",
+                  "url": `https://lflauncher.org/project/${project.slug}`,
+                  "price": "0",
+                  "priceCurrency": "USD",
+                  "availability": "https://schema.org/InStock"
+                },
+                "aggregateRating": project.ratingCount > 0 ? {
+                  "@type": "AggregateRating",
+                  "ratingValue": project.ratingAvg,
+                  "ratingCount": project.ratingCount,
+                  "bestRating": "5",
+                  "worstRating": "1"
+                } : undefined
+              }
+            ]
+          })
+        }}
+      />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProjectBreadcrumbs items={mappedProjectData.breadcrumbs} />
 

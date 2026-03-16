@@ -90,6 +90,44 @@ export default async function RootLayout({
             <Footer />
           </div>
         </Providers>
+
+        {/* SEO Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": "https://lflauncher.org/#website",
+                  "url": "https://lflauncher.org",
+                  "name": "LF Launcher",
+                  "publisher": { "@id": "https://lflauncher.org/#organization" },
+                  "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "https://lflauncher.org/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                  }
+                },
+                {
+                  "@type": "Organization",
+                  "@id": "https://lflauncher.org/#organization",
+                  "name": "LF Launcher",
+                  "url": "https://lflauncher.org",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://lflauncher.org/icons/icon.jpg"
+                  },
+                  "sameAs": [
+                    "https://www.facebook.com/lflauncher",
+                    "https://youtube.com/@lflauncher"
+                  ]
+                }
+              ]
+            })
+          }}
+        />
       </body>
     </html>
   );
