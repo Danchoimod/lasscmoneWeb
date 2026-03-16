@@ -55,7 +55,7 @@ function LoginForm() {
           // Clear cookie after use
           document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
           const name = result.user?.displayName || "Player";
-          const avatar = result.user?.photoURL || "";
+          const avatar = result.user?.photoURL || (result as any).user?.avatarUrl || (result as any).user?.avatar || "";
           window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Google&avatar=${encodeURIComponent(avatar)}`;
         } else {
           window.location.href = "/";
@@ -113,7 +113,7 @@ function LoginForm() {
         if (isLauncher) {
           document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
           const name = (result as any).user?.name || (result as any).user?.displayName || email.split('@')[0];
-          const avatar = (result as any).user?.photoURL || (result as any).user?.image || "";
+          const avatar = (result as any).user?.avatarUrl || (result as any).user?.photoURL || (result as any).user?.image || (result as any).user?.avatar || "";
           window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Email&avatar=${encodeURIComponent(avatar)}`;
         } else {
           window.location.href = "/";
