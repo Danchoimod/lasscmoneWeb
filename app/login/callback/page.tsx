@@ -27,9 +27,14 @@ function CallbackContent() {
                     const loginResult = await discordLoginAction(idToken, user);
 
                     if (loginResult.success) {
-                        // Check if we came from the launcher (via state or persistent param)
-                        const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
+                        // Check if we came from the launcher (via cookie or param)
+                        const isLauncher = searchParams.get("launcher") === "true" || 
+                                           searchParams.get("from") === "pc" ||
+                                           document.cookie.includes("is_launcher=true");
+
                         if (isLauncher) {
+                            // Clear cookie
+                            document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                             window.location.href = "lflauncher://auth";
                         } else {
                             window.location.href = "/";

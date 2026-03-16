@@ -16,6 +16,11 @@ function LoginForm() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
+    if (isLauncher) {
+      document.cookie = "is_launcher=true; path=/; max-age=1800"; // Persist for 30 mins
+    }
+
     const errorCode = searchParams.get("error");
     if (errorCode === "account_exists") {
       setError("An account with this email already exists. Please login using your original method.");
@@ -41,9 +46,14 @@ function LoginForm() {
       const loginResult = await googleLoginAction(idToken, refreshToken);
 
       if (loginResult.success) {
-        // Check if we came from the launcher
-        const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
+        // Check params or cookie
+        const isLauncher = searchParams.get("launcher") === "true" || 
+                          searchParams.get("from") === "pc" ||
+                          document.cookie.includes("is_launcher=true");
+        
         if (isLauncher) {
+          // Clear cookie after use
+          document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
           window.location.href = "lflauncher://auth";
         } else {
           window.location.href = "/";
@@ -95,8 +105,11 @@ function LoginForm() {
       const result = await loginAction({ email, password });
 
       if (result.success) {
-        const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
+        const isLauncher = searchParams.get("launcher") === "true" || 
+                          searchParams.get("from") === "pc" ||
+                          document.cookie.includes("is_launcher=true");
         if (isLauncher) {
+          document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
           window.location.href = "lflauncher://auth";
         } else {
           window.location.href = "/";
