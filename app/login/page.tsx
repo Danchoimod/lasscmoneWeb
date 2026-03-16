@@ -68,10 +68,12 @@ function LoginForm() {
     setError("");
     try {
       const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
-      const url = await getDiscordAuthUrl();
+      let url = await getDiscordAuthUrl();
       if (url) {
-        // Pass launcher param to discord callback if needed, 
-        // but for now the current page will handle it on return if we redirect back here
+        if (isLauncher) {
+          // If the URL already has params, use &, otherwise use ?
+          url += url.includes("?") ? "&launcher=true" : "?launcher=true";
+        }
         window.location.href = url;
       } else {
         setError("Failed to get Discord authorization URL.");

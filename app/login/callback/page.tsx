@@ -27,7 +27,13 @@ function CallbackContent() {
                     const loginResult = await discordLoginAction(idToken, user);
 
                     if (loginResult.success) {
-                        window.location.href = "/";
+                        // Check if we came from the launcher (via state or persistent param)
+                        const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
+                        if (isLauncher) {
+                            window.location.href = "lflauncher://auth";
+                        } else {
+                            window.location.href = "/";
+                        }
                     } else {
                         setError(loginResult.error || "Failed to initialize session.");
                     }
