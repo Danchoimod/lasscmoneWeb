@@ -35,7 +35,9 @@ function CallbackContent() {
                         if (isLauncher) {
                             // Clear cookie
                             document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                            window.location.href = "lflauncher://auth";
+                            const name = user?.displayName || user?.username || "Player";
+                            const avatar = user?.photoURL || user?.image || (user?.id && user?.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : "");
+                            window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Discord&avatar=${encodeURIComponent(avatar)}`;
                         } else {
                             window.location.href = "/";
                         }

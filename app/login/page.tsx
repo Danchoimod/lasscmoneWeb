@@ -54,7 +54,9 @@ function LoginForm() {
         if (isLauncher) {
           // Clear cookie after use
           document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          window.location.href = "lflauncher://auth";
+          const name = (loginResult as any).user?.name || (loginResult as any).user?.displayName || "Player";
+          const avatar = (loginResult as any).user?.photoURL || (loginResult as any).user?.image || "";
+          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Google&avatar=${encodeURIComponent(avatar)}`;
         } else {
           window.location.href = "/";
         }
@@ -110,7 +112,9 @@ function LoginForm() {
                           document.cookie.includes("is_launcher=true");
         if (isLauncher) {
           document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          window.location.href = "lflauncher://auth";
+          const name = (result as any).user?.name || (result as any).user?.displayName || email.split('@')[0];
+          const avatar = (result as any).user?.photoURL || (result as any).user?.image || "";
+          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Email&avatar=${encodeURIComponent(avatar)}`;
         } else {
           window.location.href = "/";
         }
@@ -131,7 +135,7 @@ function LoginForm() {
 
   return (
     <div className="bg-[#F6F6F6] font-sans text-zinc-900">
-      <main className="flex-grow">
+      <main className="grow">
         <section className="flex flex-col items-center justify-center px-4 py-2 md:py-8">
           <div className="w-full max-w-md bg-white shadow-xl border border-gray-100 overflow-hidden">
             <div className="p-8">
