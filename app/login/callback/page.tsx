@@ -35,9 +35,15 @@ function CallbackContent() {
                         if (isLauncher) {
                             // Clear cookie
                             document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-                            const name = user?.displayName || user?.username || "Player";
+                            
+                            // Get actual profile from YOUR backend
+                            const { getMe } = await import("@/lib/actions");
+                            const profile = await getMe();
+
+                            const name = profile.success ? (profile.data.displayName || profile.data.username) : (user?.displayName || user?.username || "Player");
+                            
                             // Try multiple fields for avatar
-                            let avatar = user?.avatarUrl || user?.photoURL || user?.image || "";
+                            let avatar = profile.success ? profile.data.avatarUrl : (user?.avatarUrl || user?.photoURL || user?.image || "");
                             
                             // If we still don't have it and have discord-specific info
                             if (!avatar && user?.id && user?.avatar) {
@@ -50,7 +56,7 @@ function CallbackContent() {
                                 }
                             }
                             
-                            window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Discord&avatar=${encodeURIComponent(avatar)}`;
+                            window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Discord&avatar=${encodeURIComponent(avatar)}&token=${encodeURIComponent(idToken)}`;
                         } else {
                             window.location.href = "/";
                         }

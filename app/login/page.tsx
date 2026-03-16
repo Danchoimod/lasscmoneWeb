@@ -54,9 +54,16 @@ function LoginForm() {
         if (isLauncher) {
           // Clear cookie after use
           document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          const name = result.user?.displayName || "Player";
-          const avatar = result.user?.photoURL || (result as any).user?.avatarUrl || (result as any).user?.avatar || "";
-          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Google&avatar=${encodeURIComponent(avatar)}`;
+          
+          // Get actual profile from YOUR backend
+          const { getMe } = await import("@/lib/actions");
+          const profile = await getMe();
+          
+          const name = profile.success ? (profile.data.displayName || profile.data.username) : (result.user?.displayName || "Player");
+          const avatar = profile.success ? profile.data.avatarUrl : (result.user?.photoURL || (result as any).user?.avatarUrl || "");
+          const token = (loginResult as any).idToken || (loginResult as any).accessToken || "";
+          
+          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Google&avatar=${encodeURIComponent(avatar)}&token=${encodeURIComponent(token)}`;
         } else {
           window.location.href = "/";
         }
@@ -112,9 +119,16 @@ function LoginForm() {
                           document.cookie.includes("is_launcher=true");
         if (isLauncher) {
           document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          const name = (result as any).user?.name || (result as any).user?.displayName || email.split('@')[0];
-          const avatar = (result as any).user?.avatarUrl || (result as any).user?.photoURL || (result as any).user?.image || (result as any).user?.avatar || "";
-          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Email&avatar=${encodeURIComponent(avatar)}`;
+          
+          // Get actual profile from YOUR backend
+          const { getMe } = await import("@/lib/actions");
+          const profile = await getMe();
+          
+          const name = profile.success ? (profile.data.displayName || profile.data.username) : ((result as any).user?.name || email.split('@')[0]);
+          const avatar = profile.success ? profile.data.avatarUrl : ((result as any).user?.avatarUrl || "");
+          const token = (result as any).idToken || (result as any).accessToken || "";
+          
+          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Email&avatar=${encodeURIComponent(avatar)}&token=${encodeURIComponent(token)}`;
         } else {
           window.location.href = "/";
         }
