@@ -26,8 +26,29 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
   const { data: session } = useSession();
   const [currentUser, setCurrentUser] = useState<any>(session?.user);
   const [open, setOpen] = useState(false);
-  const [categories] = useState<Category[]>(initialCategories);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialCategories && initialCategories.length > 0) {
+      setCategories(initialCategories);
+      return;
+    }
+
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api-backend/categories");
+        const result = await response.json();
+        if (result.status === "success") {
+          const cats = Array.isArray(result.data) ? result.data : (result.data?.categories || []);
+          setCategories(cats);
+        }
+      } catch (error) {
+        console.error("Error fetching categories for navbar:", error);
+      }
+    };
+    fetchCategories();
+  }, [initialCategories]);
 
   // Update currentUser when session changes
   useEffect(() => {

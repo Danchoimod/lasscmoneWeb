@@ -31,7 +31,32 @@ interface CarouselProps {
 
 const Carousel = ({ initialSlides }: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [slides] = useState<CarouselItem[]>(initialSlides);
+  const [slides, setSlides] = useState<CarouselItem[]>(initialSlides);
+  const [loading, setLoading] = useState(initialSlides.length === 0);
+
+  useEffect(() => {
+    if (initialSlides.length > 0) {
+      setSlides(initialSlides);
+      setLoading(false);
+      return;
+    }
+
+    const fetchSlides = async () => {
+      try {
+        const response = await fetch("/api-backend/carousels");
+        const result = await response.json();
+        if (result.status === "success" && Array.isArray(result.data)) {
+          setSlides(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching carousels on client:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, [initialSlides]);
 
   const nextSlide = () => {
     if (slides.length === 0) return;
@@ -50,7 +75,7 @@ const Carousel = ({ initialSlides }: CarouselProps) => {
     return () => clearInterval(interval);
   }, [slides.length, currentIndex]);
 
-  if (slides.length === 0) {
+  if (loading || slides.length === 0) {
     return (
       <div className="w-full max-w-6xl mx-auto h-[400px] bg-zinc-900 animate-pulse flex items-center justify-center">
         <span className="text-zinc-700 text-6xl font-bold opacity-10">MINECRAFT</span>
