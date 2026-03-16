@@ -41,7 +41,13 @@ function LoginForm() {
       const loginResult = await googleLoginAction(idToken, refreshToken);
 
       if (loginResult.success) {
-        window.location.href = "/";
+        // Check if we came from the launcher
+        const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
+        if (isLauncher) {
+          window.location.href = "lflauncher://auth";
+        } else {
+          window.location.href = "/";
+        }
       } else {
         setError(loginResult.error || "Google login failed on server.");
       }
@@ -61,8 +67,11 @@ function LoginForm() {
     setLoading(true);
     setError("");
     try {
+      const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
       const url = await getDiscordAuthUrl();
       if (url) {
+        // Pass launcher param to discord callback if needed, 
+        // but for now the current page will handle it on return if we redirect back here
         window.location.href = url;
       } else {
         setError("Failed to get Discord authorization URL.");
@@ -84,7 +93,12 @@ function LoginForm() {
       const result = await loginAction({ email, password });
 
       if (result.success) {
-        window.location.href = "/";
+        const isLauncher = searchParams.get("launcher") === "true" || searchParams.get("from") === "pc";
+        if (isLauncher) {
+          window.location.href = "lflauncher://auth";
+        } else {
+          window.location.href = "/";
+        }
       } else {
         if (result.error === "Account deactivated") {
           router.push(`/auth/otp?email=${encodeURIComponent(email)}`);
