@@ -12,8 +12,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
-  title: "LF Launcher: Ultimate Minecraft Launcher for Mods & Maps",
+  metadataBase: new URL('https://lflauncher.org'),
+  title: {
+    default: "LF Launcher: Ultimate Minecraft Launcher for Mods & Maps",
+    template: "%s | LF Launcher"
+  },
   description: "Download the best Minecraft Launcher for Android and PC. Explore curated mods, maps, resource packs, and more at LF Launcher.",
   keywords: ["Minecraft", "Launcher", "Mods", "Maps", "Resource Packs", "Android Minecraft", "LF Launcher"],
   authors: [{ name: "LF Launcher Team" }],
@@ -23,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "LF Launcher: Ultimate Minecraft Launcher for Mods & Maps",
     description: "Download the best Minecraft Launcher for Android and PC. Explore curated mods, maps, resource packs, and more at LF Launcher.",
-    url: "https://lflauncher.org",
+    url: "/",
     siteName: "LF Launcher",
     images: [
       {
@@ -33,7 +42,7 @@ export const metadata: Metadata = {
         alt: "LF Launcher - The Ultimate Minecraft Modding Platform",
       },
     ],
-    locale: "en_US",
+    locale: "vi_VN",
     type: "website",
   },
   twitter: {
@@ -81,37 +90,6 @@ export default async function RootLayout({
             <Footer />
           </div>
         </Providers>
-
-        {/* Structured Data for SEO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
-              {
-                "@context": "https://schema.org",
-                "@type": "WebSite",
-                "name": "LF Launcher",
-                "url": "https://lflauncher.org",
-                "potentialAction": {
-                  "@type": "SearchAction",
-                  "target": "https://lflauncher.org/search?q={search_term_string}",
-                  "query-input": "required name=search_term_string"
-                }
-              },
-              {
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                "name": "LF Launcher",
-                "url": "https://lflauncher.org",
-                "logo": "https://lflauncher.org/icons/icon.jpg",
-                "sameAs": [
-                  "https://www.facebook.com/lflauncher",
-                  "https://youtube.com/@lflauncher"
-                ]
-              }
-            ])
-          }}
-        />
       </body>
     </html>
   );

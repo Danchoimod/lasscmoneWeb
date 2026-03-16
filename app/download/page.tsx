@@ -1,7 +1,13 @@
 import Image from "next/image";
+import { Metadata } from "next";
 import { Download, ChevronRight, ShieldCheck, Zap, Heart } from "lucide-react";
 import { getLatestUpdates } from "@/lib/api";
 import FAQSection from "@/components/features/FAQSection";
+
+export const metadata: Metadata = {
+  title: "Download LF Launcher - Windows & Android",
+  description: "Get the latest version of LF Launcher. Fast, safe, and free Minecraft Bedrock Edition launcher for PC and Android devices.",
+};
 
 export default async function DownloadPage() {
   const { windows: windowsUpdate, android: androidUpdate } = await getLatestUpdates();
