@@ -125,8 +125,8 @@ const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, i
         <button
           onClick={() => handleCategoryClick(null)}
           className={`px-6 py-2 text-xs font-bold uppercase tracking-widest border transition-all duration-200 ${activeCategorySlug === null
-            ? "bg-green-600 border-green-600 text-white shadow-md"
-            : "bg-white border-gray-200 text-gray-500 hover:border-black hover:text-black"
+            ? "bg-[#00a63e] border-[#00a63e] text-white shadow-md"
+            : "bg-white border-gray-200 text-gray-500 hover:border-[#00a63e] hover:text-[#00a63e]"
             }`}
         >
           All
@@ -136,8 +136,8 @@ const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, i
             key={cat.id}
             onClick={() => handleCategoryClick(cat.param)}
             className={`px-6 py-2 text-xs font-bold uppercase tracking-widest border transition-all duration-200 ${activeCategorySlug === cat.param
-              ? "bg-green-600 border-green-600 text-white shadow-md"
-              : "bg-white border-gray-200 text-gray-500 hover:border-black hover:text-black"
+              ? "bg-[#00a63e] border-[#00a63e] text-white shadow-md"
+              : "bg-white border-gray-200 text-gray-500 hover:border-[#00a63e] hover:text-[#00a63e]"
               }`}
           >
             {cat.name}

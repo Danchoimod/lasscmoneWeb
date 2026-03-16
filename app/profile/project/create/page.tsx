@@ -62,6 +62,10 @@ export default function CreateProjectPage() {
     const [urls, setUrls] = useState<{ name: string, url: string }[]>([]);
     const [versions, setVersions] = useState<any[]>([]);
 
+    // State for new link
+    const [newUrlSource, setNewUrlSource] = useState('MediaFire');
+    const [newUrlPath, setNewUrlPath] = useState('');
+
     // Selection state for adding versions
     const [isAddingVersion, setIsAddingVersion] = useState(false);
     const [selectedVersionId, setSelectedVersionId] = useState('');
@@ -168,18 +172,19 @@ export default function CreateProjectPage() {
         setImages(images.filter((_, i) => i !== index));
     };
 
-    const handleAddUrl = async () => {
-        const name = await showPrompt("Add Link", "Enter Link Name (e.g. Mediafire):");
-        if (!name) return;
-
-        const url = await showPrompt("Add Link", "Enter Download URL:");
-        if (url) {
-            if (url.length > 191) {
-                showNotification("Download URL cannot exceed 191 characters", "error");
-                return;
-            }
-            setUrls([...urls, { name, url }]);
+    const handleAddUrlInline = () => {
+        if (!newUrlPath) {
+            showNotification("Please enter a URL", "error");
+            return;
         }
+
+        if (newUrlPath.length > 191) {
+            showNotification("Download URL cannot exceed 191 characters", "error");
+            return;
+        }
+
+        setUrls([...urls, { name: newUrlSource, url: newUrlPath }]);
+        setNewUrlPath(''); // Reset URL input only
     };
 
     const handleRemoveUrl = (index: number) => {
@@ -365,7 +370,7 @@ export default function CreateProjectPage() {
                         {/* Links Section */}
                         <div className="space-y-4">
                             <label className="text-xs font-bold uppercase tracking-widest text-gray-700 block">External Download Links</label>
-                            <div className="space-y-2">
+                            <div className="space-y-4">
                                 {urls.map((u, idx) => (
                                     <div key={idx} className="flex items-center gap-4 border border-gray-300 p-3 bg-gray-50">
                                         <LinkIcon size={16} className="text-blue-500" />
@@ -376,12 +381,45 @@ export default function CreateProjectPage() {
                                         <button onClick={() => handleRemoveUrl(idx)} className="text-[10px] font-bold text-red-500 uppercase hover:underline">Remove</button>
                                     </div>
                                 ))}
-                                <button
-                                    onClick={handleAddUrl}
-                                    className="flex items-center gap-2 text-[10px] font-bold uppercase text-blue-600 bg-blue-50 px-4 py-2 border border-blue-100 hover:bg-blue-100"
-                                >
-                                    <Plus size={14} /> Add New Link
-                                </button>
+                                
+                                <div className="flex flex-col sm:flex-row gap-2 bg-gray-50 p-4 border border-gray-200">
+                                    <div className="flex flex-col gap-1 w-full sm:w-40">
+                                        <label className="text-[9px] font-bold uppercase text-gray-500">Source</label>
+                                        <select 
+                                            value={newUrlSource} 
+                                            onChange={(e) => setNewUrlSource(e.target.value)}
+                                            className="border border-gray-300 p-2 text-xs outline-none bg-white font-medium"
+                                        >
+                                            <option>MediaFire</option>
+                                            <option>GitHub</option>
+                                            <option>Dropbox</option>
+                                            <option>OneDrive</option>
+                                            <option>Terabox</option>
+                                            <option>Mega.nz</option>
+                                            <option>Yandex Disk</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col gap-1 flex-1">
+                                        <label className="text-[9px] font-bold uppercase text-gray-500">URL</label>
+                                        <input 
+                                            type="text" 
+                                            value={newUrlPath}
+                                            onChange={(e) => setNewUrlPath(e.target.value)}
+                                            placeholder="https://..."
+                                            className="border border-gray-300 p-2 text-xs outline-none bg-white"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1 justify-end">
+                                        <button 
+                                            type="button"
+                                            onClick={handleAddUrlInline}
+                                            className="h-[34px] flex items-center gap-2 bg-blue-600 text-white px-4 py-2 text-[10px] font-bold uppercase hover:bg-black transition-colors shadow-sm"
+                                        >
+                                            <Plus size={14} /> Add
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

@@ -178,18 +178,18 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
               {item.param ? (
                 <Link
                   href={`/${item.param}`}
-                  className="flex items-center px-4 h-full hover:text-blue-600 hover:bg-gray-50 cursor-pointer transition-all whitespace-nowrap font-medium"
+                  className="flex items-center px-4 h-full hover:text-[#00a63e] hover:bg-gray-50 cursor-pointer transition-all whitespace-nowrap font-medium"
                 >
                   <span>{item.name}</span>
                   {item.hasDropdown && (
-                    <ChevronDown className="ml-1 w-3 h-3 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                    <ChevronDown className="ml-1 w-3 h-3 text-gray-400 group-hover:text-[#00a63e] transition-colors" />
                   )}
                 </Link>
               ) : (
                 <div className="flex items-center px-4 h-full text-gray-700 cursor-default whitespace-nowrap font-medium">
                   {item.name}
                   {item.hasDropdown && (
-                    <ChevronDown className="ml-1 w-3 h-3 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                    <ChevronDown className="ml-1 w-3 h-3 text-gray-400 group-hover:text-[#00a63e] transition-colors" />
                   )}
                 </div>
               )}
@@ -201,7 +201,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
                     <Link
                       key={child.id}
                       href={`/${child.param}`}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#00a63e] transition-colors"
                     >
                       {child.name}
                     </Link>
@@ -215,7 +215,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
         {/* Right Actions */}
         <div className="flex items-center gap-2 shrink-0">
           <button onClick={() => setIsSearchOpen(true)}>
-            <Search className="hidden md:block w-5 h-5 mx-2 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors" />
+            <Search className="hidden md:block w-5 h-5 mx-2 cursor-pointer text-gray-500 hover:text-[#00a63e] transition-colors" />
           </button>
 
           {/* Download Button - Changed to rounded-none */}
@@ -239,7 +239,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
           {/* 👤 User Avatar - Only show if logged in */}
           {currentUser && (
             <Link href="/profile" className="p-1">
-              <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-blue-500 transition-all">
+              <div className="w-9 h-9 bg-gray-100 border border-gray-200 rounded-none flex items-center justify-center overflow-hidden hover:border-[#00a63e] transition-all">
                 {currentUser.avatarUrl && (currentUser.avatarUrl.startsWith('http') || currentUser.avatarUrl.startsWith('/')) ? (
                   <Image src={currentUser.avatarUrl} alt={currentUser.displayName || currentUser.username} width={40} height={40} className="object-cover w-full h-full" />
                 ) : (
@@ -281,7 +281,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
 
                 {item.hasDropdown && (
                   <button
-                    className="px-6 py-4 border-l border-gray-100 flex items-center justify-center transition-colors hover:text-blue-600"
+                    className="px-6 py-4 border-l border-gray-100 flex items-center justify-center transition-colors hover:text-[#00a63e]"
                     onClick={() => setActiveMobileSubmenu(activeMobileSubmenu === item.name ? null : item.name)}
                   >
                     <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${activeMobileSubmenu === item.name ? "rotate-180" : ""}`} />
@@ -296,7 +296,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
                     <Link
                       key={child.id}
                       href={`/${child.param}`}
-                      className="block px-10 py-3 text-sm text-gray-600 hover:text-blue-600 border-l-2 border-transparent hover:border-blue-600 transition-all font-medium"
+                      className="block px-10 py-3 text-sm text-gray-600 hover:text-[#00a63e] border-l-2 border-transparent hover:border-[#00a63e] transition-all font-medium"
                       onClick={() => setOpen(false)}
                     >
                       {child.name}

@@ -76,6 +76,10 @@ export default function EditProjectPage() {
     const [urls, setUrls] = useState<any[]>([]);
     const [versions, setVersions] = useState<any[]>([]);
 
+    // State for new link
+    const [newUrlSource, setNewUrlSource] = useState('MediaFire');
+    const [newUrlPath, setNewUrlPath] = useState('');
+
     useEffect(() => {
         const loadPageData = async () => {
             if (!id) return;
@@ -162,18 +166,19 @@ export default function EditProjectPage() {
         }
     };
 
-    const handleAddUrl = async () => {
-        const name = await showPrompt("Add Link", "Enter Link Name (e.g. Mediafire):");
-        if (!name) return;
-
-        const url = await showPrompt("Add Link", "Enter Download URL:");
-        if (url) {
-            if (url.length > 191) {
-                showNotification("Download URL cannot exceed 191 characters", "error");
-                return;
-            }
-            setUrls([...urls, { name, url }]);
+    const handleAddUrlInline = () => {
+        if (!newUrlPath) {
+            showNotification("Please enter a URL", "error");
+            return;
         }
+
+        if (newUrlPath.length > 191) {
+            showNotification("Download URL cannot exceed 191 characters", "error");
+            return;
+        }
+
+        setUrls([...urls, { name: newUrlSource, url: newUrlPath }]);
+        setNewUrlPath(''); // Reset URL input only
     };
 
     const handleRemoveUrl = (index: number) => {
@@ -404,13 +409,47 @@ export default function EditProjectPage() {
                                         ))}
                                     </div>
                                 )}
-                                <button
-                                    onClick={handleAddUrl}
-                                    className="flex items-center gap-2 text-[11px] font-bold uppercase text-blue-600 border border-blue-100 bg-blue-50 px-4 py-2 hover:bg-blue-100 transition-colors"
-                                >
-                                    <Plus size={14} />
-                                    Add Link
-                                </button>
+                                <div className="bg-[#F8F9FA] border border-[#D1D4D7] p-4 space-y-4">
+                                    <div className="text-[10px] font-bold uppercase text-[#999]">Add New Mirror / Download Link</div>
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <div className="flex flex-col gap-1 sm:w-44">
+                                            <label className="text-[9px] font-bold uppercase text-gray-400">Source</label>
+                                            <select 
+                                                value={newUrlSource} 
+                                                onChange={(e) => setNewUrlSource(e.target.value)}
+                                                className="border border-[#D1D4D7] p-2 text-xs outline-none bg-white font-medium"
+                                            >
+                                                <option>MediaFire</option>
+                                                <option>GitHub</option>
+                                                <option>Dropbox</option>
+                                                <option>OneDrive</option>
+                                                <option>Terabox</option>
+                                                <option>Mega.nz</option>
+                                                <option>Yandex Disk</option>
+                                                <option>Other</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex flex-col gap-1 flex-1">
+                                            <label className="text-[9px] font-bold uppercase text-gray-400">Download URL</label>
+                                            <input 
+                                                type="text" 
+                                                value={newUrlPath}
+                                                onChange={(e) => setNewUrlPath(e.target.value)}
+                                                placeholder="https://..."
+                                                className="border border-[#D1D4D7] p-2 text-xs outline-none bg-white focus:border-[#BBB]"
+                                            />
+                                        </div>
+                                        <div className="flex flex-col gap-1 justify-end">
+                                            <button 
+                                                type="button"
+                                                onClick={handleAddUrlInline}
+                                                className="h-[34px] flex items-center gap-2 bg-[#333] text-white px-5 py-2 text-[10px] font-bold uppercase hover:bg-black transition-colors"
+                                            >
+                                                <Plus size={14} /> Add Link
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </section>
 
