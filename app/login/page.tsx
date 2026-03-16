@@ -54,8 +54,8 @@ function LoginForm() {
         if (isLauncher) {
           // Clear cookie after use
           document.cookie = "is_launcher=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-          const name = (loginResult as any).user?.name || (loginResult as any).user?.displayName || "Player";
-          const avatar = (loginResult as any).user?.photoURL || (loginResult as any).user?.image || "";
+          const name = result.user?.displayName || "Player";
+          const avatar = result.user?.photoURL || "";
           window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Google&avatar=${encodeURIComponent(avatar)}`;
         } else {
           window.location.href = "/";
