@@ -13,10 +13,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LF Launcher - Minecraft Launcher",
-  description: "Minecraft Launcher for Android & PC - LF Launcher",
+  title: "LF Launcher - Ultimate Minecraft Experience",
+  description: "Download the best Minecraft Launcher for Android and PC. Explore curated mods, maps, resource packs, and more at LF Launcher.",
+  keywords: ["Minecraft", "Launcher", "Mods", "Maps", "Resource Packs", "Android Minecraft", "LF Launcher"],
+  authors: [{ name: "LF Launcher Team" }],
   icons: {
-    icon: '/icons/icon.jpg', // Reference path from the /public directory
+    icon: '/icons/icon.jpg',
+  },
+  openGraph: {
+    title: "LF Launcher - Ultimate Minecraft Experience",
+    description: "Download the best Minecraft Launcher for Android and PC. Explore curated mods, maps, resource packs, and more at LF Launcher.",
+    url: "https://lflauncher.org",
+    siteName: "LF Launcher",
+    images: [
+      {
+        url: "/icons/icon.jpg",
+        width: 800,
+        height: 800,
+        alt: "LF Launcher Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LF Launcher - Ultimate Minecraft Experience",
+    description: "Download the best Minecraft Launcher for Android and PC. Curated mods, maps, and more.",
+    images: ["/icons/icon.jpg"],
   },
 };
 
