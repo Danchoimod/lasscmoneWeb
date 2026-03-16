@@ -29,7 +29,7 @@ const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, i
   }, [initialSlug]);
 
   useEffect(() => {
-    if (initialCategories.length > 0) {
+    if (initialCategories && initialCategories.length > 0) {
       setCategories(initialCategories);
       return;
     }
@@ -37,15 +37,21 @@ const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, i
       try {
         const response = await fetch("/api-backend/categories");
         const result = await response.json();
-        // Bóc tách data tương tự như trong lib/api.ts
-        const cats = result.status === "success" ? (result.data?.categories || result.data) : result;
-        setCategories(Array.isArray(cats) ? cats : []);
+        
+        let cats = [];
+        if (result.status === "success" || result.status === 200) {
+          cats = Array.isArray(result.data) ? result.data : (result.data?.categories || []);
+        } else if (Array.isArray(result)) {
+          cats = result;
+        }
+        
+        setCategories(cats);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching categories for FilterSection:", error);
       }
     };
     fetchCategories();
-  }, []);
+  }, [initialCategories]);
 
   // Debounced search logic - Navigates to search page
   useEffect(() => {
