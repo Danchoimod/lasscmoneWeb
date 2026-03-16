@@ -81,6 +81,37 @@ export default async function RootLayout({
             <Footer />
           </div>
         </Providers>
+
+        {/* Structured Data for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "LF Launcher",
+                "url": "https://lflauncher.org",
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": "https://lflauncher.org/search?q={search_term_string}",
+                  "query-input": "required name=search_term_string"
+                }
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "LF Launcher",
+                "url": "https://lflauncher.org",
+                "logo": "https://lflauncher.org/icons/icon.jpg",
+                "sameAs": [
+                  "https://www.facebook.com/lflauncher",
+                  "https://youtube.com/@lflauncher"
+                ]
+              }
+            ])
+          }}
+        />
       </body>
     </html>
   );

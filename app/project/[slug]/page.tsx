@@ -105,6 +105,47 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="bg-gray-50 dark:bg-gray-950 min-h-screen">
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": mappedProjectData.breadcrumbs.map((item, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "name": item.label,
+                "item": item.href ? `https://lflauncher.org${item.href}` : undefined
+              }))
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": project.title,
+              "description": project.shortSummary,
+              "applicationCategory": "GameApplication",
+              "operatingSystem": "Minecraft",
+              "author": {
+                "@type": "Person",
+                "name": mappedProjectData.creator.name
+              },
+              "aggregateRating": project.ratingCount > 0 ? {
+                "@type": "AggregateRating",
+                "ratingValue": project.ratingAvg,
+                "ratingCount": project.ratingCount
+              } : undefined,
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "image": project.images?.[0]?.url
+            }
+          ])
+        }}
+      />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ProjectBreadcrumbs items={mappedProjectData.breadcrumbs} />
 
