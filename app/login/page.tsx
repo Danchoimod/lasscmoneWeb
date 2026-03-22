@@ -61,9 +61,10 @@ function LoginForm() {
           
           const name = profile.success ? (profile.data.displayName || profile.data.username) : (result.user?.displayName || "Player");
           const avatar = profile.success ? profile.data.avatarUrl : (result.user?.photoURL || (result as any).user?.avatarUrl || "");
+          const skin = profile.success ? (profile.data.skinUrl || "") : "";
           const token = (loginResult as any).idToken || (loginResult as any).accessToken || "";
           
-          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Google&avatar=${encodeURIComponent(avatar)}&token=${encodeURIComponent(token)}`;
+          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Google&avatar=${encodeURIComponent(avatar)}&skin=${encodeURIComponent(skin)}&token=${encodeURIComponent(token)}`;
         } else {
           window.location.href = "/";
         }
@@ -126,9 +127,10 @@ function LoginForm() {
           
           const name = profile.success ? (profile.data.displayName || profile.data.username) : ((result as any).user?.name || email.split('@')[0]);
           const avatar = profile.success ? profile.data.avatarUrl : ((result as any).user?.avatarUrl || "");
+          const skin = profile.success ? (profile.data.skinUrl || "") : "";
           const token = (result as any).idToken || (result as any).accessToken || "";
           
-          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Email&avatar=${encodeURIComponent(avatar)}&token=${encodeURIComponent(token)}`;
+          window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Email&avatar=${encodeURIComponent(avatar)}&skin=${encodeURIComponent(skin)}&token=${encodeURIComponent(token)}`;
         } else {
           window.location.href = "/";
         }

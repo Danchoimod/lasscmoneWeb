@@ -44,6 +44,7 @@ function CallbackContent() {
                             
                             // Try multiple fields for avatar
                             let avatar = profile.success ? profile.data.avatarUrl : (user?.avatarUrl || user?.photoURL || user?.image || "");
+                            const skin = profile.success ? (profile.data.skinUrl || "") : "";
                             
                             // If we still don't have it and have discord-specific info
                             if (!avatar && user?.id && user?.avatar) {
@@ -56,7 +57,7 @@ function CallbackContent() {
                                 }
                             }
                             
-                            window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Discord&avatar=${encodeURIComponent(avatar)}&token=${encodeURIComponent(idToken)}`;
+                            window.location.href = `lflauncher://auth?name=${encodeURIComponent(name)}&type=Discord&avatar=${encodeURIComponent(avatar)}&skin=${encodeURIComponent(skin)}&token=${encodeURIComponent(idToken)}`;
                         } else {
                             window.location.href = "/";
                         }
