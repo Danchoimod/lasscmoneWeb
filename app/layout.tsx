@@ -20,18 +20,18 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://lflauncher.org'),
   title: {
-    default: "LF Launcher: Ultimate Minecraft Launcher for Mods & Maps",
+    default: "LF Launcher: The Ultimate Minecraft Launcher for Android & PC",
     template: "%s | LF Launcher"
   },
-  description: "Download the best Minecraft Launcher for Android and PC. Explore curated mods, maps, resource packs, and more at LF Launcher.",
-  keywords: ["Minecraft", "Launcher", "Mods", "Maps", "Resource Packs", "Android Minecraft", "LF Launcher"],
+  description: "Download LF Launcher - The optimized Minecraft launcher for Android and PC. Discover a curated collection of high-quality Mods, Maps, Resource Packs, and Skins.",
+  keywords: ["Minecraft", "Launcher", "Mods", "Maps", "Resource Packs", "Minecraft PE", "Minecraft Bedrock", "LF Launcher", "Download Minecraft"],
   authors: [{ name: "LF Launcher Team" }],
   icons: {
     icon: '/icons/icon.jpg',
   },
   openGraph: {
-    title: "LF Launcher: Ultimate Minecraft Launcher for Mods & Maps",
-    description: "Download the best Minecraft Launcher for Android and PC. Explore curated mods, maps, resource packs, and more at LF Launcher.",
+    title: "LF Launcher: The Ultimate Minecraft Launcher for Android & PC",
+    description: "Explore the world of Minecraft with LF Launcher. Support one-click installation for Mods, Maps, and Resource Packs. Safe, fast, and free.",
     url: "/",
     siteName: "LF Launcher",
     images: [
@@ -39,16 +39,16 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "LF Launcher - The Ultimate Minecraft Modding Platform",
+        alt: "LF Launcher - Leading Minecraft Modding Platform",
       },
     ],
-    locale: "vi_VN",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "LF Launcher: Ultimate Minecraft Launcher for Mods & Maps",
-    description: "Download the best Minecraft Launcher for Android and PC. Curated mods, maps, and more.",
+    title: "LF Launcher: The Ultimate Minecraft Launcher for Android & PC",
+    description: "Download official Mods, Maps, and Resource Packs for Minecraft Android and PC at LF Launcher.",
     images: ["/og-image.png"],
   },
 };

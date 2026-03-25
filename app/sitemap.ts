@@ -22,12 +22,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
     }))
 
+    // Add Blog Posts
+    const { BLOG_POSTS } = require('@/lib/blog-data')
+    const blogUrls = BLOG_POSTS.map((post: any) => ({
+        url: `${baseUrl}/blog/${post.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+    }))
+
     return [
         {
             url: baseUrl,
             lastModified: new Date(),
             changeFrequency: 'daily',
             priority: 1,
+        },
+        {
+            url: `${baseUrl}/blog`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.8,
         },
         {
             url: `${baseUrl}/privacy-policy`,
@@ -49,5 +64,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
         ...categoryUrls,
         ...packageUrls,
+        ...blogUrls,
     ]
 }

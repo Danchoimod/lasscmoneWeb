@@ -3,13 +3,13 @@
 import React from "react";
 
 export default function TermsOfService() {
-  const lastModified = "March 4th, 2026";
+  const lastModified = "March 20, 2026";
 
   return (
     <div className="bg-[#E9ECEF] font-sans text-[#333]">
-      <main className="mx-auto flex w-full max-w-[1100px] flex-grow gap-6 px-4 py-6">
+      <main className="mx-auto flex w-full max-w-[1100px] grow gap-6 px-4 py-6">
         {/* Main Content Column */}
-        <div className="flex-grow rounded-sm border border-[#D1D4D7] bg-white">
+        <div className="grow rounded-sm border border-[#D1D4D7] bg-white">
           {/* Header */}
           <div className="border-b border-[#EEE] bg-[#F8F9FA] px-6 py-3">
             <h1 className="text-sm font-bold uppercase tracking-wide text-[#555]">
@@ -56,7 +56,7 @@ export default function TermsOfService() {
             </div>
 
             <p className="pt-4 border-t border-[#EEE]">
-              The ToU of <a href="https://lflauncher.org" className="text-[#4F8A10] hover:underline font-medium">lflauncher.org</a> were last modified on [{lastModified}]
+              The ToU of <a href="https://lflauncher.org" className="text-[#4F8A10] hover:underline font-medium">lflauncher.org</a> were last modified on <strong>{lastModified}</strong>
             </p>
           </div>
         </div>

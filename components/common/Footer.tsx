@@ -12,7 +12,7 @@ const Footer = () => {
             LASSCMONE<span className="text-zinc-500 font-light italic">STUDIO</span>
           </h2>
           <p className="text-zinc-500 text-sm max-w-sm leading-relaxed">
-            Built from zero. Waiting for my miracle.
+            Creativity. Passion. Excellence. LF Launcher is a dedicated project aimed at bringing the best Minecraft experience to every player.
           </p>
         </div>
 
@@ -23,7 +23,7 @@ const Footer = () => {
           </span>
           <a
             href="mailto:support@lflauncher.org"
-            className="text-zinc-800 font-medium text-lg hover:text-blue-600 transition-colors duration-200"
+            className="text-zinc-800 font-medium text-lg hover:text-[#00a63e] transition-colors duration-200"
           >
             support@lflauncher.org
           </a>

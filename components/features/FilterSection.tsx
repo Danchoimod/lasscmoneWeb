@@ -89,7 +89,7 @@ const FilterSection = ({ onCategoryChange, onSearchChange, initialSlug = null, i
       <div className="flex flex-col md:flex-row gap-0 mb-8 shadow-sm">
 
         {/* Search Input - Nhấn mạnh vào sự vuông vức và minimalist */}
-        <div className="flex-grow flex items-center border border-gray-300 bg-white px-4 py-3 focus-within:border-black transition-colors">
+        <div className="flex grow items-center border border-gray-300 bg-white px-4 py-3 focus-within:border-black transition-colors">
           <Search className="w-4 h-4 mr-3 text-gray-400" />
           <input
             type="text"

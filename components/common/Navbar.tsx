@@ -100,6 +100,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
   // or just use API if it's supposed to be dynamic.
   // The original has Submission as hasDropdown: false.
   if (categories.length > 0) {
+    navItems.push({ name: "Blog", hasDropdown: false, param: "blog", children: [] });
     navItems.push({ name: "Submission", hasDropdown: false, param: "profile/project", children: [] });
     navItems.push({
       name: "Help",

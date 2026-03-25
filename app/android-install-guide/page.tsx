@@ -3,13 +3,13 @@
 import React from "react";
 
 export default function AndroidInstallGuide() {
-    const lastModified = "March 4th, 2026";
+    const lastModified = "March 20, 2026";
 
     return (
         <div className="bg-[#E9ECEF] font-sans text-[#333]">
-            <main className="mx-auto flex w-full max-w-[1100px] flex-grow gap-6 px-4 py-6">
+            <main className="mx-auto flex w-full max-w-[1100px] grow gap-6 px-4 py-6">
                 {/* Main Content Column */}
-                <div className="flex-grow rounded-sm border border-[#D1D4D7] bg-white">
+                <div className="grow rounded-sm border border-[#D1D4D7] bg-white">
                     {/* Header */}
                     <div className="border-b border-[#EEE] bg-[#F8F9FA] px-6 py-3">
                         <h1 className="text-sm font-bold uppercase tracking-wide text-[#555]">
@@ -20,14 +20,14 @@ export default function AndroidInstallGuide() {
                     {/* Text Content */}
                     <div className="p-8 text-[15px] leading-[1.7] text-[#444] space-y-8">
                         <p>
-                            Welcome to the mobile guide. Adding Add-Ons, Resource Packs, Worlds, or Skins to Minecraft on Android is extremely simple if you follow the steps below.
+                            Welcome to the mobile installation guide. Adding Add-Ons, Resource Packs, Worlds, or Skins to Minecraft on Android is extremely simple if you follow the steps below.
                         </p>
 
                         <div className="space-y-6">
                             {/* Section 1 */}
                             <div className="space-y-4">
-                                <p><strong>1. Quick Download & Installation (LFLAUNCHER Recommended)</strong><br />
-                                    To make the installation process as smooth as possible, we recommend using the <strong>LFLAUNCHER</strong> app to manage <code className="bg-gray-100 px-1 font-mono text-green-700">.mcpack</code>, <code className="bg-gray-100 px-1 font-mono text-green-700">.mcaddon</code>, or <code className="bg-gray-100 px-1 font-mono text-green-700">.mcworld</code> files.</p>
+                                <p><strong>1. Quick Download & Installation (LF LAUNCHER Recommended)</strong><br />
+                                    To make the installation process as smooth as possible, we recommend using the <strong>LF Launcher</strong> app to manage <code className="bg-gray-100 px-1 font-mono text-green-700">.mcpack</code>, <code className="bg-gray-100 px-1 font-mono text-green-700">.mcaddon</code>, or <code className="bg-gray-100 px-1 font-mono text-green-700">.mcworld</code> files.</p>
 
                                 <div className="pl-4 space-y-2">
                                     <p><strong>Step 1:</strong> Choose your favorite content and press the <strong>Download</strong> button.</p>
@@ -38,8 +38,10 @@ export default function AndroidInstallGuide() {
                                 <p>Immediately, the game will automatically launch and perform the import process. You will see an <strong>"Import started..."</strong> notification at the top of the screen. When you receive the <strong>"Successfully imported"</strong> message, you are ready to play!</p>
 
                                 <div className="mt-4 border border-dashed border-[#DDD] p-2 bg-[#FAFAFA]">
-                                    <img src="https://api.mcpedl.com/storage/pages/1187/67f2a6abda159.png" alt="Download and Import" className="w-full h-auto bg-white min-h-[150px] flex items-center justify-center text-[#999] italic" />
-                                    <p className="text-[11px] text-[#999] text-center mt-2 italic">Screenshot: Importing content on Android</p>
+                                    <div className="w-full h-auto bg-white min-h-[150px] flex items-center justify-center text-[#999] italic border border-zinc-100">
+                                        [Instruction Image: Importing content on Android]
+                                    </div>
+                                    <p className="text-[11px] text-[#999] text-center mt-2 italic">Screenshot: Import process on Android</p>
                                 </div>
                             </div>
 
@@ -63,8 +65,10 @@ export default function AndroidInstallGuide() {
                                 </div>
 
                                 <div className="mt-4 border border-dashed border-[#DDD] p-2 bg-[#FAFAFA]">
-                                    <img src="https://api.mcpedl.com/storage/pages/1187/67f2a6ac02ec9.png" alt="Activate Content" className="w-full h-auto bg-white min-h-[150px]" />
-                                    <p className="text-[11px] text-[#999] text-center mt-2 italic">Screenshot: Activating packs in Android world settings</p>
+                                    <div className="w-full h-auto bg-white min-h-[150px] flex items-center justify-center text-[#999] italic border border-zinc-100">
+                                        [Instruction Image: Activating packs in Android world settings]
+                                    </div>
+                                    <p className="text-[11px] text-[#999] text-center mt-2 italic">Screenshot: Activating packs in settings</p>
                                 </div>
                             </div>
 
@@ -77,7 +81,7 @@ export default function AndroidInstallGuide() {
                                     <table className="w-full text-[14px] text-left border-collapse border border-[#EEE]">
                                         <thead className="bg-[#F8F9FA] text-[#555] font-bold uppercase text-[11px]">
                                             <tr>
-                                                <th className="px-4 py-3 border border-[#EEE]">Problem</th>
+                                                <th className="px-4 py-3 border border-[#EEE]">Issue</th>
                                                 <th className="px-4 py-3 border border-[#EEE]">Solution</th>
                                             </tr>
                                         </thead>
@@ -92,7 +96,7 @@ export default function AndroidInstallGuide() {
                                             </tr>
                                             <tr>
                                                 <td className="px-4 py-4 border border-[#EEE] font-bold text-red-600">Not a Valid Zip Archive</td>
-                                                <td className="px-4 py-4 border border-[#EEE]">The file may have been corrupted during download (mobile data/Wi-Fi issues). Delete the old file and try redownloading with a different browser.</td>
+                                                <td className="px-4 py-4 border border-[#EEE]">The file may have been corrupted during download. Delete the old file and try redownloading with a different browser.</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -108,11 +112,11 @@ export default function AndroidInstallGuide() {
                         </div>
 
                         <p className="pt-4 border-t border-[#EEE] text-center italic text-[#777]">
-                            Enjoy your mobile gaming experience with LFLauncher!
+                            Enjoy your mobile gaming experience with LF Launcher!
                         </p>
 
                         <p className="text-[13px] text-[#777] text-right">
-                            Last modified: [{lastModified}]
+                            Last modified: <strong>{lastModified}</strong>
                         </p>
                     </div>
                 </div>
