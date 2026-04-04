@@ -1,6 +1,10 @@
-"use client";
-
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Android Installation Guide",
+  description: "Step-by-step guide to install Minecraft Bedrock mods, maps, resource packs and skins on Android using LF Launcher. One-click installation made simple.",
+};
 
 export default function AndroidInstallGuide() {
     const lastModified = "March 20, 2026";
@@ -38,8 +42,8 @@ export default function AndroidInstallGuide() {
                                 <p>Immediately, the game will automatically launch and perform the import process. You will see an <strong>"Import started..."</strong> notification at the top of the screen. When you receive the <strong>"Successfully imported"</strong> message, you are ready to play!</p>
 
                                 <div className="mt-4 border border-dashed border-[#DDD] p-2 bg-[#FAFAFA]">
-                                    <div className="w-full h-auto bg-white min-h-[150px] flex items-center justify-center text-[#999] italic border border-zinc-100">
-                                        [Instruction Image: Importing content on Android]
+                                    <div className="w-full h-auto bg-white flex items-center justify-center border border-zinc-100 overflow-hidden">
+                                        <img src="/images/guides/android_import_1.png" alt="Importing content on Android" className="w-full h-auto object-contain" />
                                     </div>
                                     <p className="text-[11px] text-[#999] text-center mt-2 italic">Screenshot: Import process on Android</p>
                                 </div>
@@ -65,8 +69,8 @@ export default function AndroidInstallGuide() {
                                 </div>
 
                                 <div className="mt-4 border border-dashed border-[#DDD] p-2 bg-[#FAFAFA]">
-                                    <div className="w-full h-auto bg-white min-h-[150px] flex items-center justify-center text-[#999] italic border border-zinc-100">
-                                        [Instruction Image: Activating packs in Android world settings]
+                                    <div className="w-full h-auto bg-white flex items-center justify-center border border-zinc-100 overflow-hidden">
+                                        <img src="/images/guides/android_import_2.png" alt="Activating packs in Android world settings" className="w-full h-auto object-contain" />
                                     </div>
                                     <p className="text-[11px] text-[#999] text-center mt-2 italic">Screenshot: Activating packs in settings</p>
                                 </div>

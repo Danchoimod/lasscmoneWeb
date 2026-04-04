@@ -1,6 +1,10 @@
-"use client";
-
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Use",
+  description: "Read the LF Launcher Terms of Use. Understand the rules and conditions for using our software, website, and services.",
+};
 
 export default function TermsOfService() {
   const lastModified = "March 20, 2026";

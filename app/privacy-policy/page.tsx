@@ -1,6 +1,10 @@
-"use client";
-
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Read the LF Launcher Privacy Policy. Learn how we collect, use, and protect your personal information when you use our services.",
+};
 
 export default function PrivacyPolicy() {
   const lastModified = "March 20, 2026";

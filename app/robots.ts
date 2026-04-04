@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: ['/api/packages', '/api/users', '/auth/', '/profile/', '/search/'],
+            disallow: ['/api/packages', '/api/users', '/auth/', '/profile/', '/search'],
         },
         sitemap: 'https://lflauncher.org/sitemap.xml',
     }

@@ -26,12 +26,12 @@ export default async function DownloadPage() {
         <div
           className="absolute inset-0 z-0"
           style={{
-            backgroundImage: "url('https://www.chromethemer.com/download/hd-wallpapers/minecraft-3840x2160.jpg')",
+            backgroundImage: "url('/wallpaper-download.png')",
             backgroundSize: 'cover',        /* Giúp ảnh phủ kín không bị lặp vụn vặt */
             backgroundPosition: 'center',   /* Giữ ảnh ở giữa */
             backgroundRepeat: 'no-repeat',  /* Chặn lặp hình */
-            filter: 'blur(8px)',            /* Độ mờ (có thể chỉnh từ 4px - 20px) */
-            transform: 'scale(1.1)'         /* Phóng lớn một chút để che các mép trắng khi blur */
+            filter: 'blur(3px)',            /* Độ mờ (có thể chỉnh từ 4px - 20px) */
+            transform: 'scale(1.05)'         /* Phóng lớn một chút để che các mép trắng khi blur */
           }}
         />
 

@@ -112,6 +112,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
         { id: 2, name: "Privacy Policy", param: "privacy-policy", parentId: null },
         { id: 3, name: "Windows Install Guide", param: "windows-install-guide", parentId: null },
         { id: 4, name: "Android Install Guide", param: "android-install-guide", parentId: null },
+        { id: 5, name: "Contact", param: "contact", parentId: null },
       ],
     });
   }

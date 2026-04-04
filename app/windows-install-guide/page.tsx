@@ -1,6 +1,10 @@
-"use client";
-
 import React from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Windows Installation Guide",
+  description: "Step-by-step guide to install Minecraft Bedrock content on Windows PC using LF Launcher. Install .mcpack, .mcaddon, and .mcworld files with ease.",
+};
 
 export default function WindowsInstallGuide() {
     const lastModified = "March 20, 2026";
@@ -54,8 +58,8 @@ export default function WindowsInstallGuide() {
                                 <p>The system will automatically launch Minecraft and start the import process. You will see "Import started..." followed by "Successfully imported" when finished.</p>
 
                                 <div className="mt-4 border border-dashed border-[#DDD] p-2 bg-[#FAFAFA]">
-                                    <div className="w-full h-auto bg-white min-h-[150px] flex items-center justify-center text-[#999] italic border border-zinc-100">
-                                        [Instruction Image: Installation process on Windows]
+                                    <div className="w-full h-auto bg-white flex items-center justify-center border border-zinc-100 overflow-hidden">
+                                        <img src="/images/guides/android_import_2.png" alt="Installation process on Windows" className="w-full h-auto object-contain" />
                                     </div>
                                     <p className="text-[11px] text-[#999] text-center mt-2 italic">Screenshot: Installation on Windows</p>
                                 </div>

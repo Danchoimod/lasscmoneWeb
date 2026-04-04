@@ -1,7 +1,11 @@
-"use client";
-
 import React from "react";
 import { CheckCircle2, Shield, Zap, Globe } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description: "Learn about LASSCMONE STUDIO — the team behind LF Launcher. Our mission is to make Minecraft content installation seamless for Android and PC players worldwide.",
+};
 
 export default function AboutUsPage() {
     const lastModified = "March 09, 2026";

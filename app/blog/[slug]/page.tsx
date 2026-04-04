@@ -9,6 +9,10 @@ interface Props {
     params: Promise<{ slug: string }>;
 }
 
+export function generateStaticParams() {
+    return BLOG_POSTS.map((post) => ({ slug: post.slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
     const post = BLOG_POSTS.find((p) => p.slug === slug);
@@ -16,8 +20,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!post) return { title: "Not Found" };
 
     return {
-        title: `${post.title} | Blog LF Launcher`,
+        title: post.title,
         description: post.summary,
+        openGraph: {
+            title: post.title,
+            description: post.summary,
+            type: "article",
+            publishedTime: post.date,
+            authors: [post.author],
+            images: [{ url: post.image, alt: post.title }],
+        },
     };
 }
 
@@ -31,6 +43,28 @@ export default async function BlogPostPage({ params }: Props) {
 
     return (
         <div className="bg-white min-h-screen font-sans">
+            {/* Article JSON-LD */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Article",
+                        "headline": post.title,
+                        "description": post.summary,
+                        "image": `https://lflauncher.org${post.image}`,
+                        "author": { "@type": "Person", "name": post.author },
+                        "publisher": {
+                            "@type": "Organization",
+                            "name": "LF Launcher",
+                            "logo": { "@type": "ImageObject", "url": "https://lflauncher.org/icons/icon.jpg" }
+                        },
+                        "datePublished": post.date,
+                        "dateModified": post.date,
+                        "mainEntityOfPage": { "@type": "WebPage", "@id": `https://lflauncher.org/blog/${post.slug}` }
+                    })
+                }}
+            />
             {/* Post Header */}
             <div className="relative h-[400px] w-full bg-zinc-900 overflow-hidden">
                 <Image 

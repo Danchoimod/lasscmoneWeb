@@ -44,7 +44,7 @@ const ContentCard = ({
         <Link href={`/project/${slug}`} className="flex flex-col flex-1">
           <div className="relative aspect-video w-full bg-zinc-100">
             <Image
-              src={thumbnail && thumbnail.startsWith('http') || thumbnail.startsWith('/') ? thumbnail : "https://placehold.co/600x400?text=Invalid+Image"}
+              src={thumbnail && (thumbnail.startsWith('http') || thumbnail.startsWith('/')) ? thumbnail : "/no-thumbnail.png"}
               alt={title || "Image"}
               fill
               className="object-cover"
