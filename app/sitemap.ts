@@ -13,8 +13,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
     }))
 
-    // Fetch recent packages (we might need all, but let's start with a decent amount)
-    const { packages } = await getPackages(null, 1)
+    // Fetch recent packages (increase limit to ensure better indexing)
+    const { packages } = await getPackages(null, 1, 500)
     const packageUrls = packages.map((pkg: any) => ({
         url: `${baseUrl}/project/${pkg.slug}`,
         lastModified: new Date(pkg.updatedAt || new Date()),

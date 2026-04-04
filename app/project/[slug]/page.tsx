@@ -168,7 +168,7 @@ export default async function ProjectDetailPage({
           </div>
 
           {/* Right Column */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             <ProjectSidebar
               packageId={project.id}
               title={mappedProjectData.title}
@@ -182,6 +182,33 @@ export default async function ProjectDetailPage({
               versions={project.versions}
               otherFromCreator={mappedProjectData.otherFromCreator}
             />
+
+            {/* Recommended Guides - High Value for AdSense */}
+            <div className="bg-white border border-zinc-200 p-6 shadow-sm">
+              <h3 className="text-sm font-black uppercase tracking-widest text-[#00a63e] mb-4">
+                Technical Guides
+              </h3>
+              <div className="space-y-4">
+                <a href="/blog/how-to-optimize-minecraft-fps-on-low-end-pc" className="block group">
+                  <h4 className="text-sm font-bold text-zinc-800 group-hover:text-[#00a63e] transition-colors leading-tight">
+                    How to Optimize Minecraft FPS for Low-End PCs
+                  </h4>
+                  <p className="text-[10px] text-zinc-400 mt-1 uppercase">TUTORIAL • 5 MIN READ</p>
+                </a>
+                <a href="/blog/minecraft-account-security-best-practices" className="block group border-t border-zinc-100 pt-4">
+                  <h4 className="text-sm font-bold text-zinc-800 group-hover:text-[#00a63e] transition-colors leading-tight">
+                    Keep Your Minecraft Account Secure in 2026
+                  </h4>
+                  <p className="text-[10px] text-zinc-400 mt-1 uppercase">SECURITY • 8 MIN READ</p>
+                </a>
+                <a href="/android-install-guide" className="block group border-t border-zinc-100 pt-4">
+                  <h4 className="text-sm font-bold text-zinc-800 group-hover:text-[#00a63e] transition-colors leading-tight">
+                    Step-by-Step Android Installation Guide
+                  </h4>
+                  <p className="text-[10px] text-zinc-400 mt-1 uppercase">GUIDE • 3 MIN READ</p>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </main>

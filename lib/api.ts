@@ -35,11 +35,11 @@ export async function getCarousels() {
     }
 }
 
-export async function getPackages(categorySlug?: string | null, page: number = 1) {
+export async function getPackages(categorySlug?: string | null, page: number = 1, limit: number = 10) {
     try {
-        let url = `${API_BASE_URL}/packages?page=${page}&limit=10`;
+        let url = `${API_BASE_URL}/packages?page=${page}&limit=${limit}`;
         if (categorySlug) {
-            url = `${API_BASE_URL}/categories/${categorySlug}/packages?page=${page}&limit=10`;
+            url = `${API_BASE_URL}/categories/${categorySlug}/packages?page=${page}&limit=${limit}`;
         }
         const res = await fetch(url, {
             next: { revalidate: 60 }

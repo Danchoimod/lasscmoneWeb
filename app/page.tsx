@@ -107,6 +107,75 @@ export default async function HomePage({
               </div>
             </div>
           </div>
+          {/* FAQ Section - High Value for AdSense */}
+          <div className="py-20 border-t border-zinc-100">
+            <h2 className="text-3xl font-black mb-12 tracking-tighter uppercase text-center">
+              Frequently Asked Questions
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 max-w-5xl mx-auto">
+              <div className="space-y-2">
+                <h3 className="font-bold text-lg">What is LF Launcher?</h3>
+                <p className="text-zinc-600 text-sm leading-relaxed">
+                  LF Launcher is a specialized tool for Minecraft enthusiasts on Android and Windows. It provides a unified interface to discover, download, and install mods, maps, and other community-created content with a single click.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-bold text-lg">Is LF Launcher safe to use?</h3>
+                <p className="text-zinc-600 text-sm leading-relaxed">
+                  Yes, safety is our top priority. Every file in our library is scanned for malware and verified for compatibility before being released. We use official Microsoft authentication APIs to ensure your account security.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-bold text-lg">Does it support Minecraft Bedrock?</h3>
+                <p className="text-zinc-600 text-sm leading-relaxed">
+                  Absolutely. LF Launcher is the leading platform for Bedrock Edition content on mobile devices. We specialize in handling .mcpack and .mcaddon files automatically for you.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-bold text-lg">How do I report a bug or broken mod?</h3>
+                <p className="text-zinc-600 text-sm leading-relaxed">
+                  You can report issues directly through our Discord community or by emailing our support team. We take community feedback seriously and update our library daily.
+                </p>
+              </div>
+            </div>
+
+            {/* FAQ Schema */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  "mainEntity": [
+                    {
+                      "@type": "Question",
+                      "name": "What is LF Launcher?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "LF Launcher is a specialized tool for Minecraft enthusiasts on Android and Windows, providing a unified interface for mod and map installation."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "Is LF Launcher safe to use?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, we implement rigorous security checks on all hosted content and use official Microsoft APIs for authentication."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "Does it support Minecraft Bedrock?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, it is fully optimized for Bedrock Edition, supporting automatic installation of .mcpack and .mcaddon formats."
+                      }
+                    }
+                  ]
+                })
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
