@@ -11,7 +11,7 @@ export default function ProfileSidebar() {
     const { data: session } = useSession();
     
     // Hardcoded admin email check
-    const isAdmin = session?.user?.email === 'tranphupham1989@gmail.com';
+    const isAdmin = (session?.user as any)?.status === 4;
 
     const handleLogout = async (e: React.MouseEvent) => {
         e.preventDefault();

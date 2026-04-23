@@ -23,5 +23,5 @@ export function useAdminApi() {
         return res.json();
     };
 
-    return { adminFetch, token, isAdmin: !!token && session?.user?.email === 'tranphupham1989@gmail.com' };
+    return { adminFetch, token, isAdmin: !!token && (session?.user as any)?.status === 4 };
 }

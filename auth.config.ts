@@ -8,6 +8,13 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnProfile = nextUrl.pathname.startsWith("/profile");
+            const isOnAdmin = nextUrl.pathname.startsWith("/profile/admin");
+
+            if (isOnAdmin) {
+                if (isLoggedIn && (auth?.user as any)?.status === 4) return true;
+                return Response.redirect(new URL("/", nextUrl)); // Redirect non-admins to home
+            }
+
             if (isOnProfile) {
                 if (isLoggedIn) return true;
                 return false; // Redirect unauthenticated users to login page
