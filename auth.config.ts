@@ -8,19 +8,14 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnProfile = nextUrl.pathname.startsWith("/profile");
-            const isOnAdmin = nextUrl.pathname.startsWith("/profile/admin");
 
-            if (isOnAdmin) {
-                const userStatus = (auth?.user as any)?.status;
-                if (isLoggedIn && userStatus === 4) return true;
-                return Response.redirect(new URL("/", nextUrl)); // Redirect non-admins to home
-            }
-
+            // For /profile routes (including /profile/admin), just check if logged in.
+            // Admin-specific access control is handled at the page/layout level
+            // because Edge Middleware cannot reliably read custom JWT fields like 'status'.
             if (isOnProfile) {
                 if (isLoggedIn) return true;
                 return false; // Redirect unauthenticated users to login page
             } else if (isLoggedIn && nextUrl.pathname.startsWith("/login")) {
-                // Allow access to login page even if session exists to handle expired tokens
                 return true;
             }
             return true;
