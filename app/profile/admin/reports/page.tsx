@@ -29,11 +29,11 @@ export default function ReportPage() {
 
     const fetchReports = async () => {
         try {
-            const res = await fetch("/api-backend/admin/reports", {
+            const res = await fetch("/api-backend/admin/reports?limit=100", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
-            const data = await res.json();
-            if (Array.isArray(data)) setReports(data);
+            const json = await res.json();
+            if (json.data) setReports(json.data);
         } catch (err) {
             console.error(err);
         } finally {
@@ -44,7 +44,10 @@ export default function ReportPage() {
     const handleDelete = async (id: number) => {
         if (!confirm("Delete this report?")) return;
         try {
-            const res = await fetch(`/api-backend/admin/reports/${id}`, { method: "DELETE" });
+            const res = await fetch(`/api-backend/admin/reports/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
             if (res.ok) fetchReports();
         } catch (err) {
             console.error(err);

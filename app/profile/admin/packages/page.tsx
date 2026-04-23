@@ -33,13 +33,13 @@ export default function PackagePage() {
 
   const fetchPackages = async () => {
     try {
-      const res = await fetch("/api-backend/admin/packages", {
+      const res = await fetch("/api-backend/admin/packages?limit=100", {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       });
-      const data = await res.json();
-      if (Array.isArray(data)) setPackages(data);
+      const json = await res.json();
+      if (json.data) setPackages(json.data);
     } catch (err) {
       console.error("Fetch packages failed", err);
     } finally {

@@ -30,11 +30,11 @@ export default function CommentPage() {
 
     const fetchComments = async () => {
         try {
-            const res = await fetch("/api-backend/admin/comments", {
+            const res = await fetch("/api-backend/admin/comments?limit=100", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
-            const data = await res.json();
-            if (Array.isArray(data)) setComments(data);
+            const json = await res.json();
+            if (json.data) setComments(json.data);
         } catch (err) {
             console.error(err);
         } finally {
@@ -45,7 +45,10 @@ export default function CommentPage() {
     const handleDelete = async (id: number) => {
         if (!confirm("Delete this comment?")) return;
         try {
-            const res = await fetch(`/api-backend/admin/comments/${id}`, { method: "DELETE" });
+            const res = await fetch(`/api-backend/admin/comments/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
             if (res.ok) fetchComments();
         } catch (err) {
             console.error(err);
