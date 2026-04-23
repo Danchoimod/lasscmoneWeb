@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { MainLayout } from '@/app/profile/admin/layouts/MainLayout';
 import { ChevronRight, Check, XCircle, Clock } from "lucide-react";
 import Link from "next/link";
@@ -20,6 +21,8 @@ interface Package {
 }
 
 export default function ReviewPackagePage() {
+  const { data: session } = useSession();
+  const token = (session as any)?.accessToken;
   const params = useParams();
   const router = useRouter();
   const [pkg, setPkg] = useState<Package | null>(null);
@@ -30,7 +33,9 @@ export default function ReviewPackagePage() {
     async function fetchPackage() {
       try {
         const id = params.id;
-        const res = await fetch(`/api-backend/admin/packages/${id}`);
+        const res = await fetch(`/api-backend/admin/packages/${id}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           setPkg(data);
@@ -41,8 +46,8 @@ export default function ReviewPackagePage() {
         setLoading(false);
       }
     }
-    if (params.id) fetchPackage();
-  }, [params.id]);
+    if (params.id && token) fetchPackage();
+  }, [params.id, token]);
 
   const updateStatus = async (newStatus: number) => {
     if (!pkg) return;
@@ -50,7 +55,10 @@ export default function ReviewPackagePage() {
     try {
       const res = await fetch(`/api-backend/admin/packages/${pkg.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {

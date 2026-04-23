@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { MainLayout } from '@/app/profile/admin/layouts/MainLayout';
 import UserForm from "@/components/users/UserForm";
 import { ChevronRight } from "lucide-react";
 
 export default function EditUserPage() {
+    const { data: session } = useSession();
+    const token = (session as any)?.accessToken;
     const params = useParams();
     const [initialData, setInitialData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -15,7 +18,9 @@ export default function EditUserPage() {
         async function fetchUser() {
             try {
                 const id = params.id;
-                const res = await fetch(`/api-backend/admin/users/${id}`);
+                const res = await fetch(`/api-backend/admin/users/${id}`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setInitialData(data);
@@ -26,8 +31,8 @@ export default function EditUserPage() {
                 setLoading(false);
             }
         }
-        if (params.id) fetchUser();
-    }, [params.id]);
+        if (params.id && token) fetchUser();
+    }, [params.id, token]);
 
     if (loading) return <MainLayout><div className="p-8">Loading user data...</div></MainLayout>;
     if (!initialData) return <MainLayout><div className="p-8">User not found.</div></MainLayout>;

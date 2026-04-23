@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { MainLayout } from '@/app/profile/admin/layouts/MainLayout';
 import CarouselForm from "@/components/carousels/CarouselForm";
 import { ChevronRight } from "lucide-react";
 
 export default function EditCarouselPage() {
+    const { data: session } = useSession();
+    const token = (session as any)?.accessToken;
     const params = useParams();
     const [initialData, setInitialData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -15,7 +18,9 @@ export default function EditCarouselPage() {
         async function fetchItem() {
             try {
                 const id = params.id;
-                const res = await fetch(`/api-backend/admin/carousels/${id}`);
+                const res = await fetch(`/api-backend/admin/carousels/${id}`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setInitialData(data);
@@ -26,8 +31,8 @@ export default function EditCarouselPage() {
                 setLoading(false);
             }
         }
-        if (params.id) fetchItem();
-    }, [params.id]);
+        if (params.id && token) fetchItem();
+    }, [params.id, token]);
 
     if (loading) return <MainLayout><div className="p-8">Loading carousel data...</div></MainLayout>;
     if (!initialData) return <MainLayout><div className="p-8">Item not found.</div></MainLayout>;
