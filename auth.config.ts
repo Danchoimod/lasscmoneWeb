@@ -11,7 +11,8 @@ export const authConfig = {
             const isOnAdmin = nextUrl.pathname.startsWith("/profile/admin");
 
             if (isOnAdmin) {
-                if (isLoggedIn && (auth?.user as any)?.status === 4) return true;
+                const userStatus = (auth?.user as any)?.status;
+                if (isLoggedIn && userStatus === 4) return true;
                 return Response.redirect(new URL("/", nextUrl)); // Redirect non-admins to home
             }
 

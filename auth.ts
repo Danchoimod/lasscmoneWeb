@@ -124,12 +124,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async jwt({ token, user }) {
             // Initial sign in
             if (user) {
-                console.log("[Auth] JWT Initial sign in. User has refreshToken:", !!(user as any).refreshToken);
+                console.log("[Auth] JWT Initial sign in. User status:", (user as any).user?.status);
                 return {
                     accessToken: (user as any).accessToken,
                     refreshToken: (user as any).refreshToken,
                     accessTokenExpires: Date.now() + ((user as any).expiresIn || 3600) * 1000,
                     user: (user as any).user,
+                    status: (user as any).user?.status, // Put status at top level of token
                 };
             }
 
@@ -149,6 +150,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (token) {
                 (session as any).accessToken = token.accessToken;
                 (session as any).user = token.user as any;
+                if ((session as any).user) {
+                    (session as any).user.status = token.status; // Ensure status is in user object
+                }
                 (session as any).error = token.error;
             }
             return session;
