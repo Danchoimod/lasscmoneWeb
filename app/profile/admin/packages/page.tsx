@@ -174,8 +174,8 @@ export default function PackagePage() {
                       </button>
                     )}
                     <Link
-                      href={`/packages/${p.id}/review`}
-                      className="text-amber-600 hover:text-amber-900 font-bold uppercase text-[10px] tracking-wider"
+                      href={`/profile/admin/packages/${p.id}/review`}
+                      className="text-indigo-600 hover:text-indigo-900 font-bold uppercase text-[10px] tracking-wider"
                     >
                       Review
                     </Link>

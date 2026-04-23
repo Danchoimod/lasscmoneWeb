@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Save } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface Category {
     id: number;
@@ -17,6 +18,9 @@ interface CategoryFormProps {
 
 export default function CategoryForm({ initialData, isEdit }: CategoryFormProps) {
     const router = useRouter();
+    const { data: session } = useSession();
+    const token = (session as any)?.accessToken;
+
     const [loading, setLoading] = useState(false);
     const [allCategories, setAllCategories] = useState<Category[]>([]);
     const [formData, setFormData] = useState({
@@ -26,15 +30,21 @@ export default function CategoryForm({ initialData, isEdit }: CategoryFormProps)
     });
 
     useEffect(() => {
-        fetch("/api-backend/admin/categories")
+        if (token) {
+            fetch("/api-backend/admin/categories", {
+                headers: { "Authorization": `Bearer ${token}` }
+            })
             .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setAllCategories(data.filter(c => c.id !== initialData?.id));
+            .then(json => {
+                const data = json.data || json;
+                if (Array.isArray(data)) setAllCategories(data.filter((c: any) => c.id !== initialData?.id));
             });
-    }, [initialData?.id]);
+        }
+    }, [initialData?.id, token]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!token) return;
         setLoading(true);
         const method = isEdit ? "PUT" : "POST";
         const url = isEdit ? `/api-backend/admin/categories/${initialData.id}` : "/api-backend/admin/categories";
@@ -42,7 +52,10 @@ export default function CategoryForm({ initialData, isEdit }: CategoryFormProps)
         try {
             const res = await fetch(url, {
                 method,
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     ...formData,
                     parentId: formData.parentId ? parseInt(formData.parentId) : null,
@@ -63,59 +76,58 @@ export default function CategoryForm({ initialData, isEdit }: CategoryFormProps)
     return (
         <div className="max-w-2xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
-                <Link href="/profile/admin/categories" className="flex items-center text-gray-500 hover:text-gray-800 transition-colors">
-                    <ChevronLeft size={20} className="mr-1" /> Back to list
+                <Link href="/profile/admin/categories" className="flex items-center text-[10px] font-bold uppercase text-gray-400 hover:text-indigo-600 transition-colors tracking-widest">
+                    <ChevronLeft size={14} className="mr-1" /> Back to list
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-800">{isEdit ? "Edit Category" : "New Category"}</h1>
+                <h1 className="text-xl font-bold text-gray-800 uppercase tracking-tight italic">{isEdit ? "Refine Category" : "New Classification"}</h1>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 space-y-6">
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Category Name</label>
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl shadow-indigo-500/5 border border-gray-100 p-8 space-y-8">
+                <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Category Name</label>
                     <input
                         type="text"
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                        className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                         placeholder="e.g. Action Games"
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Param (Slug)</label>
+                <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">URL Param (Slug)</label>
                     <input
                         type="text"
                         required
                         value={formData.param}
                         onChange={(e) => setFormData({ ...formData, param: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono"
+                        className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-mono text-sm"
                         placeholder="action-games"
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Parent Category (Optional)</label>
+                <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Parent Hierarchy (Optional)</label>
                     <select
                         value={formData.parentId}
                         onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full px-5 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold text-xs uppercase appearance-none"
                     >
-                        <option value="">None (Top Level)</option>
+                        <option value="">None (Root Category)</option>
                         {allCategories.map((c) => (
                             <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
                     </select>
                 </div>
 
-                <div className="pt-6 flex justify-end">
+                <div className="pt-6">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 flex items-center shadow-md transition-all disabled:opacity-50"
+                        className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50 flex justify-center items-center active:scale-[0.98]"
                     >
-                        <Save size={18} className="mr-2" />
-                        {loading ? "Saving..." : isEdit ? "Update Category" : "Save Category"}
+                        {loading ? "Syncing..." : <><Save size={16} className="mr-2" /> {isEdit ? "Update Metadata" : "Finalize Category"}</>}
                     </button>
                 </div>
             </form>
