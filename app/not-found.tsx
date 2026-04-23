@@ -39,7 +39,7 @@ export default function NotFound() {
                             <FileText className="text-zinc-300" size={32} />
                             <span className="text-xs font-bold uppercase tracking-wider">Latest Blog News</span>
                         </Link>
-                        <Link href="/download" className="flex flex-col items-center gap-3 p-6 border border-zinc-100 hover:border-green-600 transition-colors">
+                        <Link href="https://lflauncher.vercel.app" className="flex flex-col items-center gap-3 p-6 border border-zinc-100 hover:border-green-600 transition-colors">
                             <Download className="text-zinc-300" size={32} />
                             <span className="text-xs font-bold uppercase tracking-wider">Download Launcher</span>
                         </Link>

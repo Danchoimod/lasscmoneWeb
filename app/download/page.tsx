@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { Download, ChevronRight, ShieldCheck, Zap, Heart } from "lucide-react";
 import { getLatestUpdates } from "@/lib/api";
 import FAQSection from "@/components/features/FAQSection";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Download LF Launcher - Windows & Android",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DownloadPage() {
+  redirect('https://lflauncher.vercel.app');
   const { windows: windowsUpdate, android: androidUpdate } = await getLatestUpdates();
 
   const latestUpdate = windowsUpdate || androidUpdate;

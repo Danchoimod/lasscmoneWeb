@@ -222,7 +222,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
 
           {/* Download Button - Changed to rounded-none */}
           <Link
-            href="/download"
+            href="https://lflauncher.vercel.app"
             className="hidden md:block bg-[#D4A017] hover:bg-[#C19214] text-white font-bold px-4 py-1.5 rounded-none text-xs transition-colors"
           >
             DOWNLOAD
@@ -312,7 +312,7 @@ const Navbar = ({ initialCategories = [] }: NavbarProps) => {
           <div className="flex flex-col gap-2 p-6 bg-gray-50">
             {/* Mobile Buttons - Changed to rounded-none */}
             <Link
-              href="/download"
+              href="https://lflauncher.vercel.app"
               className="w-full bg-[#D4A017] text-white font-bold py-3 text-sm text-center rounded-none shadow-sm"
               onClick={() => setOpen(false)}
             >
