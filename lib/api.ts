@@ -209,7 +209,7 @@ export async function loginWithDiscord(code: string) {
         });
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            return { success: false, error: errorData.message || "Failed to login with Discord" };
+            return { success: false, error: errorData.error || errorData.message || errorData.details || "Failed to login with Discord" };
         }
         const result = await res.json();
         if (result.status === "success" && result.data?.idToken) {
