@@ -24,7 +24,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 export async function getCarousels() {
     try {
         const res = await fetch(`${API_BASE_URL}/carousels`, {
-            next: { revalidate: 3600 }
+            next: { revalidate: 60 }
         });
         if (!res.ok) return [];
         const result = await res.json();
